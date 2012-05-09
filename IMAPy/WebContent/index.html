@@ -3,27 +3,38 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<link href="style.css" media="all" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<p id="list">some text</p>
+<div id="item"></div>
+<div id="nav"> 
+	<div id="sources">some text</div>
+	<div id="collection"></div>
+</div>
+<div id="cleaner"></div>
+
 <script type='text/javascript' src='fnsack-all-0.6.0.js'></script>
 <script type='text/javascript'>
-
-var data = { what: "web", state: "dead" },  
-msg = fs.str.format("{what} is {state}", data),  
-div;  
-
-fs.dom.append( document.body,   
-div=fs.dom.create("div", {style: "color:red;"}, msg) );  
- 
-fs.dom.addListener(div, "click", function(event){  
-  fs.dom.remove(this);  
-});  
-
-var feed = fs.ajax.loadSync( { url : "http://localhost:8088/FeedServer/rss" } );
-obj = JSON.parse(feed);
-fs.dom.append( document.body,   
-		div=fs.dom.create("div", {style: "color:red;"}, obj.title) );  
+var feed = fs.ajax.loadSync( { url : "/IMAPy/imap" } );
+var obj = JSON.parse(feed);
+var l = obj.items.length;
+var createText = function(str) {
+	var txt = str;
+	return function(event) { 			
+		var it = document.getElementById("item");
+		fs.dom.removeChildNodes(it);
+		fs.dom.append(it, fs.dom.create("p", {'class':'btn'}, str) 
+		);
+	} 
+};
+for (var idx = 0; idx < l; ++idx) {
+	var col = document.getElementById("collection");
+	fs.dom.append(col, div=fs.dom.create("p", {'class':'btn'}, 
+			obj.items[idx].title, fs.dom.create("br"), obj.items[idx].author) );
+	fs.dom.addListener(div, "click", createText(obj.items[idx].content));
+}
+var col = document.getElementById("collection");
+fs.dom.style(col, "max-height", window.innerHeight+"px");
 </script>
 </body>
 </html>

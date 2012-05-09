@@ -11,4 +11,14 @@
     <servlet-name>RSSServlet</servlet-name>
     <url-pattern>/rss</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>IMAPServlet</display-name>
+    <servlet-name>IMAPServlet</servlet-name>
+    <servlet-class>de.jalin.feedserver.IMAPServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IMAPServlet</servlet-name>
+    <url-pattern>/imap</url-pattern>
+  </servlet-mapping>
 </web-app>

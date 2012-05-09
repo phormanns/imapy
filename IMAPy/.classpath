@@ -6,8 +6,16 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="/usr/share/java/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jsoup-1.6.2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mail.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/activation.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/dsn.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/imap.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mailapi.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/pop3.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/smtp.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -1,0 +1,42 @@
+body {
+	margin:0px;
+	padding:0px;
+	color:black; 
+}
+#nav { 
+	margin: 0px 394px 0px 0px; 
+	width:50%;
+}
+#sources { 
+	margin:0px;
+	padding:0px;
+	float:left;  
+	width:50%; 
+	max-height:500px;
+	overflow:auto; 
+}
+#collection { 
+	margin:0px;
+	padding:0px;
+	width:50%; 
+	max-height:500px;
+	overflow:auto; 
+}
+#item { 
+	float:right; 
+	margin:0px; 
+	padding:0px; 
+	width:50%; 
+	max-height:500px;
+	overflow:auto; 
+}
+#cleaner { 
+	clear:both; 
+}
+.btn { 
+	margin:3px; 
+	padding:1px;
+	border-style:solid;
+	border-color:grey;
+	border-width:1px 3px 3px 1px; 
+}
