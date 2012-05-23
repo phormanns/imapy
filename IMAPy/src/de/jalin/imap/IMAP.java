@@ -9,6 +9,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.mail.FetchProfile;
+import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -37,9 +38,19 @@ public class IMAP {
 	public List<Map<String, String>> getFolders() {
 		List<Map<String, String>> fdList = new ArrayList<Map<String, String>>();
 		for (String fdName : folders.keySet()) {
+			Folder fd = folders.get(fdName);
 			Map<String,String> map = new HashMap<String, String>();
-			map.put("title", folders.get(fdName).getName());
-			map.put("id", fdName);
+			map.put("folder", fdName);
+			map.put("title", fd.getName());
+			try {
+				map.put("ntotal", Integer.toString(fd.getMessageCount()));
+				map.put("nunread", Integer.toString(fd.getUnreadMessageCount()));
+				map.put("nunseen", Integer.toString(fd.getNewMessageCount()));
+			} catch (MessagingException e) {
+				map.put("ntotal", "?");
+				map.put("nunread", "?");
+				map.put("nunseen", "?");
+			}
 			fdList.add(map);
 		}
 		return fdList;
@@ -49,11 +60,14 @@ public class IMAP {
 		List<Map<String, String>> msgList = new ArrayList<Map<String, String>>();
 		try {
 			Folder folder = folders.get(folderName);
-			folder.open(Folder.READ_ONLY);
+			if (!folder.isOpen()) {
+				folder.open(Folder.READ_ONLY);
+			}
 			Message[] messages = folder.getMessages();
 			FetchProfile fp = new FetchProfile();
 			fp.add(FetchProfile.Item.ENVELOPE);
 			fp.add(FetchProfile.Item.CONTENT_INFO);
+			fp.add(FetchProfile.Item.FLAGS);
 			folder.fetch(messages, fp);
 			folder.close(false);
 			for (Message msg : messages) {
@@ -62,6 +76,7 @@ public class IMAP {
 				map.put("title", MimeParser.getSubject(msg));
 				map.put("author", MimeParser.getFromAddress(msg));
 				map.put("folder", folderName);
+				map.put("status", msg.isSet(Flag.SEEN) ? "seen" : "new");
 				msgList.add(map);
 			}
 		} catch (MessagingException e) {
@@ -74,7 +89,7 @@ public class IMAP {
 		Map<String, String> item = new HashMap<String, String>();
 		try {
 			Folder folder = folders.get(folderName);
-			folder.open(Folder.READ_ONLY);
+			folder.open(Folder.READ_WRITE);
 			Message msg = folder.getMessage(Integer.parseInt(msgId));
 			item.put("folder", folderName);
 			item.put("idx", msgId);
@@ -84,7 +99,8 @@ public class IMAP {
 				MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
 				item.put("content", messageData.getFormattedText());
 			}
-			folder.close(false);
+			msg.setFlag(Flag.SEEN, true);
+			folder.close(true);
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);
 		}

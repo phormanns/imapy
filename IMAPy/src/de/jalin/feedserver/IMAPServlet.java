@@ -27,11 +27,9 @@ public class IMAPServlet extends HttpServlet {
 		String host = (String) session.getAttribute("host");
 		String user = (String) session.getAttribute("user");
 		String password = (String) session.getAttribute("password");
+		String email = (String) session.getAttribute("email");
 		IMAP imap = (IMAP) session.getAttribute("imap");
 		String folder = request.getParameter("fd");
-		if (folder == null) {
-			folder = "INBOX";
-		}
 		String msg = request.getParameter("msg");
 		try {
 			if (imap == null) {
@@ -39,24 +37,45 @@ public class IMAPServlet extends HttpServlet {
 				session.setAttribute("imap", imap);
 			}
 			JSONObject jsonObject = new JSONObject();
-			if (msg != null) {
-				Map<String,String> msgItem = imap.getMessage(folder, msg);
-				jsonObject.put("title", msgItem.get("title"));
-				jsonObject.put("folder", msgItem.get("folder"));
-				jsonObject.put("content", msgItem.get("content"));
-				jsonObject.put("author", msgItem.get("author"));
-			} else {
-				List<Map<String,String>> list = imap.getMessages(folder);
-				jsonObject.put("title", user + "@" + host);
+			if (folder == null) {
+				List<Map<String,String>> list = imap.getFolders();
+				jsonObject.put("title", email);
 				JSONArray jsonArray = new JSONArray();
 				jsonObject.put("items", jsonArray);
 				for (Map<String, String> item : list) {
 					JSONObject jsonItem = new JSONObject();
-					jsonItem.put("author", item.get("author"));
-					jsonItem.put("title", item.get("title"));
+					String title = item.get("folder");
+					if (title.startsWith("INBOX.")) {
+						title = title.substring(6);
+					}
+					jsonItem.put("title", title);
 					jsonItem.put("folder", item.get("folder"));
-					jsonItem.put("idx", item.get("idx"));
+					jsonItem.put("ntotal", item.get("ntotal"));
+					jsonItem.put("nunread", item.get("nunread"));
+					jsonItem.put("nunseen", item.get("nunseen"));
 					jsonArray.add(jsonItem);
+				}
+			} else {
+				if (msg == null) {
+					List<Map<String,String>> list = imap.getMessages(folder);
+					jsonObject.put("title", email);
+					JSONArray jsonArray = new JSONArray();
+					jsonObject.put("items", jsonArray);
+					for (Map<String, String> item : list) {
+						JSONObject jsonItem = new JSONObject();
+						jsonItem.put("author", item.get("author"));
+						jsonItem.put("title", item.get("title"));
+						jsonItem.put("folder", item.get("folder"));
+						jsonItem.put("idx", item.get("idx"));
+						jsonItem.put("status", item.get("status"));
+						jsonArray.add(jsonItem);
+					}
+				} else {
+					Map<String,String> msgItem = imap.getMessage(folder, msg);
+					jsonObject.put("title", msgItem.get("title"));
+					jsonObject.put("folder", msgItem.get("folder"));
+					jsonObject.put("content", msgItem.get("content"));
+					jsonObject.put("author", msgItem.get("author"));
 				}
 			}
 			response.setContentType("application/json");

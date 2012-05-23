@@ -74,7 +74,7 @@ public class MessageData {
 	}
 
 	public String getFormattedText() {
-		int maxlen = 82;
+		int maxlen = 64;
 		int blank = maxlen - 10;
 		StringBuffer formated = new StringBuffer();
 		try {

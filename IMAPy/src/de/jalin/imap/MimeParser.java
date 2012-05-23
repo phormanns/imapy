@@ -27,9 +27,7 @@ public class MimeParser {
 		String subject = getSubject(mimeMsg);
 		Date sentDate = getSentDate(mimeMsg);
 		String messageID = getMessageID(mimeMsg);
-		MessageData msg = new MessageData(fromEMail, subject, 
-				df.format(sentDate),
-				messageID);
+		MessageData msg = new MessageData(fromEMail, subject, df.format(sentDate), messageID);
 		msg.setAttached("");
 		msg.setText("");
 		try {
