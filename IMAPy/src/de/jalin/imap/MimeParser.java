@@ -1,4 +1,4 @@
-package de.jalin.javamail;
+package de.jalin.imap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,47 +11,18 @@ import java.util.Date;
 import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.Flags;
-import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import de.jalin.jspwiki.plugin.imap.IMAPProxy;
-import de.jalin.jspwiki.plugin.imap.MessageBox;
-import de.jalin.message.MessageData;
-import de.jalin.message.MessageList;
 
-public class EMailReader {
+public class MimeParser {
 
 	public static final DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
 
-	public static MessageBox getMessageBox(String imapHost, String imapUser, String imapPassword) {
-		return IMAPProxy.getInstance().getMessageBox(imapHost, imapUser, imapPassword);
-	}
-
-	public static MessageList readEMailFolder(Folder folder, int level) {
-		MessageList msgList = new MessageList(folder.getFullName(), folder.getName(), level);
-		try {
-			folder.open(Folder.READ_ONLY);
-			Message[] messagesArray = folder.getMessages();
-			for (int msgsIdx = 0; msgsIdx < messagesArray.length; msgsIdx++) {
-				Message msg = messagesArray[msgsIdx];
-				if (msg instanceof MimeMessage) {
-					MimeMessage mimeMsg = (MimeMessage) msg;
-					MessageData messageData = readEMailMessage(mimeMsg);
-					msgList.put(messageData.getMessageID(), messageData);
-				}
-			}
-			folder.close(false);
-		} catch (MessagingException e) {
-			msgList.setNotReadable(true);
-		}
-		return msgList;
-	}
-
-	public static MessageData readEMailMessage(MimeMessage mimeMsg) {
+	public static MessageData parseMimeMessage(MimeMessage mimeMsg) {
 		String fromEMail = getFromAddress(mimeMsg);
 		String subject = getSubject(mimeMsg);
 		Date sentDate = getSentDate(mimeMsg);
@@ -106,9 +77,9 @@ public class EMailReader {
 		return msg;
 	}
 
-	private static String getFromAddress(MimeMessage mimeMsg) {
+	public static String getFromAddress(Message msg) {
 		try {
-			Address address = mimeMsg.getFrom()[0];
+			Address address = msg.getFrom()[0];
 			String fromEMail = 
 				address instanceof InternetAddress 
 					? ((InternetAddress) address).getAddress().toLowerCase()
@@ -119,7 +90,7 @@ public class EMailReader {
 		}
 	}
 
-	private static Date getSentDate(MimeMessage mimeMsg) {
+	public static Date getSentDate(Message mimeMsg) {
 		try {
 			return mimeMsg.getSentDate();
 		} catch (MessagingException e) {
@@ -131,15 +102,18 @@ public class EMailReader {
 		try {
 			String messageID = mimeMsg.getMessageID();
 			return messageID.substring(1, messageID.length() - 1);
+		} catch (NullPointerException e) {
+			return Long.toHexString(System.currentTimeMillis())
+				+ "@" + Thread.currentThread().toString();
 		} catch (MessagingException e) {
 			return Long.toHexString(System.currentTimeMillis())
 				+ "@" + Thread.currentThread().toString();
 		}
 	}
 
-	private static String getSubject(MimeMessage mimeMsg) {
+	public static String getSubject(Message msg) {
 		try {
-			String subj = mimeMsg.getSubject();
+			String subj = msg.getSubject();
 			if (subj != null && subj.length() > 0) {
 				return subj;
 			} else {

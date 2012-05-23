@@ -1,4 +1,4 @@
-package de.jalin.message;
+package de.jalin.imap;
 
 public class TextUtil {
 

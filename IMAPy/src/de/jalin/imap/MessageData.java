@@ -1,10 +1,11 @@
-package de.jalin.message;
+package de.jalin.imap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 
 import org.jsoup.Jsoup;
+
 
 public class MessageData {
 
@@ -17,8 +18,7 @@ public class MessageData {
 	private boolean isNew;
 	private boolean isFlagged;
 
-	public MessageData(String from, String subject, String sent,
-			String messageID) {
+	public MessageData(String from, String subject, String sent, String messageID) {
 		this.isNew = true;
 		this.isFlagged = false;
 		this.setFrom(from);

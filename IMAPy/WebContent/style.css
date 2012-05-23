@@ -2,6 +2,19 @@ body {
 	margin:0px;
 	padding:0px;
 	color:black; 
+	font-family: Verdana, Arial, Sans-serif;
+	font-style: normal;
+	font-size: 12pt;
+}
+p {
+	font-family: Verdana, Arial, Sans-serif;
+	font-style: normal;
+	font-size: 12pt;
+}
+pre {
+	font-family: Verdana, Arial, Sans-serif;
+	font-style: normal;
+	font-size: 12pt;
 }
 #nav { 
 	margin: 0px 394px 0px 0px; 

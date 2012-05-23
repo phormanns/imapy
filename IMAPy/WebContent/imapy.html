@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>IMAPy EMails</title>
+<link href="style.css" media="all" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="item"></div>
+<div id="nav"> 
+	<div id="sources">some text</div>
+	<div id="collection"></div>
+</div>
+<div id="cleaner"></div>
+
+<script type='text/javascript' src='fnsack-all-0.6.0.js'></script>
+<script type='text/javascript'>
+var feed = fs.ajax.loadSync( { url : "/IMAPy/imap" } );
+var obj = JSON.parse(feed);
+var l = obj.items.length;
+var createText = function(idx, fd) {
+	var _idx = idx;
+	var _fd = fd;
+	return function(event) {
+		var json = fs.ajax.loadSync( { url : "/IMAPy/imap?fd=" + _fd + "&msg=" + _idx } );
+		var o = JSON.parse(json);
+		var it = document.getElementById("item");
+		fs.dom.removeChildNodes(it);
+		fs.dom.append(it, fs.dom.create("pre", {'class':'btn'}, fs.str.unescapeHTML(o.content)) 
+		);
+	} 
+};
+for (var idx = 0; idx < l; ++idx) {
+	var col = document.getElementById("collection");
+	fs.dom.append(col, div=fs.dom.create("p", {'class':'btn'}, 
+			obj.items[idx].title, fs.dom.create("br"), obj.items[idx].author) );
+	fs.dom.addListener(div, "click", createText(obj.items[idx]['idx'], obj.items[idx]['folder']));
+}
+fs.dom.style(document.getElementById("item"), "max-height", window.innerHeight+"px");
+fs.dom.style(document.getElementById("nav"), "max-height", window.innerHeight+"px");
+fs.dom.style(document.getElementById("sources"), "max-height", window.innerHeight+"px");
+fs.dom.style(document.getElementById("collection"), "max-height", window.innerHeight+"px");
+</script>
+</body>
+</html>

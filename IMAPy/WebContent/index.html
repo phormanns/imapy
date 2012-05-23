@@ -2,39 +2,19 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>IMAPy Login</title>
 <link href="style.css" media="all" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<div id="item"></div>
-<div id="nav"> 
-	<div id="sources">some text</div>
-	<div id="collection"></div>
-</div>
-<div id="cleaner"></div>
-
-<script type='text/javascript' src='fnsack-all-0.6.0.js'></script>
-<script type='text/javascript'>
-var feed = fs.ajax.loadSync( { url : "/IMAPy/imap" } );
-var obj = JSON.parse(feed);
-var l = obj.items.length;
-var createText = function(str) {
-	var txt = str;
-	return function(event) { 			
-		var it = document.getElementById("item");
-		fs.dom.removeChildNodes(it);
-		fs.dom.append(it, fs.dom.create("p", {'class':'btn'}, str) 
-		);
-	} 
-};
-for (var idx = 0; idx < l; ++idx) {
-	var col = document.getElementById("collection");
-	fs.dom.append(col, div=fs.dom.create("p", {'class':'btn'}, 
-			obj.items[idx].title, fs.dom.create("br"), obj.items[idx].author) );
-	fs.dom.addListener(div, "click", createText(obj.items[idx].content));
-}
-var col = document.getElementById("collection");
-fs.dom.style(col, "max-height", window.innerHeight+"px");
-</script>
+	<form action="login" method="post">
+		<fieldset>
+			<legend>Anmeldung</legend>
+			<table>
+				<tr><td>E-Mail Adresse</td><td><input type="text" size="48" maxlength="72" name="email"></td></tr>
+				<tr><td>Passwort</td><td><input type="password" size="48" maxlength="48" name="password"></td></tr>
+				<tr><td><input type="submit" value=" Absenden "></td><td>&nbsp; </td></tr>
+			</table>
+		</fieldset>
+	</form>
 </body>
 </html>
