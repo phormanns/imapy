@@ -1,0 +1,16 @@
+body { font-family: Helvetica, Arial; padding: 0; margin: 0; }
+.folders { background-color: #bbb; list-style-type: none; padding: 0; margin: 0; border-radius: 7px; 
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #d6d6d6), color-stop(0.4, #c0c0c0), color-stop(1,#a4a4a4)); 
+	margin: 10px 0 16px 0;
+	font-size: 0px;
+}
+.folders li:hover { background-color: #ddd; }    
+.folders li:first-child { border-top: none; border-radius: 7px 7px 0 0; }
+.folders li:last-child { border-bottom: none; border-radius: 0 0 7px 7px; }
+.folders li { font-size: 16px; font-weight: bold; padding: 0.5em 1.5em; cursor: pointer; color: #444; text-shadow: #f7f7f7 0 1px 1px; border-top: 1px solid #ddd; border-bottom: 1px solid #888; margin-left:6px;}
+.folders .selected { background-color: #444 !important; color: white; text-shadow:none; border-right-color: #aaa; border-left: none; box-shadow:inset 1px 2px 6px #070707; }    
+.folders .unread {  border-left: 4px solid #D22; }  
+.viewMail .mailInfo { background-color: #dae0e8; padding: 1em 1em 0.5em 1.25em; border-radius: 1em; }
+.viewMail .mailInfo h1 { margin-top: 0.2em; font-size: 130%; }
+.viewMail .mailInfo label { color: #777; font-weight: bold; min-width: 2.75em; text-align:right; display: inline-block; }
+.viewMail .message { padding: 0 1.25em; }

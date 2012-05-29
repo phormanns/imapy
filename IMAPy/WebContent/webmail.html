@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>IMAPy Webmail</title>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="knockout/knockout.js"></script>
+    <script type="text/javascript" src="knockout/sammy.js"></script>
+    <link rel="Stylesheet" href="knockout/webmail.css" />
+</head>
+<body>
+    <!-- Folders -->
+    <div style="float:left; width:50%; margin:0; padding:0;">
+	    <div class="calcSize" style="width:50%; height:480px; overflow-y:scroll; overflow-x:hidden; float:left;" data-bind="with: folders">
+		    <ul class="folders" data-bind="foreach: items">
+		        <li data-bind="text: title + ' (' + nunread + '/' + ntotal + ')', 
+		                       css: { selected: folder == $root.chosenFolderId(), unread: nunread > 0 },
+		                       click: $root.goToFolder"></li>
+		    </ul>
+	    </div>
+	    <!-- Mails -->
+	    <div class="calcSize" style="width:50%; height:480px; overflow-y:scroll; overflow-x:hidden;" data-bind="with: chosenFolderData">
+		    <ul class="folders" data-bind="foreach: mails">
+		        <li data-bind="css: { selected: id == $root.chosenMailId(), unread: status == 'new' },
+		                       click: $root.goToMail"><span data-bind="text: subject"></span><br /><span data-bind="text: from"></span></li>
+		    </ul>
+	    </div>
+	</div>
+    <div class="calcSize viewMail" style="width:50%; height:480px; overflow-y:scroll; overflow-x:scroll;margin:0;padding:0;" data-bind="with: chosenMailData">
+        <div class="mailInfo">
+            <h1 data-bind="text: subject"></h1>
+            <p>
+	            <label>From</label>: <span data-bind="text: from"></span><br />
+	            <label>To</label>: <span data-bind="text: to"></span><br />
+	            <label>Date</label>: <span data-bind="text: date"></span>
+            </p>
+        </div>
+        <p class="message" data-bind="html: messageContent"> </p>
+    </div>
+    <script type="text/javascript">
+        function WebmailViewModel() {
+            // Data
+            var self = this;
+            self.folders = ko.observable();
+            $.get("mail", { }, self.folders);
+            self.chosenFolderId = ko.observable();
+            self.chosenFolderData = ko.observable();
+            self.chosenMailId = ko.observable();
+            self.chosenMailData = ko.observable();
+
+            // Behaviours    
+            self.goToFolder = function (item) { location.hash = item.folder };
+            self.goToMail = function (mail) { mail.status = 'seen'; location.hash = mail.folder + '/' + mail.id };
+
+            // Client-side routes    
+            Sammy(function () {
+                this.get('#:folder', function () {
+                    self.chosenFolderId(this.params.folder);
+                    self.chosenMailId(null);
+                    self.chosenMailData(null);
+                    $.get("mail", { folder: this.params.folder }, self.chosenFolderData);
+                });
+                this.get('#:folder/:mailId', function () {
+                    self.chosenFolderId(this.params.folder);
+                    self.chosenMailId(this.params.mailId);
+                    $.get("mail", { mailId: this.params.mailId, folder: this.params.folder }, self.chosenMailData);
+                });
+                this.get('', function () { this.app.runRoute('get', '#INBOX') });
+            }).run();
+        };
+
+        ko.applyBindings(new WebmailViewModel());
+        $("div.calcSize").css("height", window.innerHeight+"px")
+    </script>
+
+</body>
+</html>

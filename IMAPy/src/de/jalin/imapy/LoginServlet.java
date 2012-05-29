@@ -68,7 +68,7 @@ public class LoginServlet extends HttpServlet {
 			session.setAttribute("user", user);
 			session.setAttribute("password", password);
 			session.setAttribute("email", emailAddr);
-			response.sendRedirect("imapy.html");
+			response.sendRedirect("webmail.html");
 		} catch (ParserConfigurationException e) {
 			throw new ServletException(e);
 		} catch (SAXException e) {

@@ -93,11 +93,15 @@ public class IMAP {
 			Message msg = folder.getMessage(Integer.parseInt(msgId));
 			item.put("folder", folderName);
 			item.put("idx", msgId);
+			item.put("date", "heute");
 			item.put("title", MimeParser.getSubject(msg));
 			item.put("author", MimeParser.getFromAddress(msg));
+			item.put("subject", MimeParser.getSubject(msg));
+			item.put("from", MimeParser.getFromAddress(msg));
+			item.put("to", MimeParser.getToAddress(msg));
 			if (msg instanceof MimeMessage) {
 				MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
-				item.put("content", messageData.getFormattedText());
+				item.put("content", "<pre>" + messageData.getFormattedText() + "</pre>");
 			}
 			msg.setFlag(Flag.SEEN, true);
 			folder.close(true);

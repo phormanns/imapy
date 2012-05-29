@@ -29,8 +29,8 @@ public class IMAPServlet extends HttpServlet {
 		String password = (String) session.getAttribute("password");
 		String email = (String) session.getAttribute("email");
 		IMAP imap = (IMAP) session.getAttribute("imap");
-		String folder = request.getParameter("fd");
-		String msg = request.getParameter("msg");
+		String folder = request.getParameter("folder");
+		String msg = request.getParameter("mailId");
 		try {
 			if (imap == null) {
 				imap = new IMAP(host, user, password);
@@ -48,6 +48,9 @@ public class IMAPServlet extends HttpServlet {
 					if (title.startsWith("INBOX.")) {
 						title = title.substring(6);
 					}
+					if (title.equalsIgnoreCase("INBOX")) {
+						title = "Posteingang";
+					}
 					jsonItem.put("title", title);
 					jsonItem.put("folder", item.get("folder"));
 					jsonItem.put("ntotal", item.get("ntotal"));
@@ -60,21 +63,31 @@ public class IMAPServlet extends HttpServlet {
 					List<Map<String,String>> list = imap.getMessages(folder);
 					jsonObject.put("title", email);
 					JSONArray jsonArray = new JSONArray();
-					jsonObject.put("items", jsonArray);
+					jsonObject.put("mails", jsonArray);
 					for (Map<String, String> item : list) {
 						JSONObject jsonItem = new JSONObject();
+						jsonItem.put("from", item.get("author"));
+						jsonItem.put("to", item.get("author"));
+						jsonItem.put("subject", item.get("title"));
+						jsonItem.put("date", "heute");
+						jsonItem.put("id", item.get("idx"));
 						jsonItem.put("author", item.get("author"));
 						jsonItem.put("title", item.get("title"));
 						jsonItem.put("folder", item.get("folder"));
 						jsonItem.put("idx", item.get("idx"));
 						jsonItem.put("status", item.get("status"));
-						jsonArray.add(jsonItem);
+						jsonArray.add(0, jsonItem);
 					}
 				} else {
 					Map<String,String> msgItem = imap.getMessage(folder, msg);
+					jsonObject.put("id", msgItem.get("idx"));
+					jsonObject.put("to", msgItem.get("to"));
+					jsonObject.put("from", msgItem.get("from"));
+					jsonObject.put("subject", msgItem.get("subject"));
 					jsonObject.put("title", msgItem.get("title"));
+					jsonObject.put("date", msgItem.get("date"));
 					jsonObject.put("folder", msgItem.get("folder"));
-					jsonObject.put("content", msgItem.get("content"));
+					jsonObject.put("messageContent", msgItem.get("content"));
 					jsonObject.put("author", msgItem.get("author"));
 				}
 			}

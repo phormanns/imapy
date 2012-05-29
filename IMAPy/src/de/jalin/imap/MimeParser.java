@@ -88,6 +88,19 @@ public class MimeParser {
 		}
 	}
 
+	public static String getToAddress(Message msg) {
+		try {
+			Address address = msg.getAllRecipients()[0];
+			String fromEMail = 
+				address instanceof InternetAddress 
+					? ((InternetAddress) address).getAddress().toLowerCase()
+					: address.toString();
+			return fromEMail;
+		} catch (MessagingException e) {
+			return "Unbekannt";
+		}
+	}
+
 	public static Date getSentDate(Message mimeMsg) {
 		try {
 			return mimeMsg.getSentDate();
