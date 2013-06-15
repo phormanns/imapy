@@ -18,6 +18,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import de.jalin.imap.IMAP;
+
 public class LoginServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -64,14 +66,17 @@ public class LoginServlet extends HttpServlet {
 				}
 			}
 			HttpSession session = request.getSession();
-			session.setAttribute("host", host);
-			session.setAttribute("user", user);
-			session.setAttribute("password", password);
+//			session.setAttribute("host", host);
+//			session.setAttribute("user", user);
+//			session.setAttribute("password", password);
 			session.setAttribute("email", emailAddr);
-			response.sendRedirect("webmail.html");
+			session.setAttribute("imap", new IMAP(host, user, password));
+			response.sendRedirect("mailbox");
 		} catch (ParserConfigurationException e) {
 			throw new ServletException(e);
 		} catch (SAXException e) {
+			throw new ServletException(e);
+		} catch (IMAPyException e) {
 			throw new ServletException(e);
 		} finally {
 			autoconfigStream.close();

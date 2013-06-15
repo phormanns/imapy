@@ -40,6 +40,7 @@ public class MimeParser {
 		}
 		try {
 			Object contentObj;
+			BufferedReader reader = null;
 			try {
 				contentObj = mimeMsg.getContent();
 				if (contentObj instanceof String) {
@@ -52,8 +53,7 @@ public class MimeParser {
 					InputStream streamContent = (InputStream) contentObj;
 					msg.setText("IMAPInputStream type=" + type);
 					if (type.startsWith("text/")) {
-						BufferedReader reader = new BufferedReader(
-								new InputStreamReader(streamContent));
+						reader = new BufferedReader(new InputStreamReader(streamContent));
 						String l = reader.readLine();
 						StringBuffer textBuffer = new StringBuffer();
 						while (l != null) {
@@ -68,6 +68,8 @@ public class MimeParser {
 				}
 			} catch (MessagingException e) {
 				msg.setText("Fehler beim Lesen des Inhalts der Nachricht");
+			} finally {
+				if (reader != null) try { reader.close(); } catch (IOException e) { } 
 			}
 		} catch (IOException e) {
 			msg.setText("I-/O-Fehler beim Lesen der Nachricht");
