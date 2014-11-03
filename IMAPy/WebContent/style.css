@@ -1,7 +1,11 @@
 * { margin:0; padding:0; }
 p { margin:5px 0 10px 0; }
 body { line-height: 1; color: #000000; background: #f0f0f0; font-family:Helvetica,Arial,sans-serif; }
-
+a:link { text-decoration:none; font-weight:normal; color:#000000; }
+a:visited { text-decoration:none; font-weight:normal; color:#000000; }
+a:hover { text-decoration:none; font-weight:normal; color:#000000; }
+a:active { text-decoration:none; font-weight:normal; color:#000000; }
+a:focus { text-decoration:none; font-weight:normal; color:#000000; }
 ul.folders { list-style-type:none; }
 ul.messages { list-style-type:none; }
 li { margin: 0px 0px; }
