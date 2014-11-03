@@ -8,10 +8,16 @@
 <title>IMAPy Mailbox <%= session.getAttribute("email") %></title>
 </head>
 <body>
-	<dl>
+	<ul class="menu">
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/mailbox">Mailbox</a></li>
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/folder/<%= session.getAttribute("folder") %>">Folder</a></li>			
+	</ul>
 <%
-	Map<String, String> message = (Map<String, String>)session.getAttribute("message");
-%>
+	final Object attrObj = session.getAttribute("message");
+	if (attrObj instanceof Map<?, ?>) {
+		final Map<?, ?> message = (Map<?, ?>)session.getAttribute("message");
+ %>
+	<dl>
 		<dt>from</dt>
 		<dd><%= message.get("from") %></dd>
 
@@ -21,5 +27,9 @@
 		<dt>subject</dt>
 		<dd><%= message.get("subject") %></dd>
 	</dl>
+	<%= message.get("content") %>
+<%
+	}
+ %>
 </body>
 </html>

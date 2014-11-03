@@ -20,8 +20,8 @@ public class MailboxServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try {
-			HttpSession session = request.getSession();
-			IMAP imap = (IMAP) session.getAttribute("imap");
+			final HttpSession session = request.getSession();
+			final IMAP imap = (IMAP) session.getAttribute("imap");
 			if (imap == null) {
 				response.sendRedirect(request.getContextPath() + "/login.html");
 			} else {

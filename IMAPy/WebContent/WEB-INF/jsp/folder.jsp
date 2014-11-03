@@ -6,17 +6,27 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>IMAPy Mailbox <%= session.getAttribute("email") %></title>
+<link href="<%= request.getContextPath() %>/style.css" media="all" rel="stylesheet" type="text/css" />
 </head>
 <body>
-	<ul>
+	<ul class="menu">
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/mailbox">Mailbox</a></li>
+	</ul>
+	<ul class="messages">
 <%
-	List<Map<String, String>> messagesList = (List<Map<String, String>>)session.getAttribute("messages");
-	for (Map<String, String> messageMap : messagesList) {
+	final Object messagesListObj = session.getAttribute("messages");
+	if (messagesListObj instanceof List<?>) {
+		final List<?> messagesList = (List<?>) messagesListObj;
+		for (final Object messageMapObj : messagesList) {
+			if (messageMapObj instanceof Map<?, ?>) {
+				final Map<?, ?> messageMap = (Map<?, ?>) messageMapObj;
  %>
-		<li><a href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>"><%= messageMap.get("title") %></a></li>			
+		<li class="message<%= messageMap.get("status") %>"><a href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>"><%= messageMap.get("title") %></a></li>			
 <%		
+			}
+		}
 	}
-%>
+ %>
 	</ul>
 </body>
 </html>

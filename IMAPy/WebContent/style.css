@@ -1,0 +1,27 @@
+* { margin:0; padding:0; }
+p { margin:5px 0 10px 0; }
+body { line-height: 1; color: #000000; background: #f0f0f0; font-family:Helvetica,Arial,sans-serif; }
+
+ul.folders { list-style-type:none; }
+ul.messages { list-style-type:none; }
+li { margin: 0px 0px; }
+li.foldernewmsgs { 
+	border-left-width:4px; border-left-style:solid; border-left-color:red; 
+	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0; 
+	padding: 4px 12px; 
+}
+li.folderread { 
+	border-left-width:4px; border-left-style:solid; border-left-color:#b0b0b0;
+	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0;
+	padding: 4px 12px; 
+}
+li.messagenew { 
+	border-left-width:4px; border-left-style:solid; border-left-color:red; 
+	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0; 
+	padding: 4px 12px;
+}
+li.messageseen { 
+	border-left-width:4px; border-left-style:solid; border-left-color:#b0b0b0; 
+	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0;
+	padding: 4px 12px;
+}	

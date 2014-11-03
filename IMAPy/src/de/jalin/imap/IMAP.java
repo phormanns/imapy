@@ -22,10 +22,10 @@ import de.jalin.imapy.IMAPyException;
 
 public class IMAP {
 
-	private String user;
-	private String password;
-	private String host;
-	private SortedMap<String, Folder> folders;
+	final private String user;
+	final private String password;
+	final private String host;
+	final private SortedMap<String, Folder> folders;
 	
 	public IMAP(String host, String user, String password) throws IMAPyException {
 		this.user = user;
@@ -36,16 +36,20 @@ public class IMAP {
 	}
 	
 	public List<Map<String, String>> getFolders() {
-		List<Map<String, String>> fdList = new ArrayList<Map<String, String>>();
-		for (String fdName : folders.keySet()) {
-			Folder fd = folders.get(fdName);
-			Map<String,String> map = new HashMap<String, String>();
+		final List<Map<String, String>> fdList = new ArrayList<Map<String, String>>();
+		for (final String fdName : folders.keySet()) {
+			final Folder fd = folders.get(fdName);
+			final Map<String,String> map = new HashMap<String, String>();
 			map.put("folder", fdName);
 			map.put("title", fd.getName());
 			try {
-				map.put("ntotal", Integer.toString(fd.getMessageCount()));
-				map.put("nunread", Integer.toString(fd.getUnreadMessageCount()));
-				map.put("nunseen", Integer.toString(fd.getNewMessageCount()));
+				final int messageCount = fd.getMessageCount();
+				final int unreadMessageCount = fd.getUnreadMessageCount();
+				final int newMessageCount = fd.getNewMessageCount();
+				map.put("cssclass", (unreadMessageCount > 0) ? "foldernewmsgs": "folderread");
+				map.put("ntotal", Integer.toString(messageCount));
+				map.put("nunread", Integer.toString(unreadMessageCount));
+				map.put("nunseen", Integer.toString(newMessageCount));
 			} catch (MessagingException e) {
 				map.put("ntotal", "?");
 				map.put("nunread", "?");
@@ -56,28 +60,28 @@ public class IMAP {
 		return fdList;
 	}
 	
-	public List<Map<String, String>> getMessages(String folderName) throws IMAPyException {
-		List<Map<String, String>> msgList = new ArrayList<Map<String, String>>();
+	public List<Map<String, String>> getMessages(final String folderName) throws IMAPyException {
+		final List<Map<String, String>> msgList = new ArrayList<Map<String, String>>();
 		try {
-			Folder folder = folders.get(folderName);
+			final Folder folder = folders.get(folderName);
 			if (!folder.isOpen()) {
 				folder.open(Folder.READ_ONLY);
 			}
-			Message[] messages = folder.getMessages();
-			FetchProfile fp = new FetchProfile();
+			final Message[] messages = folder.getMessages();
+			final FetchProfile fp = new FetchProfile();
 			fp.add(FetchProfile.Item.ENVELOPE);
 			fp.add(FetchProfile.Item.CONTENT_INFO);
 			fp.add(FetchProfile.Item.FLAGS);
 			folder.fetch(messages, fp);
 			folder.close(false);
 			for (Message msg : messages) {
-				Map<String,String> map = new HashMap<String, String>();
+				final Map<String,String> map = new HashMap<String, String>();
 				map.put("idx", Integer.toString(msg.getMessageNumber()));
 				map.put("title", MimeParser.getSubject(msg));
 				map.put("author", MimeParser.getFromAddress(msg));
 				map.put("folder", folderName);
 				map.put("status", msg.isSet(Flag.SEEN) ? "seen" : "new");
-				msgList.add(map);
+				msgList.add(0, map);
 			}
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);
@@ -85,12 +89,12 @@ public class IMAP {
 		return msgList;
 	}
 	
-	public Map<String, String> getMessage(String folderName, String msgId) throws IMAPyException {
-		Map<String, String> item = new HashMap<String, String>();
+	public Map<String, String> getMessage(final String folderName, final String msgId) throws IMAPyException {
+		final Map<String, String> item = new HashMap<String, String>();
 		try {
-			Folder folder = folders.get(folderName);
+			final Folder folder = folders.get(folderName);
 			folder.open(Folder.READ_WRITE);
-			Message msg = folder.getMessage(Integer.parseInt(msgId));
+			final Message msg = folder.getMessage(Integer.parseInt(msgId));
 			item.put("folder", folderName);
 			item.put("idx", msgId);
 			item.put("date", "heute");
@@ -100,7 +104,7 @@ public class IMAP {
 			item.put("from", MimeParser.getFromAddress(msg));
 			item.put("to", MimeParser.getToAddress(msg));
 			if (msg instanceof MimeMessage) {
-				MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
+				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
 				item.put("content", "<pre>" + messageData.getFormattedText() + "</pre>");
 			}
 			msg.setFlag(Flag.SEEN, true);
@@ -113,8 +117,8 @@ public class IMAP {
 
 	private void initFolders() throws IMAPyException {
 		try {
-			Session session = Session.getDefaultInstance(new Properties());
-			Store store = session.getStore("imaps");
+			final Session session = Session.getDefaultInstance(new Properties());
+			final Store store = session.getStore("imaps");
 			store.connect(host, user, password);
 			getChildren(store.getDefaultFolder());
 			store.close();
@@ -125,10 +129,10 @@ public class IMAP {
 		}
 	}
 
-	private void getChildren(Folder parent) throws MessagingException {
-		Folder[] children = parent.listSubscribed();
-		for (Folder child : children) {
-			int type = child.getType();
+	private void getChildren(final Folder parent) throws MessagingException {
+		final Folder[] children = parent.listSubscribed();
+		for (final Folder child : children) {
+			final int type = child.getType();
 			if ((type & Folder.HOLDS_MESSAGES) > 0) {
 				folders.put(child.getFullName(), child);
 			}

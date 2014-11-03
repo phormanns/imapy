@@ -9,10 +9,11 @@ import org.jsoup.Jsoup;
 
 public class MessageData {
 
-	private String from;
-	private String subject;
-	private String sentTimestamp;
-	private String messageID;
+	final private String from;
+	final private String subject;
+	final private String sentTimestamp;
+	final private String messageID;
+	
 	private String text;
 	private String attached;
 	private boolean isNew;
@@ -21,12 +22,12 @@ public class MessageData {
 	public MessageData(String from, String subject, String sent, String messageID) {
 		this.isNew = true;
 		this.isFlagged = false;
-		this.setFrom(from);
-		this.setSubject(subject);
-		this.setSentTimestamp(sent);
+		this.from = from;
+		this.subject = subject;
+		this.sentTimestamp = sent;
 		this.messageID = messageID;
-		this.setText("");
-		this.setAttached("");
+		this.text = "";
+		this.attached = "";
 	}
 
 	public void setFlagged(boolean flagged) {
@@ -41,16 +42,8 @@ public class MessageData {
 		return messageID;
 	}
 
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
 	public String getSubject() {
 		return subject;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
 	}
 
 	public String getFrom() {
@@ -66,7 +59,8 @@ public class MessageData {
 	}
 
 	public void setText(String text) {
-		if (text != null && text.length() > 29 && text.substring(0, 29).contains("<html")) {
+		if (text != null && text.length() > 29 && 
+				(text.substring(0, 29).contains("<html") || text.substring(0, 29).contains("<div"))) {
 			setHtmlText(text);
 		} else {
 			this.text = text;
@@ -74,11 +68,11 @@ public class MessageData {
 	}
 
 	public String getFormattedText() {
-		int maxlen = 64;
+		final int maxlen = 84;
+		final StringBuffer formated = new StringBuffer();
 		int blank = maxlen - 10;
-		StringBuffer formated = new StringBuffer();
 		try {
-			BufferedReader reader = new BufferedReader(new StringReader(text));
+			final BufferedReader reader = new BufferedReader(new StringReader(text));
 			String s = reader.readLine();
 			while (s != null) { // Schleife liest zeilenweise
 				while (s.length() > maxlen) { // lange Zeile werden zerlegt
@@ -107,9 +101,9 @@ public class MessageData {
 		return text;
 	}
 
-	public void setSentTimestamp(String sent) {
-		this.sentTimestamp = sent;
-	}
+//	public void setSentTimestamp(String sent) {
+//		this.sentTimestamp = sent;
+//	}
 
 	public String getSentTimestamp() {
 		return sentTimestamp;

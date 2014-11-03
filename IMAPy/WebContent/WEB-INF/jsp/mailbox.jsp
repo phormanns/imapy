@@ -6,17 +6,24 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>IMAPy Mailbox <%= session.getAttribute("email") %></title>
+<link href="<%= request.getContextPath() %>/style.css" media="all" rel="stylesheet" type="text/css" />
 </head>
 <body>
-	<ul>
+	<ul class="folders">
 <%
-	List<Map<String, String>> foldersList = (List<Map<String, String>>)session.getAttribute("folders");
-	for (Map<String, String> folderMap : foldersList) {
+	final Object foldersListObj = session.getAttribute("folders");
+	if (foldersListObj instanceof List<?>) {
+		final List<?> foldersList = (List<?>)foldersListObj;
+		for (final Object folderMapObj : foldersList) {
+			if (folderMapObj instanceof Map<?, ?>) {
+				final Map<?, ?> folderMap = (Map<?, ?>) folderMapObj;
  %>
-		<li><a href="folder/<%= folderMap.get("folder") %>"><%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)</a></li>			
+				<li class="<%= folderMap.get("cssclass") %>"><a href="folder/<%= folderMap.get("folder") %>"><%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)</a></li>			
 <%		
+			}
+		}
 	}
-%>
+ %>
 	</ul>
 </body>
 </html>

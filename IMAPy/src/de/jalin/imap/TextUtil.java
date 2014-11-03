@@ -10,7 +10,7 @@ public class TextUtil {
 		return src;
 	}
 
-	private static final String replaceString(String orig, String src, String dest) {
+	private static final String replaceString(final String orig, final String src, final String dest) {
 		if (orig == null) {
 			return null;
 		}
@@ -20,7 +20,7 @@ public class TextUtil {
 		if (src.length() == 0) {
 			return orig;
 		}
-		StringBuffer res = new StringBuffer(orig.length() + 20); 
+		final StringBuffer res = new StringBuffer(orig.length() + 20); 
 		int start = 0;
 		int end = 0;
 		int last = 0;

@@ -18,14 +18,14 @@ public class FolderServlet extends HttpServlet {
         super();
     }
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
 		try {
-			HttpSession session = request.getSession();
-			IMAP imap = (IMAP) session.getAttribute("imap");
+			final HttpSession session = request.getSession();
+			final IMAP imap = (IMAP) session.getAttribute("imap");
 			if (imap == null) {
 				response.sendRedirect(request.getContextPath() + "/login.html");
 			} else {
-				String pathInfo = request.getPathInfo();
+				final String pathInfo = request.getPathInfo();
 				session.setAttribute("messages", imap.getMessages(pathInfo.substring(1)));
 				request.getRequestDispatcher("/WEB-INF/jsp/folder.jsp").forward(request, response);
 			}

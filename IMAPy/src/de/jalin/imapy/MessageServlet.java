@@ -18,17 +18,18 @@ public class MessageServlet extends HttpServlet {
         super();
     }
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
 		try {
-			HttpSession session = request.getSession();
-			IMAP imap = (IMAP) session.getAttribute("imap");
+			final HttpSession session = request.getSession();
+			final IMAP imap = (IMAP) session.getAttribute("imap");
 			if (imap == null) {
 				response.sendRedirect(request.getContextPath() + "/login.html");
 			} else {
-				String pathInfo = request.getPathInfo().substring(1);
+				final String pathInfo = request.getPathInfo().substring(1);
 				int slashIndex = pathInfo.indexOf('/');
-				String folder = pathInfo.substring(0, slashIndex);
-				String msgIndex = pathInfo.substring(slashIndex + 1);
+				final String folder = pathInfo.substring(0, slashIndex);
+				final String msgIndex = pathInfo.substring(slashIndex + 1);
+				session.setAttribute("folder", folder);
 				session.setAttribute("message", imap.getMessage(folder, msgIndex));
 				request.getRequestDispatcher("/WEB-INF/jsp/message.jsp").forward(request, response);
 			}

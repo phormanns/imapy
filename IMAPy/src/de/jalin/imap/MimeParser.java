@@ -22,17 +22,17 @@ public class MimeParser {
 
 	public static final DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
 
-	public static MessageData parseMimeMessage(MimeMessage mimeMsg) {
-		String fromEMail = getFromAddress(mimeMsg);
-		String subject = getSubject(mimeMsg);
-		Date sentDate = getSentDate(mimeMsg);
-		String messageID = getMessageID(mimeMsg);
-		MessageData msg = new MessageData(fromEMail, subject, df.format(sentDate), messageID);
+	public static MessageData parseMimeMessage(final MimeMessage mimeMsg) {
+		final String fromEMail = getFromAddress(mimeMsg);
+		final String subject = getSubject(mimeMsg);
+		final Date sentDate = getSentDate(mimeMsg);
+		final String messageID = getMessageID(mimeMsg);
+		final MessageData msg = new MessageData(fromEMail, subject, df.format(sentDate), messageID);
 		msg.setAttached("");
 		msg.setText("");
 		try {
-			Flags flags = mimeMsg.getFlags();
-			boolean seen = flags.contains(Flags.Flag.SEEN);
+			final Flags flags = mimeMsg.getFlags();
+			final boolean seen = flags.contains(Flags.Flag.SEEN);
 			msg.setNew(!seen);
 			msg.setFlagged(flags.contains(Flags.Flag.FLAGGED));
 		} catch (MessagingException e) {
@@ -46,16 +46,16 @@ public class MimeParser {
 				if (contentObj instanceof String) {
 					msg.setText((String) contentObj);
 				} else if (contentObj instanceof Multipart) {
-					Multipart multipartContent = (Multipart) contentObj;
+					final Multipart multipartContent = (Multipart) contentObj;
 					parseMultipart(msg, multipartContent);
 				} else if (contentObj instanceof InputStream) {
-					String type = mimeMsg.getContentType();
-					InputStream streamContent = (InputStream) contentObj;
+					final String type = mimeMsg.getContentType();
+					final InputStream streamContent = (InputStream) contentObj;
 					msg.setText("IMAPInputStream type=" + type);
 					if (type.startsWith("text/")) {
 						reader = new BufferedReader(new InputStreamReader(streamContent));
 						String l = reader.readLine();
-						StringBuffer textBuffer = new StringBuffer();
+						final StringBuffer textBuffer = new StringBuffer();
 						while (l != null) {
 							textBuffer.append(l);
 							textBuffer.append('\n');
