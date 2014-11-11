@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import javax.mail.AuthenticationFailedException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +78,11 @@ public class LoginServlet extends HttpServlet {
 		} catch (SAXException e) {
 			throw new ServletException(e);
 		} catch (IMAPyException e) {
-			throw new ServletException(e);
+			if (e.getCause() instanceof AuthenticationFailedException) {
+				response.sendRedirect("login.jsp");
+			} else {
+				throw new ServletException(e);
+			}
 		} finally {
 			autoconfigStream.close();
 		}

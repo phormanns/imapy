@@ -23,7 +23,7 @@ public class FolderServlet extends HttpServlet {
 			final HttpSession session = request.getSession();
 			final IMAP imap = (IMAP) session.getAttribute("imap");
 			if (imap == null) {
-				response.sendRedirect(request.getContextPath() + "/login.html");
+				response.sendRedirect(request.getContextPath() + "/login.jsp");
 			} else {
 				final String pathInfo = request.getPathInfo();
 				session.setAttribute("messages", imap.getMessages(pathInfo.substring(1)));

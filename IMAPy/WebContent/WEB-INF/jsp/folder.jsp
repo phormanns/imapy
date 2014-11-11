@@ -21,7 +21,7 @@
 			if (messageMapObj instanceof Map<?, ?>) {
 				final Map<?, ?> messageMap = (Map<?, ?>) messageMapObj;
  %>
-		<li class="message<%= messageMap.get("status") %>"><a href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>"><%= messageMap.get("title") %></a></li>			
+		<li class="message<%= messageMap.get("status") %>"><a href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>"><%= messageMap.get("title") %> [von: <%= messageMap.get("author") %>]</a></li>			
 <%		
 			}
 		}

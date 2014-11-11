@@ -23,7 +23,7 @@ public class MailboxServlet extends HttpServlet {
 			final HttpSession session = request.getSession();
 			final IMAP imap = (IMAP) session.getAttribute("imap");
 			if (imap == null) {
-				response.sendRedirect(request.getContextPath() + "/login.html");
+				response.sendRedirect(request.getContextPath() + "/login.jsp");
 			} else {
 				session.setAttribute("folders", imap.getFolders());
 				request.getRequestDispatcher("/WEB-INF/jsp/mailbox.jsp").forward(request, response);

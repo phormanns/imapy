@@ -1,5 +1,7 @@
 package de.jalin.imap;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,8 @@ import de.jalin.imapy.IMAPyException;
 
 public class IMAP {
 
+	final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm");
+	
 	final private String user;
 	final private String password;
 	final private String host;
@@ -77,7 +81,7 @@ public class IMAP {
 			for (Message msg : messages) {
 				final Map<String,String> map = new HashMap<String, String>();
 				map.put("idx", Integer.toString(msg.getMessageNumber()));
-				map.put("title", MimeParser.getSubject(msg));
+				map.put("title", shorten(msg));
 				map.put("author", MimeParser.getFromAddress(msg));
 				map.put("folder", folderName);
 				map.put("status", msg.isSet(Flag.SEEN) ? "seen" : "new");
@@ -88,6 +92,14 @@ public class IMAP {
 		}
 		return msgList;
 	}
+
+	private String shorten(final Message msg) {
+		final String subject = MimeParser.getSubject(msg);
+		if (subject.length() > 80) {
+			return subject.substring(0, 79);
+		}
+		return subject;
+	}
 	
 	public Map<String, String> getMessage(final String folderName, final String msgId) throws IMAPyException {
 		final Map<String, String> item = new HashMap<String, String>();
@@ -97,10 +109,10 @@ public class IMAP {
 			final Message msg = folder.getMessage(Integer.parseInt(msgId));
 			item.put("folder", folderName);
 			item.put("idx", msgId);
-			item.put("date", "heute");
-			item.put("title", MimeParser.getSubject(msg));
+			item.put("date", DF.format(msg.getSentDate()));
+			item.put("title", shorten(msg));
 			item.put("author", MimeParser.getFromAddress(msg));
-			item.put("subject", MimeParser.getSubject(msg));
+			item.put("subject", shorten(msg));
 			item.put("from", MimeParser.getFromAddress(msg));
 			item.put("to", MimeParser.getToAddress(msg));
 			if (msg instanceof MimeMessage) {

@@ -6,6 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>IMAPy Mailbox <%= session.getAttribute("email") %></title>
+<link href="<%= request.getContextPath() %>/style.css" media="all" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<ul class="menu">
@@ -17,17 +18,15 @@
 	if (attrObj instanceof Map<?, ?>) {
 		final Map<?, ?> message = (Map<?, ?>)session.getAttribute("message");
  %>
-	<dl>
-		<dt>from</dt>
-		<dd><%= message.get("from") %></dd>
-
-		<dt>to</dt>
-		<dd><%= message.get("to") %></dd>
-
-		<dt>subject</dt>
-		<dd><%= message.get("subject") %></dd>
-	</dl>
-	<%= message.get("content") %>
+	<div class="emailheader">
+		<h1><%= message.get("subject") %></h1>
+		<div class="emailfrom"><div class="label">Absender</div><div class="text"><%= message.get("from") %></div></div>
+		<div class="emailto"><div class="label">Empfänger</div><div class="text"><%= message.get("to") %></div></div>
+		<div class="emaildate"><div class="label">Datum</div><div class="text"><%= message.get("date") %></div></div>
+	</div>
+	<div class="emailcontent">
+		<%= message.get("content") %>
+	</div>
 <%
 	}
  %>

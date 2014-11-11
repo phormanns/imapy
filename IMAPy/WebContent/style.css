@@ -1,6 +1,7 @@
 * { margin:0; padding:0; }
 p { margin:5px 0 10px 0; }
-body { line-height: 1; color: #000000; background: #f0f0f0; font-family:Helvetica,Arial,sans-serif; }
+html { font-family: sans-serif; -moz-text-size-adjust: none; -webkit-text-size-adjust: none; -ms-text-size-adjust: none; }
+body { line-height: 1; color: #000000; background: #f0f0f0; font-family:Helvetica,Arial,sans-serif; font-size:large; }
 a:link { text-decoration:none; font-weight:normal; color:#000000; }
 a:visited { text-decoration:none; font-weight:normal; color:#000000; }
 a:hover { text-decoration:none; font-weight:normal; color:#000000; }
@@ -8,24 +9,35 @@ a:active { text-decoration:none; font-weight:normal; color:#000000; }
 a:focus { text-decoration:none; font-weight:normal; color:#000000; }
 ul.folders { list-style-type:none; }
 ul.messages { list-style-type:none; }
-li { margin: 0px 0px; }
+li { margin: 0 0; font-size: 1.3em; line-height: 1.4em; }
 li.foldernewmsgs { 
-	border-left-width:4px; border-left-style:solid; border-left-color:red; 
-	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0; 
-	padding: 4px 12px; 
+	border-left-width:0.4em; border-left-style:solid; border-left-color:red; 
+	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; 
+	padding: 0.4em 1.2em; 
 }
 li.folderread { 
-	border-left-width:4px; border-left-style:solid; border-left-color:#b0b0b0;
-	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0;
-	padding: 4px 12px; 
+	border-left-width:0.4em; border-left-style:solid; border-left-color:#b0b0b0;
+	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0;
+	padding: 0.4em 1.2em; 
 }
 li.messagenew { 
-	border-left-width:4px; border-left-style:solid; border-left-color:red; 
-	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0; 
-	padding: 4px 12px;
+	border-left-width:0.4em; border-left-style:solid; border-left-color:red; 
+	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; 
+	padding: 0.4em 1.2em; 
 }
 li.messageseen { 
-	border-left-width:4px; border-left-style:solid; border-left-color:#b0b0b0; 
-	border-top-width:1px; border-top-style:solid; border-top-color:#d0d0d0;
-	padding: 4px 12px;
-}	
+	border-left-width:0.4em; border-left-style:solid; border-left-color:#b0b0b0; 
+	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0;
+	padding: 0.4em 1.2em; 
+}
+div.login{ margin: 1.0em; }
+.login p { margin: 1.6em 0; }
+.menu { display: block; margin: 0.6em 0; }
+.menuitem { display: inline; margin: 0.2em; padding: 0.4em; background: #b0b0b0; }
+.emailcontent { margin: 1.0em 0.4em; }
+.emailcontent pre { font-size: 1.3em; line-height: 1.4em; }
+.emailheader { border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; }
+.emailheader h1 { margin: 0.5em 0 0.3em 0.3em; font-size: 1.3em; line-height: 1.4em; }
+.emailheader div { margin: 0em 0.3em 0em 0.3em; font-size: 1.0em; line-height: 1.2em; height: 1.8em; }
+div.label {margin: 0em; padding: 0.1em; color: #a0a0a0; text-align: right; width: 5.6em; }
+div.text {display:inline; margin: 0.1em; padding: 0.1em; left: 6.0em; top: -1.9em; position: relative; }
