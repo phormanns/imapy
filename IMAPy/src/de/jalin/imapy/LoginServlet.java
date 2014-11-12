@@ -29,34 +29,34 @@ public class LoginServlet extends HttpServlet {
         super();
     }
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String emailAddr = request.getParameter("email");
+	protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+		final String emailAddr = request.getParameter("email");
 		if (emailAddr == null || !emailAddr.contains("@")) {
 			throw new ServletException("no valid email address given");
 		}
-		String password = request.getParameter("password");
+		final String password = request.getParameter("password");
 		if (password == null || password.length() < 3) {
 			throw new ServletException("no valid password given");
 		}
-		URL url = new URL("http://autoconfig." + emailAddr.split("@")[1] 
+		final URL url = new URL("http://autoconfig." + emailAddr.split("@")[1] 
 				+ "/mail/config-v1.1.xml?emailaddress=" + emailAddr);
-		InputStream autoconfigStream = url.openConnection().getInputStream();
+		final InputStream autoconfigStream = url.openConnection().getInputStream();
 		String host = null;
 		String user = null;
 		try {
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			Document document = documentBuilder.parse(autoconfigStream);
-			NodeList inServersNodes = document.getElementsByTagName("incomingServer");
-			int listLength = inServersNodes.getLength();
+			final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+			final Document document = documentBuilder.parse(autoconfigStream);
+			final NodeList inServersNodes = document.getElementsByTagName("incomingServer");
+			final int listLength = inServersNodes.getLength();
 			for (int idx = 0; idx < listLength; idx++) {
-				Node node = inServersNodes.item(idx);
-				Node item = node.getAttributes().getNamedItem("type");
+				final Node node = inServersNodes.item(idx);
+				final Node item = node.getAttributes().getNamedItem("type");
 				if (item != null && "imap".equals(item.getNodeValue())) {
-					NodeList childNodes = node.getChildNodes();
-					int childsListLength = childNodes.getLength();
+					final NodeList childNodes = node.getChildNodes();
+					final int childsListLength = childNodes.getLength();
 					for (int childsIdx = 0; childsIdx < childsListLength; childsIdx++) {
-						Node child = childNodes.item(childsIdx);
+						final Node child = childNodes.item(childsIdx);
 						if ("hostname".equals(child.getNodeName())) {
 							host = child.getTextContent();
 						}
@@ -66,10 +66,7 @@ public class LoginServlet extends HttpServlet {
 					}
 				}
 			}
-			HttpSession session = request.getSession();
-//			session.setAttribute("host", host);
-//			session.setAttribute("user", user);
-//			session.setAttribute("password", password);
+			final HttpSession session = request.getSession();
 			session.setAttribute("email", emailAddr);
 			session.setAttribute("imap", new IMAP(host, user, password));
 			response.sendRedirect("mailbox");
