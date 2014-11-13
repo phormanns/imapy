@@ -43,13 +43,17 @@ public class MimeParser {
 			BufferedReader reader = null;
 			try {
 				contentObj = mimeMsg.getContent();
+				final String type = mimeMsg.getContentType();
 				if (contentObj instanceof String) {
-					msg.setText((String) contentObj);
+					if (type.startsWith("text/html")) {
+						msg.setHtmlText((String) contentObj);
+					} else {
+						msg.setText((String) contentObj);
+					}
 				} else if (contentObj instanceof Multipart) {
 					final Multipart multipartContent = (Multipart) contentObj;
 					parseMultipart(msg, multipartContent);
 				} else if (contentObj instanceof InputStream) {
-					final String type = mimeMsg.getContentType();
 					final InputStream streamContent = (InputStream) contentObj;
 					msg.setText("IMAPInputStream type=" + type);
 					if (type.startsWith("text/")) {
@@ -140,9 +144,9 @@ public class MimeParser {
 	private static void parseMultipart(MessageData msg, Multipart multipartContent)
 			throws MessagingException, IOException {
 		int i = 0;
-		int parts = multipartContent.getCount();
+		final int parts = multipartContent.getCount();
 		while (i < parts) {
-			BodyPart bodyPart = multipartContent.getBodyPart(i);
+			final BodyPart bodyPart = multipartContent.getBodyPart(i);
 			String contentType = bodyPart.getContentType();
 			if (contentType != null) {
 				msg.setAttached(msg.getAttached() + contentType);
@@ -150,10 +154,9 @@ public class MimeParser {
 			} else {
 				contentType = "text/plain";
 			}
-			Object object = bodyPart.getContent();
-			if (object instanceof String
-					&& msg.getFormattedText().length() < 2) {
-				String text = (String) object;
+			final Object object = bodyPart.getContent();
+			if (object instanceof String && msg.getFormattedText().length() < 17) {
+				final String text = (String) object;
 				if (contentType.contains("html")) {
 					msg.setHtmlText(text);
 				} else {

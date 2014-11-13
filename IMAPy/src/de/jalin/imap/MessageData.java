@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 
 public class MessageData {
@@ -16,12 +17,14 @@ public class MessageData {
 	
 	private String text;
 	private String attached;
+	private boolean isHtml;
 	private boolean isNew;
 	private boolean isFlagged;
 
-	public MessageData(String from, String subject, String sent, String messageID) {
+	public MessageData(final String from, final String subject, final String sent, final String messageID) {
 		this.isNew = true;
 		this.isFlagged = false;
+		this.isHtml = false;
 		this.from = from;
 		this.subject = subject;
 		this.sentTimestamp = sent;
@@ -58,18 +61,25 @@ public class MessageData {
 		return attached;
 	}
 
-	public void setText(String text) {
-		if (text != null && text.length() > 29 && 
-				(text.substring(0, 29).contains("<html") || text.substring(0, 29).contains("<div"))) {
-			setHtmlText(text);
+	public void setText(final String text) {
+		if (text != null && text.length() > 29) {
+			final String textBeginning = text.substring(0, 29);
+			if (textBeginning.contains("<html") || textBeginning.contains("<div") || textBeginning.contains("<!DOCTYPE html")) {
+				setHtmlText(text);
+			} else {
+				this.text = text;
+			}
 		} else {
 			this.text = text;
 		}
 	}
 
 	public String getFormattedText() {
+		if (isHtml) {
+			return text;
+		}
 		final int maxlen = 84;
-		final StringBuffer formated = new StringBuffer();
+		final StringBuffer formated = new StringBuffer("<pre>\n");
 		int blank = maxlen - 10;
 		try {
 			final BufferedReader reader = new BufferedReader(new StringReader(text));
@@ -94,16 +104,13 @@ public class MessageData {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		formated.append("</pre>\n");
 		return formated.toString();
 	}
 
 	public String getText() {
 		return text;
 	}
-
-//	public void setSentTimestamp(String sent) {
-//		this.sentTimestamp = sent;
-//	}
 
 	public String getSentTimestamp() {
 		return sentTimestamp;
@@ -117,8 +124,9 @@ public class MessageData {
 		return isFlagged;
 	}
 
-	public void setHtmlText(String translate) {
-		text = Jsoup.parse(translate).text();
+	public void setHtmlText(final String translate) {
+		isHtml = true;
+		text = Jsoup.clean(translate, Whitelist.basic());
 	}
 
 }

@@ -117,7 +117,7 @@ public class IMAP {
 			item.put("to", MimeParser.getToAddress(msg));
 			if (msg instanceof MimeMessage) {
 				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
-				item.put("content", "<pre>" + messageData.getFormattedText() + "</pre>");
+				item.put("content", messageData.getFormattedText());
 			}
 			msg.setFlag(Flag.SEEN, true);
 			folder.close(true);
