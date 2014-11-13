@@ -19,7 +19,11 @@
 			if (folderMapObj instanceof Map<?, ?>) {
 				final Map<?, ?> folderMap = (Map<?, ?>) folderMapObj;
  %>
-				<li class="<%= folderMap.get("cssclass") %>"><a href="folder/<%= folderMap.get("folder") %>"><%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)</a></li>			
+				<li class="<%= folderMap.get("cssclass") %>">
+					<a href="folder/<%= folderMap.get("folder") %>" target="<%= session.getAttribute("folderstarget") %>">
+						<%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)
+					</a>
+				</li>			
 <%		
 			}
 		}
