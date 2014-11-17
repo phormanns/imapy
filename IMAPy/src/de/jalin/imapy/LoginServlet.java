@@ -30,6 +30,7 @@ public class LoginServlet extends HttpServlet {
     }
 
 	protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+		final HttpSession session = request.getSession();
 		final String emailAddr = request.getParameter("email");
 		if (emailAddr == null || !emailAddr.contains("@")) {
 			throw new ServletException("no valid email address given");
@@ -38,6 +39,8 @@ public class LoginServlet extends HttpServlet {
 		if (password == null || password.length() < 3) {
 			throw new ServletException("no valid password given");
 		}
+		final String mobile = request.getParameter("mobile");
+		session.setAttribute("mobile", mobile);
 		final URL url = new URL("http://autoconfig." + emailAddr.split("@")[1] 
 				+ "/mail/config-v1.1.xml?emailaddress=" + emailAddr);
 		final InputStream autoconfigStream = url.openConnection().getInputStream();
@@ -66,10 +69,13 @@ public class LoginServlet extends HttpServlet {
 					}
 				}
 			}
-			final HttpSession session = request.getSession();
 			session.setAttribute("email", emailAddr);
 			session.setAttribute("imap", new IMAP(host, user, password));
-			response.sendRedirect("mailbox");
+			if ("true".equals(mobile)) {
+				response.sendRedirect("mailbox");
+			} else {
+				response.sendRedirect("desktop.html");
+			}
 		} catch (ParserConfigurationException e) {
 			throw new ServletException(e);
 		} catch (SAXException e) {
