@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="imapy" default="war">
+	
+    <description>
+		IMAPy - simple Web-Mailer in Java/JSP Technology
+    </description>
+
+	<path id="cp.compile">
+		<fileset dir="WebContent/WEB-INF/lib">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="/usr/share/java">
+    		<include name="servlet-api-2.5.jar"/>
+		</fileset>
+	</path>
+	
+    <target name="war" depends="compile" description="description">
+    	<mkdir dir="target"/>
+        <war destfile="target/IMAPy.war" basedir="WebContent" />
+    </target>
+
+    <target name="compile">
+    	<mkdir dir="WebContent/WEB-INF/classes"/>
+    	<javac srcdir="src" destdir="WebContent/WEB-INF/classes"
+         classpathref="cp.compile" debug="on" />
+    </target>
+
+</project>
