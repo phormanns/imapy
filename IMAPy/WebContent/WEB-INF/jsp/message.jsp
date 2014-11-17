@@ -11,8 +11,14 @@
 </head>
 <body>
 	<ul class="menu">
+<%
+	if ("true".equals(session.getAttribute("mobile"))) {
+ %>
 		<li class="menuitem"><a href="<%= request.getContextPath() %>/mailbox">Mailbox</a></li>
 		<li class="menuitem"><a href="<%= request.getContextPath() %>/folder/<%= session.getAttribute("folder") %>">Folder</a></li>			
+<%
+	}
+ %>
 	</ul>
 <%
 	final Object attrObj = session.getAttribute("message");
