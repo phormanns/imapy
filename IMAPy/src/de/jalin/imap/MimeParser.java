@@ -109,7 +109,11 @@ public class MimeParser {
 
 	public static Date getSentDate(Message mimeMsg) {
 		try {
-			return mimeMsg.getSentDate();
+			final Date sentDate = mimeMsg.getSentDate();
+			if (sentDate == null) {
+				return new Date();
+			}
+			return sentDate;
 		} catch (MessagingException e) {
 			return new Date();
 		}

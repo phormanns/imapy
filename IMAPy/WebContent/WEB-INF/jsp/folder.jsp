@@ -11,7 +11,13 @@
 </head>
 <body>
 	<ul class="menu">
+<%
+	if ("true".equals(session.getAttribute("mobile"))) {
+%>
 		<li class="menuitem"><a href="<%= request.getContextPath() %>/mailbox">Mailbox</a></li>
+<%
+	}
+%>
 	</ul>
 	<ul class="messages">
 <%
@@ -21,9 +27,25 @@
 		for (final Object messageMapObj : messagesList) {
 			if (messageMapObj instanceof Map<?, ?>) {
 				final Map<?, ?> messageMap = (Map<?, ?>) messageMapObj;
+				if ("true".equals(session.getAttribute("mobile"))) {
  %>
-		<li class="message<%= messageMap.get("status") %>"><a href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>"><%= messageMap.get("title") %> [von: <%= messageMap.get("author") %>]</a></li>			
-<%		
+		<li class="message<%= messageMap.get("status") %>">
+			<a target="_self"
+				href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>">
+				<%= messageMap.get("title") %> [von: <%= messageMap.get("author") %>]
+			</a>
+		</li>			
+<%
+				} else {
+ %>
+		<li class="message<%= messageMap.get("status") %>">
+			<a target="messagesframe"
+				href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>">
+				<%= messageMap.get("title") %> [von: <%= messageMap.get("author") %>]
+			</a>
+		</li>			
+<%
+				}
 			}
 		}
 	}

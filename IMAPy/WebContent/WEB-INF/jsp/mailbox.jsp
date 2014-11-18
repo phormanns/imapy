@@ -18,13 +18,24 @@
 		for (final Object folderMapObj : foldersList) {
 			if (folderMapObj instanceof Map<?, ?>) {
 				final Map<?, ?> folderMap = (Map<?, ?>) folderMapObj;
+				if ("true".equals(session.getAttribute("mobile"))) {
+
  %>
-				<li class="<%= folderMap.get("cssclass") %>">
-					<a href="folder/<%= folderMap.get("folder") %>" target="<%= session.getAttribute("folderstarget") %>">
-						<%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)
-					</a>
-				</li>			
-<%		
+		<li class="<%= folderMap.get("cssclass") %>">
+			<a href="folder/<%= folderMap.get("folder") %>" target="_self">
+				<%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)
+			</a>
+		</li>			
+<%
+				} else {
+					 %>
+		<li class="<%= folderMap.get("cssclass") %>">
+			<a href="folder/<%= folderMap.get("folder") %>" target="foldersframe">
+				<%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)
+			</a>
+		</li>			
+				<%
+				}
 			}
 		}
 	}

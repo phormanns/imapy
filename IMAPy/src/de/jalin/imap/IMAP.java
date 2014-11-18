@@ -3,6 +3,7 @@ package de.jalin.imap;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +110,12 @@ public class IMAP {
 			final Message msg = folder.getMessage(Integer.parseInt(msgId));
 			item.put("folder", folderName);
 			item.put("idx", msgId);
-			item.put("date", DF.format(msg.getSentDate()));
+			final Date sentDate = msg.getSentDate();
+			if (sentDate != null) {
+				item.put("date", DF.format(sentDate));
+			} else {
+				item.put("date", DF.format(new Date()));
+			}
 			item.put("title", shorten(msg));
 			item.put("author", MimeParser.getFromAddress(msg));
 			item.put("subject", shorten(msg));
