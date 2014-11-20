@@ -14,7 +14,12 @@
 		</fileset>
 	</path>
 	
-    <target name="war" depends="compile" description="description">
+	<target name="clean">
+		<delete dir="target"/>
+		<delete dir="WebContent/WEB-INF/classes"/>
+	</target>
+	
+    <target name="war" depends="compile" description="pack war archive">
     	<mkdir dir="target"/>
         <war destfile="target/IMAPy.war" basedir="WebContent" />
     </target>
@@ -22,7 +27,7 @@
     <target name="compile">
     	<mkdir dir="WebContent/WEB-INF/classes"/>
     	<javac srcdir="src" destdir="WebContent/WEB-INF/classes"
-         classpathref="cp.compile" debug="on" />
+         		classpathref="cp.compile" debug="on" />
     </target>
 
 </project>
