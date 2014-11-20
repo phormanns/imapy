@@ -19,12 +19,21 @@
 <%
 	}
  %>
-	</ul>
 <%
 	final Object attrObj = session.getAttribute("message");
 	if (attrObj instanceof Map<?, ?>) {
 		final Map<?, ?> message = (Map<?, ?>)session.getAttribute("message");
+		if ("requestdel".equals(request.getParameter("msgop"))) {
  %>
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/message/<%= message.get("folder") %>/<%= message.get("idx") %>?msgop=confirmdel">Löschen Bestätigen</a></li>			
+<%
+		} else {
+ %>
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/message/<%= message.get("folder") %>/<%= message.get("idx") %>?msgop=requestdel">Löschen</a></li>			
+<%
+		}
+ %>
+	</ul>
 	<div class="emailheader">
 		<h1><%= message.get("subject") %></h1>
 		<div class="emailfrom"><div class="label">Absender</div><div class="text"><%= message.get("from") %></div></div>
@@ -35,6 +44,14 @@
 		<%= message.get("content") %>
 	</div>
 <%
+		if (!"true".equals(session.getAttribute("mobile")) && "new".equals(message.get("status"))) {
+ %>
+ 	<script type="text/javascript">
+		parent.foldersframe.location.reload();
+		parent.mailboxframe.location.reload();
+	</script>
+<%
+		}
 	}
  %>
 </body>

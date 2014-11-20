@@ -107,7 +107,12 @@ public class IMAP {
 		try {
 			final Folder folder = folders.get(folderName);
 			folder.open(Folder.READ_WRITE);
-			final Message msg = folder.getMessage(Integer.parseInt(msgId));
+			final int messageCount = folder.getMessageCount();
+			int msgIndx = Integer.parseInt(msgId);
+			if (msgIndx > messageCount) {
+				msgIndx = messageCount - 1;
+			}
+			final Message msg = folder.getMessage(msgIndx);
 			item.put("folder", folderName);
 			item.put("idx", msgId);
 			final Date sentDate = msg.getSentDate();
@@ -121,11 +126,28 @@ public class IMAP {
 			item.put("subject", shorten(msg));
 			item.put("from", MimeParser.getFromAddress(msg));
 			item.put("to", MimeParser.getToAddress(msg));
+			item.put("status", msg.isSet(Flag.SEEN) ? "seen" : "new");
 			if (msg instanceof MimeMessage) {
 				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
 				item.put("content", messageData.getFormattedText());
 			}
 			msg.setFlag(Flag.SEEN, true);
+			folder.close(true);
+		} catch (MessagingException e) {
+			throw new IMAPyException(e);
+		}
+		return item;
+	}
+
+	public Map<String, String> removeMessage(final String folderName, final String msgId) throws IMAPyException {
+		final Map<String, String> item = new HashMap<String, String>();
+		try {
+			final Folder folder = folders.get(folderName);
+			folder.open(Folder.READ_WRITE);
+			final Message msg = folder.getMessage(Integer.parseInt(msgId));
+			item.put("folder", folderName);
+			item.put("idx", msgId);
+			msg.setFlag(Flag.DELETED, true);
 			folder.close(true);
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);

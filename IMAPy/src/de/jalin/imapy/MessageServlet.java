@@ -29,6 +29,15 @@ public class MessageServlet extends HttpServlet {
 				int slashIndex = pathInfo.indexOf('/');
 				final String folder = pathInfo.substring(0, slashIndex);
 				final String msgIndex = pathInfo.substring(slashIndex + 1);
+				if ("confirmdel".equals(request.getParameter("msgop"))) {
+					imap.removeMessage(folder, msgIndex);
+					if ("true".equals(session.getAttribute("mobile"))) {
+						response.sendRedirect(request.getContextPath() + "/folder/" + folder);
+					} else {
+						request.getRequestDispatcher("/WEB-INF/jsp/folder-reload.jsp").forward(request, response);
+					}
+					return;
+				}
 				session.setAttribute("folder", folder);
 				session.setAttribute("message", imap.getMessage(folder, msgIndex));
 				request.getRequestDispatcher("/WEB-INF/jsp/message.jsp").forward(request, response);

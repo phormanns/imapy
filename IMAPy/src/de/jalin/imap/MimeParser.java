@@ -83,7 +83,11 @@ public class MimeParser {
 
 	public static String getFromAddress(Message msg) {
 		try {
-			Address address = msg.getFrom()[0];
+			final Address[] allSenders = msg.getFrom();
+			if (allSenders == null || allSenders.length < 1) {
+				return "Unbekannter Absender";
+			}
+			final Address address = allSenders[0];
 			String fromEMail = 
 				address instanceof InternetAddress 
 					? ((InternetAddress) address).getAddress().toLowerCase()
@@ -96,7 +100,11 @@ public class MimeParser {
 
 	public static String getToAddress(Message msg) {
 		try {
-			Address address = msg.getAllRecipients()[0];
+			final Address[] allRecipients = msg.getAllRecipients();
+			if (allRecipients == null || allRecipients.length < 1) {
+				return "Unbekannt";
+			}
+			final Address address = allRecipients[0];
 			String fromEMail = 
 				address instanceof InternetAddress 
 					? ((InternetAddress) address).getAddress().toLowerCase()
