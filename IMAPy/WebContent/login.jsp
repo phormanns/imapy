@@ -13,6 +13,10 @@
 	if (browserType == null || !browserType.toLowerCase().contains("mobile")) {
 		mobile = "false";
 	}
+	String email = request.getParameter(email);
+	if (email == null) {
+		email = "";
+	}
 %>
 <body>
 	<div class="login">
