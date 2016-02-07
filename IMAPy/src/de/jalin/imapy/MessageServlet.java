@@ -20,28 +20,25 @@ public class MessageServlet extends HttpServlet {
 
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
 		try {
+			final IMAPySession imapySession = new IMAPySession(request, response);
+			final IMAP imap = imapySession.getSession();
 			final HttpSession session = request.getSession();
-			final IMAP imap = (IMAP) session.getAttribute("imap");
-			if (imap == null) {
-				response.sendRedirect(request.getContextPath() + "/login.jsp");
-			} else {
-				final String pathInfo = request.getPathInfo().substring(1);
-				int slashIndex = pathInfo.indexOf('/');
-				final String folder = pathInfo.substring(0, slashIndex);
-				final String msgIndex = pathInfo.substring(slashIndex + 1);
-				if ("confirmdel".equals(request.getParameter("msgop"))) {
-					imap.removeMessage(folder, msgIndex);
-					if ("true".equals(session.getAttribute("mobile"))) {
-						response.sendRedirect(request.getContextPath() + "/folder/" + folder);
-					} else {
-						request.getRequestDispatcher("/WEB-INF/jsp/folder-reload.jsp").forward(request, response);
-					}
-					return;
+			final String pathInfo = request.getPathInfo().substring(1);
+			int slashIndex = pathInfo.indexOf('/');
+			final String folder = pathInfo.substring(0, slashIndex);
+			final String msgIndex = pathInfo.substring(slashIndex + 1);
+			if ("confirmdel".equals(request.getParameter("msgop"))) {
+				imap.removeMessage(folder, msgIndex);
+				if ("true".equals(session.getAttribute("mobile"))) {
+					response.sendRedirect(request.getContextPath() + "/folder/" + folder);
+				} else {
+					imapySession.dispatchTo("/WEB-INF/jsp/folder-reload.jsp");
 				}
-				session.setAttribute("folder", folder);
-				session.setAttribute("message", imap.getMessage(folder, msgIndex));
-				request.getRequestDispatcher("/WEB-INF/jsp/message.jsp").forward(request, response);
+				return;
 			}
+			session.setAttribute("folder", folder);
+			session.setAttribute("message", imap.getMessage(folder, msgIndex));
+			imapySession.dispatchTo("/WEB-INF/jsp/message.jsp");
 		} catch (IOException e) {
 			throw new ServletException(e);
 		} catch (IMAPyException e) {
