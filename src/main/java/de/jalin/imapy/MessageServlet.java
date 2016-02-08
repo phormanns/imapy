@@ -24,9 +24,12 @@ public class MessageServlet extends HttpServlet {
 			final IMAPySession imapySession = new IMAPySession(request, response);
 			final IMAP imap = imapySession.getSession();
 			final HttpSession session = request.getSession();
+			String messageId = null;
 			@SuppressWarnings("unchecked")
 			final Map<String, String > mesgHash = (Map<String, String>) session.getAttribute("message");
-			final String messageId = mesgHash.get("message-id");
+			if (mesgHash != null) {
+				messageId = mesgHash.get("message-id");
+			}
 			final String pathInfo = request.getPathInfo().substring(1);
 			int slashIndex = pathInfo.indexOf('/');
 			final String folder = pathInfo.substring(0, slashIndex);
