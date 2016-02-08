@@ -78,33 +78,51 @@ public class MessageData {
 		if (isHtml) {
 			return text;
 		}
+		final String regex = "(https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
 		final int maxlen = 84;
-		final StringBuffer formated = new StringBuffer("<pre>\n");
+		final StringBuffer formated = new StringBuffer("<p>\n");
 		int blank = maxlen - 10;
+		boolean isPreFormatted = false;
 		try {
 			final BufferedReader reader = new BufferedReader(new StringReader(text));
 			String s = reader.readLine();
 			while (s != null) { // Schleife liest zeilenweise
+				if (s.trim().isEmpty()) {
+					formated.append("</p>\n");
+					formated.append("<p>\n");
+					isPreFormatted = false;
+				} else {
+					isPreFormatted = s.startsWith(">") || s.startsWith(" ") || s.startsWith("--") || s.startsWith("==");
+					if (isPreFormatted) {
+						formated.append("<br />\n");
+					}
+				}
 				while (s.length() > maxlen) { // lange Zeile werden zerlegt
 					blank = maxlen - 10; // Blank vor dem Umbruch suchen
 					while (blank < s.length() && s.charAt(blank) != ' ') {
 						blank++;
 					}
-					formated.append(TextUtil.replaceEntities(s.substring(0, blank)));
+					formated.append(TextUtil.replaceEntities(s.substring(0, blank).replaceAll(regex, "<a href=\"#\">$1</a>")));
 					formated.append('\n');
+					if (isPreFormatted) {
+						formated.append("<br />\n");
+					}
 					s = s.substring(blank);
 					while (s.length() > 0 && s.charAt(0) == ' ') {
 						s = s.substring(1); // ggf. fuehrende Blank abschneiden
 					}
 				}
-				formated.append(TextUtil.replaceEntities(s));
+				formated.append(TextUtil.replaceEntities(s).replaceAll(regex, "<a href=\"$1\" target=\"_new\">$1</a>"));
+				if (s.endsWith("--") || s.endsWith("==")) {
+					formated.append("<br />\n");
+				}
 				formated.append('\n');
 				s = reader.readLine(); // naechste Zeile
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		formated.append("</pre>\n");
+		formated.append("</p>\n");
 		return formated.toString();
 	}
 

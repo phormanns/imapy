@@ -130,6 +130,7 @@ public class IMAP {
 			if (msg instanceof MimeMessage) {
 				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
 				item.put("content", messageData.getFormattedText());
+				item.put("message-id", messageData.getMessageID());
 			}
 			msg.setFlag(Flag.SEEN, true);
 			folder.close(true);
@@ -139,15 +140,22 @@ public class IMAP {
 		return item;
 	}
 
-	public Map<String, String> removeMessage(final String folderName, final String msgId) throws IMAPyException {
+	public Map<String, String> removeMessage(final String folderName, final String msgId, final String messageId) throws IMAPyException {
 		final Map<String, String> item = new HashMap<String, String>();
 		try {
 			final Folder folder = folders.get(folderName);
 			folder.open(Folder.READ_WRITE);
 			final Message msg = folder.getMessage(Integer.parseInt(msgId));
+			String messageIDtoCheck = null;
+			if (msg instanceof MimeMessage) {
+				messageIDtoCheck = MimeParser.getMessageID((MimeMessage) msg);
+			}
 			item.put("folder", folderName);
 			item.put("idx", msgId);
-			msg.setFlag(Flag.DELETED, true);
+			final boolean messageIdChecked = (messageIDtoCheck != null && messageIDtoCheck.equals(messageId)) || (messageId == null && messageIDtoCheck == null);
+			if (messageIdChecked) {
+				msg.setFlag(Flag.DELETED, true);
+			}
 			folder.close(true);
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);
