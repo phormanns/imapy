@@ -21,30 +21,30 @@
  %>
 <%
 	final Object attrObj = session.getAttribute("message");
-	if (attrObj instanceof Map<?, ?>) {
-		final Map<?, ?> message = (Map<?, ?>)session.getAttribute("message");
+	if (attrObj instanceof IMAPyMessage) {
+		final IMAPyMessage message = (IMAPyMessage) session.getAttribute("message");
 		if ("requestdel".equals(request.getParameter("msgop"))) {
  %>
-		<li class="menuitem"><a href="<%= request.getContextPath() %>/message/<%= message.get("folder") %>/<%= message.get("idx") %>?msgop=confirmdel">Löschen Bestätigen</a></li>			
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/message/<%= message.getFolder() %>/<%= message.getIndex() %>?msgop=confirmdel">Löschen Ok</a></li>			
 <%
 		} else {
  %>
-		<li class="menuitem"><a href="<%= request.getContextPath() %>/message/<%= message.get("folder") %>/<%= message.get("idx") %>?msgop=requestdel">Löschen</a></li>			
+		<li class="menuitem"><a href="<%= request.getContextPath() %>/message/<%= message.getFolder() %>/<%= message.getIndex() %>?msgop=requestdel">Löschen</a></li>			
 <%
 		}
  %>
 	</ul>
 	<div class="emailheader">
-		<h1><%= message.get("subject") %></h1>
-		<div class="emailfrom"><div class="label">Absender</div><div class="text"><%= message.get("from") %></div></div>
-		<div class="emailto"><div class="label">Empfänger</div><div class="text"><%= message.get("to") %></div></div>
-		<div class="emaildate"><div class="label">Datum</div><div class="text"><%= message.get("date") %></div></div>
+		<h1><%= message.getSubject() %></h1>
+		<div class="emailfrom"><div class="label">Absender</div><div class="text"><%= message.getFrom() %></div></div>
+		<div class="emailto"><div class="label">Empfänger</div><div class="text"><%= message.getTo() %></div></div>
+		<div class="emaildate"><div class="label">Datum</div><div class="text"><%= message.getDate() %></div></div>
 	</div>
 	<div class="emailcontent">
-		<%= message.get("content") %>
+		<%= message.getContent() %>
 	</div>
 <%
-		if (!"true".equals(session.getAttribute("mobile")) && "new".equals(message.get("status"))) {
+		if (!"true".equals(session.getAttribute("mobile")) && "new".equals(message.getStatus())) {
  %>
  	<script type="text/javascript">
 		parent.foldersframe.location.reload();

@@ -1,7 +1,6 @@
 package de.jalin.imapy;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -10,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import de.jalin.imap.IMAP;
+import de.jalin.imap.IMAPyMessage;
 
 public class MessageServlet extends HttpServlet {
 
@@ -25,10 +25,9 @@ public class MessageServlet extends HttpServlet {
 			final IMAP imap = imapySession.getSession();
 			final HttpSession session = request.getSession();
 			String messageId = null;
-			@SuppressWarnings("unchecked")
-			final Map<String, String > mesgHash = (Map<String, String>) session.getAttribute("message");
-			if (mesgHash != null) {
-				messageId = mesgHash.get("message-id");
+			final IMAPyMessage yMsg = (IMAPyMessage) session.getAttribute("message");
+			if (yMsg != null) {
+				messageId = yMsg.getMessageId();
 			}
 			final String pathInfo = request.getPathInfo().substring(1);
 			int slashIndex = pathInfo.indexOf('/');

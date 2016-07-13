@@ -4,9 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -24,6 +22,9 @@ import javax.mail.internet.MimeMessage;
 import de.jalin.imapy.IMAPyException;
 
 public class IMAP {
+
+	public static final String NEW = "new";
+	public static final String SEEN = "seen";
 
 	final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm");
 	
@@ -64,8 +65,8 @@ public class IMAP {
 		return fdList;
 	}
 	
-	public List<Map<String, String>> getMessages(final String folderName) throws IMAPyException {
-		final List<Map<String, String>> msgList = new ArrayList<Map<String, String>>();
+	public List<IMAPyMessage> getMessages(final String folderName) throws IMAPyException {
+		final List<IMAPyMessage> yMessages = new ArrayList<>();
 		try {
 			final Folder folder = folders.get(folderName);
 			if (!folder.isOpen()) {
@@ -79,18 +80,18 @@ public class IMAP {
 			folder.fetch(messages, fp);
 			folder.close(false);
 			for (Message msg : messages) {
-				final Map<String,String> map = new HashMap<String, String>();
-				map.put("idx", Integer.toString(msg.getMessageNumber()));
-				map.put("title", shorten(msg));
-				map.put("author", MimeParser.getFromAddress(msg));
-				map.put("folder", folderName);
-				map.put("status", msg.isSet(Flag.SEEN) ? "seen" : "new");
-				msgList.add(0, map);
+				final IMAPyMessage yMsg = new IMAPyMessage();
+				yMsg.setIndex(msg.getMessageNumber());
+				yMsg.setTitle(shorten(msg));
+				yMsg.setAuthor(MimeParser.getFromAddress(msg));
+				yMsg.setFolder(folderName);
+				yMsg.setStatus(msg.isSet(Flag.SEEN) ? SEEN : NEW);
+				yMessages.add(0, yMsg);
 			}
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);
 		}
-		return msgList;
+		return yMessages;
 	}
 
 	private String shorten(final Message msg) {
@@ -101,8 +102,8 @@ public class IMAP {
 		return subject;
 	}
 	
-	public Map<String, String> getMessage(final String folderName, final String msgId) throws IMAPyException {
-		final Map<String, String> item = new HashMap<String, String>();
+	public IMAPyMessage getMessage(final String folderName, final String msgId) throws IMAPyException {
+		final IMAPyMessage yMsg = new IMAPyMessage(); 
 		try {
 			final Folder folder = folders.get(folderName);
 			folder.open(Folder.READ_WRITE);
@@ -112,45 +113,46 @@ public class IMAP {
 				msgIndx = messageCount - 1;
 			}
 			final Message msg = folder.getMessage(msgIndx);
-			item.put("folder", folderName);
-			item.put("idx", msgId);
+			yMsg.setFolder(folderName);
+			yMsg.setIndex(msgIndx);
 			final Date sentDate = msg.getSentDate();
 			if (sentDate != null) {
-				item.put("date", DF.format(sentDate));
+				yMsg.setDate(DF.format(sentDate));
 			} else {
-				item.put("date", DF.format(new Date()));
+				yMsg.setDate(DF.format(new Date()));
 			}
-			item.put("title", shorten(msg));
-			item.put("author", MimeParser.getFromAddress(msg));
-			item.put("subject", shorten(msg));
-			item.put("from", MimeParser.getFromAddress(msg));
-			item.put("to", MimeParser.getToAddress(msg));
-			item.put("status", msg.isSet(Flag.SEEN) ? "seen" : "new");
+			yMsg.setTitle(shorten(msg));
+			yMsg.setSubject(MimeParser.getFromAddress(msg));
+			yMsg.setSubject(shorten(msg));
+			yMsg.setFrom(MimeParser.getFromAddress(msg));
+			yMsg.setTo(MimeParser.getToAddress(msg));
+			yMsg.setStatus(msg.isSet(Flag.SEEN) ? SEEN : NEW);
 			if (msg instanceof MimeMessage) {
 				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
-				item.put("content", messageData.getFormattedText());
-				item.put("message-id", messageData.getMessageID());
+				yMsg.setContent(messageData.getFormattedText());
+				yMsg.setMessageId(messageData.getMessageID());
 			}
 			msg.setFlag(Flag.SEEN, true);
 			folder.close(true);
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);
 		}
-		return item;
+		return yMsg;
 	}
 
-	public Map<String, String> removeMessage(final String folderName, final String msgId, final String messageId) throws IMAPyException {
-		final Map<String, String> item = new HashMap<String, String>();
+	public IMAPyMessage removeMessage(final String folderName, final String msgId, final String messageId) throws IMAPyException {
+		final IMAPyMessage yMsg = new IMAPyMessage(); 
 		try {
 			final Folder folder = folders.get(folderName);
 			folder.open(Folder.READ_WRITE);
-			final Message msg = folder.getMessage(Integer.parseInt(msgId));
+			int msgIndx = Integer.parseInt(msgId);
+			final Message msg = folder.getMessage(msgIndx);
 			String messageIDtoCheck = null;
 			if (msg instanceof MimeMessage) {
 				messageIDtoCheck = MimeParser.getMessageID((MimeMessage) msg);
 			}
-			item.put("folder", folderName);
-			item.put("idx", msgId);
+			yMsg.setFolder(folderName);
+			yMsg.setIndex(msgIndx);
 			final boolean messageIdChecked = (messageIDtoCheck != null && messageIDtoCheck.equals(messageId)) || (messageId == null && messageIDtoCheck == null);
 			if (messageIdChecked) {
 				msg.setFlag(Flag.DELETED, true);
@@ -159,7 +161,7 @@ public class IMAP {
 		} catch (MessagingException e) {
 			throw new IMAPyException(e);
 		}
-		return item;
+		return yMsg;
 	}
 
 	private void initFolders() throws IMAPyException {

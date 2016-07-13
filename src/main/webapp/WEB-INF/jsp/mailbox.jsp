@@ -22,7 +22,7 @@
 
  %>
 		<li class="<%= ( yFolder.getUnreadMessageCount() > 0 ) ? "foldernewmsgs" : "folderread" %>">
-			<a href="folder/<%= folderMap.get("folder") %>" target="_self">
+			<a href="folder/<%= yFolder.getName() %>" target="_self">
 				<%= yFolder.getTitle() %> (<%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %>)
 			</a>
 		</li>			
@@ -30,7 +30,7 @@
 				} else {
 					 %>
 		<li class="<%= ( yFolder.getUnreadMessageCount() > 0 ) ? "foldernewmsgs" : "folderread" %>">
-			<a href="folder/<%= folderMap.get("folder") %>" target="foldersframe">
+			<a href="folder/<%= yFolder.getName() %>" target="foldersframe">
 				<%= yFolder.getTitle() %> (<%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %>)
 			</a>
 		</li>			

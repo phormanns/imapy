@@ -25,28 +25,29 @@
 	if (messagesListObj instanceof List<?>) {
 		final List<?> messagesList = (List<?>) messagesListObj;
 		for (final Object messageMapObj : messagesList) {
-			if (messageMapObj instanceof Map<?, ?>) {
-				final Map<?, ?> messageMap = (Map<?, ?>) messageMapObj;
+			if (messageMapObj instanceof IMAPyMessage) {
+				final IMAPyMessage yMessage = (IMAPyMessage) messageMapObj;
 				if ("true".equals(session.getAttribute("mobile"))) {
  %>
-		<li class="message<%= messageMap.get("status") %>">
+		<li class="message<%= yMessage.getStatus() %>">
 			<a target="_self"
-				href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>">
-				<%= messageMap.get("title") %> [von: <%= messageMap.get("author") %>]
+				href="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>">
+				<%= yMessage.getTitle() %> [von: <%= yMessage.getAuthor() %>]
 			</a>
 		</li>			
 <%
 				} else {
  %>
-		<li class="message<%= messageMap.get("status") %>">
+		<li class="message<%= yMessage.getStatus() %>">
 			<a target="messagesframe"
-				href="<%= request.getContextPath() %>/message/<%= messageMap.get("folder") %>/<%= messageMap.get("idx") %>">
-				<%= messageMap.get("title") %> [von: <%= messageMap.get("author") %>]
+				href="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>">
+				<%= yMessage.getTitle() %> [von: <%= yMessage.getAuthor() %>]
 			</a>
 		</li>			
 <%
 				}
 			}
+
 		}
 	}
  %>
