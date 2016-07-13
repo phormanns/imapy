@@ -40,27 +40,26 @@ public class IMAP {
 		initFolders();
 	}
 	
-	public List<Map<String, String>> getFolders() {
-		final List<Map<String, String>> fdList = new ArrayList<Map<String, String>>();
+	public List<IMAPyFolder> getFolders() {
+		final List<IMAPyFolder> fdList = new ArrayList<>();
 		for (final String fdName : folders.keySet()) {
 			final Folder fd = folders.get(fdName);
-			final Map<String,String> map = new HashMap<String, String>();
-			map.put("folder", fdName);
-			map.put("title", fd.getName());
+			final IMAPyFolder yFolder = new IMAPyFolder();
+			yFolder.setName(fdName);
+			yFolder.setTitle(fd.getName());
 			try {
 				final int messageCount = fd.getMessageCount();
 				final int unreadMessageCount = fd.getUnreadMessageCount();
 				final int newMessageCount = fd.getNewMessageCount();
-				map.put("cssclass", (unreadMessageCount > 0) ? "foldernewmsgs": "folderread");
-				map.put("ntotal", Integer.toString(messageCount));
-				map.put("nunread", Integer.toString(unreadMessageCount));
-				map.put("nunseen", Integer.toString(newMessageCount));
+				yFolder.setNewMessageCount(newMessageCount);
+				yFolder.setUnreadMessageCount(unreadMessageCount);
+				yFolder.setTotalMessageCount(messageCount);
 			} catch (MessagingException e) {
-				map.put("ntotal", "?");
-				map.put("nunread", "?");
-				map.put("nunseen", "?");
+				yFolder.setNewMessageCount(-999);
+				yFolder.setUnreadMessageCount(-999);
+				yFolder.setTotalMessageCount(-999);
 			}
-			fdList.add(map);
+			fdList.add(yFolder);
 		}
 		return fdList;
 	}

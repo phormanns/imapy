@@ -16,22 +16,22 @@
 	if (foldersListObj instanceof List<?>) {
 		final List<?> foldersList = (List<?>)foldersListObj;
 		for (final Object folderMapObj : foldersList) {
-			if (folderMapObj instanceof Map<?, ?>) {
-				final Map<?, ?> folderMap = (Map<?, ?>) folderMapObj;
+			if (folderMapObj instanceof IMAPyFolder) {
+				final IMAPyFolder yFolder = (IMAPyFolder) folderMapObj;
 				if ("true".equals(session.getAttribute("mobile"))) {
 
  %>
-		<li class="<%= folderMap.get("cssclass") %>">
+		<li class="<%= ( yFolder.getUnreadMessageCount() > 0 ) ? "foldernewmsgs" : "folderread" %>">
 			<a href="folder/<%= folderMap.get("folder") %>" target="_self">
-				<%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)
+				<%= yFolder.getTitle() %> (<%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %>)
 			</a>
 		</li>			
 <%
 				} else {
 					 %>
-		<li class="<%= folderMap.get("cssclass") %>">
+		<li class="<%= ( yFolder.getUnreadMessageCount() > 0 ) ? "foldernewmsgs" : "folderread" %>">
 			<a href="folder/<%= folderMap.get("folder") %>" target="foldersframe">
-				<%= folderMap.get("title") %> (<%= folderMap.get("nunread") %>/<%= folderMap.get("ntotal") %>)
+				<%= yFolder.getTitle() %> (<%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %>)
 			</a>
 		</li>			
 				<%
