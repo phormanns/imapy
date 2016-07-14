@@ -23,7 +23,7 @@
 	<div class="login">
 		<p>Anmeldung</p>
 		<form action="login" method="post">
-			<div>E-Mail Adresse</div>
+			<div>User / Postfach</div>
 			<div><input type="text" size="48" maxlength="72" name="email" value="<%=email%>"></div>
 			<div>Passwort</div>
 			<div><input type="password" size="48" maxlength="48" name="password"></div>
