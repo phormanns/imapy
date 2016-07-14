@@ -36,6 +36,11 @@ div.login{ margin: 1.0em; }
 .menuitem { display: inline; margin: 0.2em; padding: 0.4em; background: #b0b0b0; }
 .emailcontent { margin: 1.0em 0.4em; }
 .emailcontent pre { font-size: 1.3em; line-height: 1.4em; }
+.emailcontent a:link { text-decoration:underline; font-weight:normal; color:#000000; }
+.emailcontent a:visited { text-decoration:none; font-weight:normal; color:#000000; }
+.emailcontent a:hover { text-decoration:underline; font-weight:normal; color:#808080; }
+.emailcontent a:active { text-decoration:none; font-weight:normal; color:#000000; }
+.emailcontent a:focus { text-decoration:none; font-weight:normal; color:#000000; }
 .emailheader { border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; }
 .emailheader h1 { margin: 0.5em 0 0.3em 0.3em; font-size: 1.3em; line-height: 1.4em; }
 .emailheader div { margin: 0em 0.3em 0em 0.3em; font-size: 1.0em; line-height: 1.2em; height: 1.8em; }

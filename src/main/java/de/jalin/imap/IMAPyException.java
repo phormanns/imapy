@@ -1,4 +1,4 @@
-package de.jalin.imapy;
+package de.jalin.imap;
 
 import javax.mail.MessagingException;
 
@@ -8,6 +8,10 @@ public class IMAPyException extends Exception {
 
 	public IMAPyException(MessagingException e) {
 		super(e);
+	}
+
+	public IMAPyException(String message) {
+		super(message);
 	}
 
 }

@@ -1,4 +1,4 @@
-package de.jalin.imap;
+package de.jalin.imap.mime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,13 +36,12 @@ public class MimeParser {
 			msg.setNew(!seen);
 			msg.setFlagged(flags.contains(Flags.Flag.FLAGGED));
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
+			msg.setText("Fehler beim Lesen der Flags " + e.getMessage());
 		}
 		try {
-			Object contentObj;
 			BufferedReader reader = null;
 			try {
-				contentObj = mimeMsg.getContent();
+				final Object contentObj = mimeMsg.getContent();
 				final String type = mimeMsg.getContentType();
 				if (contentObj instanceof String) {
 					if (type.startsWith("text/html")) {
@@ -71,12 +70,12 @@ public class MimeParser {
 					msg.setText("Unbekannter Inhalt");
 				}
 			} catch (MessagingException e) {
-				msg.setText("Fehler beim Lesen des Inhalts der Nachricht");
+				msg.setText("Fehler beim Lesen des Inhalts der Nachricht " + e.getLocalizedMessage());
 			} finally {
 				if (reader != null) try { reader.close(); } catch (IOException e) { } 
 			}
 		} catch (IOException e) {
-			msg.setText("I-/O-Fehler beim Lesen der Nachricht");
+			msg.setText("I-/O-Fehler beim Lesen der Nachricht " + e.getLocalizedMessage());
 		}
 		return msg;
 	}

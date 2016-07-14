@@ -1,4 +1,4 @@
-package de.jalin.imapy;
+package de.jalin.webmail;
 
 import java.io.IOException;
 
@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import de.jalin.imap.IMAP;
+import de.jalin.imap.IMAPySession;
+import de.jalin.imap.IMAPyException;
 import de.jalin.imap.IMAPyMessage;
 
 public class MessageServlet extends HttpServlet {
@@ -21,8 +22,8 @@ public class MessageServlet extends HttpServlet {
 
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
 		try {
-			final IMAPySession imapySession = new IMAPySession(request, response);
-			final IMAP imap = imapySession.getSession();
+			final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
+			final IMAPySession imap = imapySession.getSession();
 			final HttpSession session = request.getSession();
 			String messageId = null;
 			final IMAPyMessage yMsg = (IMAPyMessage) session.getAttribute("message");

@@ -1,15 +1,24 @@
-package de.jalin.imap;
+package de.jalin.imap.mime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
+import de.jalin.imap.text.HtmlHelper;
 
-public class MessageData {
 
+public class MessageData implements Serializable {
+
+
+	private static final long serialVersionUID = 1L;
+
+	private static final String REGEXP_HTTP_TEXT_LINK = "(https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
+	private static final String HTTP_LINK_REPLACEMENT = "<a href=\"$1\" target=\"_new\">$1</a>";
+	
 	final private String from;
 	final private String subject;
 	final private String sentTimestamp;
@@ -78,7 +87,6 @@ public class MessageData {
 		if (isHtml) {
 			return text;
 		}
-		final String regex = "(https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
 		final int maxlen = 84;
 		final StringBuffer formated = new StringBuffer("<p>\n");
 		int blank = maxlen - 10;
@@ -102,7 +110,7 @@ public class MessageData {
 					while (blank < s.length() && s.charAt(blank) != ' ') {
 						blank++;
 					}
-					formated.append(TextUtil.replaceEntities(s.substring(0, blank).replaceAll(regex, "<a href=\"#\">$1</a>")));
+					formated.append(HtmlHelper.replaceEntities(s.substring(0, blank)).replaceAll(REGEXP_HTTP_TEXT_LINK, HTTP_LINK_REPLACEMENT));
 					formated.append('\n');
 					if (isPreFormatted) {
 						formated.append("<br />\n");
@@ -112,8 +120,8 @@ public class MessageData {
 						s = s.substring(1); // ggf. fuehrende Blank abschneiden
 					}
 				}
-				formated.append(TextUtil.replaceEntities(s).replaceAll(regex, "<a href=\"$1\" target=\"_new\">$1</a>"));
-				if (s.endsWith("--") || s.endsWith("==")) {
+				formated.append(HtmlHelper.replaceEntities(s).replaceAll(REGEXP_HTTP_TEXT_LINK, HTTP_LINK_REPLACEMENT));
+				if (s.endsWith("--") || s.endsWith("-- ") || s.endsWith("==")) {
 					formated.append("<br />\n");
 				}
 				formated.append('\n');

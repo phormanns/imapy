@@ -19,9 +19,10 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 
-import de.jalin.imapy.IMAPyException;
+import de.jalin.imap.mime.MessageData;
+import de.jalin.imap.mime.MimeParser;
 
-public class IMAP {
+public class IMAPySession {
 
 	public static final String NEW = "new";
 	public static final String SEEN = "seen";
@@ -33,7 +34,7 @@ public class IMAP {
 	final private String host;
 	final private SortedMap<String, Folder> folders;
 	
-	public IMAP(String host, String user, String password) throws IMAPyException {
+	public IMAPySession(String host, String user, String password) throws IMAPyException {
 		this.user = user;
 		this.password = password;
 		this.host = host;
@@ -122,7 +123,7 @@ public class IMAP {
 				yMsg.setDate(DF.format(new Date()));
 			}
 			yMsg.setTitle(shorten(msg));
-			yMsg.setSubject(MimeParser.getFromAddress(msg));
+			yMsg.setAuthor(MimeParser.getFromAddress(msg));
 			yMsg.setSubject(shorten(msg));
 			yMsg.setFrom(MimeParser.getFromAddress(msg));
 			yMsg.setTo(MimeParser.getToAddress(msg));
@@ -131,6 +132,8 @@ public class IMAP {
 				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
 				yMsg.setContent(messageData.getFormattedText());
 				yMsg.setMessageId(messageData.getMessageID());
+			} else {
+				throw new IMAPyException("unknown message type");
 			}
 			msg.setFlag(Flag.SEEN, true);
 			folder.close(true);

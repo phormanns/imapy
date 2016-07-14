@@ -1,4 +1,4 @@
-package de.jalin.imapy;
+package de.jalin.webmail;
 
 import java.io.IOException;
 
@@ -7,25 +7,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import de.jalin.imap.IMAP;
+import de.jalin.imap.IMAPySession;
 
-public class IMAPySession {
+public class WebmailHttpSession {
 
 	final HttpServletRequest request;
 	final HttpServletResponse response;
-	final IMAP imapSession;
+	final IMAPySession imapSession;
 	
-	public IMAPySession(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+	public WebmailHttpSession(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 		this.request = request;
 		this.response = response;
 		final HttpSession httpSession = request.getSession();
-		imapSession = (IMAP) httpSession.getAttribute("imap");
+		imapSession = (IMAPySession) httpSession.getAttribute("imap");
 		if (imapSession == null) {
 			response.sendRedirect(request.getContextPath() + "/login.jsp");
 		}
 	}
 	
-	public IMAP getSession() {
+	public IMAPySession getSession() {
 		return imapSession;
 	}
 	

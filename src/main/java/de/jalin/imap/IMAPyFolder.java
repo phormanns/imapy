@@ -1,7 +1,11 @@
 package de.jalin.imap;
 
-public class IMAPyFolder {
+import java.io.Serializable;
 
+public class IMAPyFolder implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private String title;
 	private int totalMessageCount;

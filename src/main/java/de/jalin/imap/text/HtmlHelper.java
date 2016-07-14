@@ -1,6 +1,6 @@
-package de.jalin.imap;
+package de.jalin.imap.text;
 
-public class TextUtil {
+public class HtmlHelper {
 
 	public static String replaceEntities(String src) {
 		src = replaceString(src, "&", "&amp;");

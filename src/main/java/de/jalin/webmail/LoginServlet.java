@@ -1,4 +1,4 @@
-package de.jalin.imapy;
+package de.jalin.webmail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +19,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import de.jalin.imap.IMAP;
+import de.jalin.imap.IMAPySession;
+import de.jalin.imap.IMAPyException;
 
 public class LoginServlet extends HttpServlet {
 
@@ -70,7 +71,7 @@ public class LoginServlet extends HttpServlet {
 				}
 			}
 			session.setAttribute("email", emailAddr);
-			session.setAttribute("imap", new IMAP(host, user, password));
+			session.setAttribute("imap", new IMAPySession(host, user, password));
 			if ("true".equals(mobile)) {
 				response.sendRedirect("mailbox");
 			} else {

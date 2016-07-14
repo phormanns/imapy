@@ -1,7 +1,11 @@
 package de.jalin.imap;
 
-public class IMAPyMessage {
+import java.io.Serializable;
 
+public class IMAPyMessage implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private int index;
 	private String title;
 	private String author;

@@ -1,4 +1,4 @@
-package de.jalin.imapy;
+package de.jalin.webmail;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ public class MailboxServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try {
-			final IMAPySession imapySession = new IMAPySession(request, response);
+			final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
 			request.getSession().setAttribute("folders", imapySession.getSession().getFolders());
 			imapySession.dispatchTo("/WEB-INF/jsp/mailbox.jsp");
 		} catch (IOException e) {
