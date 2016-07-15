@@ -18,8 +18,6 @@
 		<li class="menuitem"><a href="<%= request.getContextPath() %>/folder/<%= session.getAttribute("folder") %>">Folder</a></li>			
 <%
 	}
- %>
-<%
 	final Object attrObj = session.getAttribute("message");
 	if (attrObj instanceof IMAPyMessage) {
 		final IMAPyMessage message = (IMAPyMessage) session.getAttribute("message");
@@ -39,6 +37,21 @@
 		<div class="emailfrom"><div class="label">Absender</div><div class="text"><%= message.getFrom() %></div></div>
 		<div class="emailto"><div class="label">Empfänger</div><div class="text"><%= message.getTo() %></div></div>
 		<div class="emaildate"><div class="label">Datum</div><div class="text"><%= message.getDate() %></div></div>
+<%
+		final List<String> attachments = message.getAttachments(); 
+		final int numAttached = attachments.size();
+		if (numAttached > 0) {
+ %>
+		<div class="emailattached"><div class="label">Anhänge</div><div class="text">
+<%
+			for (int idx=0; idx<numAttached; idx++) {
+ %>
+ 				<a href="<%= request.getContextPath() %>/attachment/<%= message.getFolder() %>/<%= message.getIndex() %>/<%= attachments.get(idx) %>" target=\"_new\"><%= attachments.get(idx) %></a> &nbsp;
+<%
+			}
+		}
+ %>
+		</div></div>
 	</div>
 	<div class="emailcontent">
 		<%= message.getContent() %>

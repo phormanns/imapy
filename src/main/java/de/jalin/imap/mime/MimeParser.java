@@ -28,8 +28,6 @@ public class MimeParser {
 		final Date sentDate = getSentDate(mimeMsg);
 		final String messageID = getMessageID(mimeMsg);
 		final MessageData msg = new MessageData(fromEMail, subject, df.format(sentDate), messageID);
-		msg.setAttached("");
-		msg.setText("");
 		try {
 			final Flags flags = mimeMsg.getFlags();
 			final boolean seen = flags.contains(Flags.Flag.SEEN);
@@ -152,16 +150,16 @@ public class MimeParser {
 		}
 	}
 
-	private static void parseMultipart(MessageData msg, Multipart multipartContent)
-			throws MessagingException, IOException {
+	private static void parseMultipart(MessageData msg, Multipart multipartContent) throws MessagingException, IOException 
+	{
 		int i = 0;
 		final int parts = multipartContent.getCount();
 		while (i < parts) {
 			final BodyPart bodyPart = multipartContent.getBodyPart(i);
 			String contentType = bodyPart.getContentType();
-			if (contentType != null) {
-				msg.setAttached(msg.getAttached() + contentType);
-				msg.setAttached(msg.getAttached() + "\n");
+			if (contentType != null && contentType.contains("name=")) {
+				final String attName = contentType.substring(contentType.indexOf("name=") + 5);
+				msg.addAttachment(attName, contentType);
 			} else {
 				contentType = "text/plain";
 			}

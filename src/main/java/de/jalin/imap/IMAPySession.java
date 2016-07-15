@@ -130,6 +130,7 @@ public class IMAPySession {
 			yMsg.setStatus(msg.isSet(Flag.SEEN) ? SEEN : NEW);
 			if (msg instanceof MimeMessage) {
 				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
+				yMsg.addAttachments(messageData.getAttachmentsHash());
 				yMsg.setContent(messageData.getFormattedText());
 				yMsg.setMessageId(messageData.getMessageID());
 			} else {

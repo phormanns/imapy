@@ -1,11 +1,16 @@
 package de.jalin.imap;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class IMAPyMessage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
+	private final List<String> attachments;  
+
 	private int index;
 	private String title;
 	private String author;
@@ -17,6 +22,10 @@ public class IMAPyMessage implements Serializable {
 	private String date;
 	private String content;
 	private String messageId;
+
+	public IMAPyMessage() {
+		attachments = new ArrayList<>();
+	}
 	
 	public int getIndex() {
 		return index;
@@ -104,6 +113,14 @@ public class IMAPyMessage implements Serializable {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public void addAttachments(final Map<String, String> map) {
+		attachments.addAll(map.keySet());
+	}
+	
+	public List<String> getAttachments() {
+		return attachments;
 	}
 	
 }

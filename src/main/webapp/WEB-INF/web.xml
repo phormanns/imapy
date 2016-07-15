@@ -24,9 +24,17 @@
 		<servlet-name>MessageServlet</servlet-name>
 		<servlet-class>de.jalin.webmail.MessageServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>AttachmentServlet</servlet-name>
+		<servlet-class>de.jalin.webmail.AttachmentServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>MessageServlet</servlet-name>
 		<url-pattern>/message/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AttachmentServlet</servlet-name>
+		<url-pattern>/attachment/*</url-pattern>
 	</servlet-mapping>
 	<servlet>
 		<servlet-name>LoginServlet</servlet-name>
