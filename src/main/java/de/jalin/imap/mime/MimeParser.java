@@ -161,7 +161,7 @@ public class MimeParser {
 			String contentType = bodyPart.getContentType();
 			if (contentType != null && ( Part.ATTACHMENT.equalsIgnoreCase(disposition) || Part.INLINE.equalsIgnoreCase(disposition) )) {
 				String attName = "attachment" + i;
-				if (bodyPart.getFileName() != null) {
+				if (bodyPart.getFileName() != null && !bodyPart.getFileName().isEmpty()) {
 					attName = bodyPart.getFileName();
 				}
 				msg.addAttachment(attName, contentType);

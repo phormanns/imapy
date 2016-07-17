@@ -69,7 +69,7 @@ public class MessageData implements Serializable {
 	public void setText(final String text) {
 		if (text != null && text.length() > 29) {
 			final String textBeginning = text.substring(0, 29);
-			if (textBeginning.contains("<html") || textBeginning.contains("<div") || textBeginning.contains("<!DOCTYPE html")) {
+			if (textBeginning.startsWith("<p") || textBeginning.startsWith("<span") || textBeginning.contains("<html") || textBeginning.contains("<div") || textBeginning.contains("<!DOCTYPE html")) {
 				setHtmlText(text);
 			} else {
 				this.text = text;
