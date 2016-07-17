@@ -14,6 +14,7 @@ import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -156,9 +157,13 @@ public class MimeParser {
 		final int parts = multipartContent.getCount();
 		while (i < parts) {
 			final BodyPart bodyPart = multipartContent.getBodyPart(i);
+			final String disposition = bodyPart.getDisposition();
 			String contentType = bodyPart.getContentType();
-			if (contentType != null && contentType.contains("name=")) {
-				final String attName = contentType.substring(contentType.indexOf("name=") + 5);
+			if (contentType != null && ( Part.ATTACHMENT.equalsIgnoreCase(disposition) || Part.INLINE.equalsIgnoreCase(disposition) )) {
+				String attName = "attachment" + i;
+				if (bodyPart.getFileName() != null) {
+					attName = bodyPart.getFileName();
+				}
 				msg.addAttachment(attName, contentType);
 			} else {
 				contentType = "text/plain";
