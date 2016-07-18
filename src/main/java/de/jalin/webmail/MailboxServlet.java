@@ -6,6 +6,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import de.jalin.imap.IMAPySession;
 
 public class MailboxServlet extends HttpServlet {
 
@@ -18,7 +21,12 @@ public class MailboxServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try {
 			final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
-			request.getSession().setAttribute("folders", imapySession.getSession().getFolders());
+			final HttpSession httpSession = request.getSession();
+			final IMAPySession imapSession = imapySession.getSession();
+			if (imapSession == null) {
+				return;
+			}
+			httpSession.setAttribute("folders", imapSession.getFolders());
 			imapySession.dispatchTo("/WEB-INF/jsp/mailbox.jsp");
 		} catch (IOException e) {
 			throw new ServletException(e);

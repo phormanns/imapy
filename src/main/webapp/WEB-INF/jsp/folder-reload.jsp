@@ -11,8 +11,8 @@
 </head>
 <body>
 	<script type="text/javascript">
-	parent.foldersframe.location.reload();
-	parent.mailboxframe.location.reload();
+		parent.foldersframe.location.reload();
+		parent.mailboxframe.location.reload();
 	</script>
 </body>
 </html>

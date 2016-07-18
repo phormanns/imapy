@@ -22,6 +22,9 @@ public class FolderServlet extends HttpServlet {
 		try {
 			final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
 			final IMAPySession imap = imapySession.getSession();
+			if (imap == null) {
+				return;
+			}
 			final String pathInfo = request.getPathInfo();
 			request.getSession().setAttribute("messages", imap.getMessages(pathInfo.substring(1)));
 			imapySession.dispatchTo("/WEB-INF/jsp/folder.jsp");

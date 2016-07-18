@@ -194,5 +194,26 @@ public class IMAPySession {
 			}
 		}
 	}
+
+	public IMAPyMessage moveMessageToFolder(final String sourceFolderName, final String msgIndex, final String targetFolderName) throws IMAPyException {
+		final IMAPyMessage yMsg = new IMAPyMessage(); 
+		try {
+			final Folder srcFolder = folders.get(sourceFolderName);
+			srcFolder.open(Folder.READ_WRITE);
+			final Folder targetFolder = folders.get(targetFolderName);
+			targetFolder.open(Folder.READ_WRITE);
+			int msgIndx = Integer.parseInt(msgIndex);
+			final Message msg = srcFolder.getMessage(msgIndx);
+			srcFolder.copyMessages(new Message[] { msg }, targetFolder);
+			msg.setFlag(Flag.DELETED, true);
+			yMsg.setFolder(targetFolderName);
+			yMsg.setIndex(msgIndx);
+			srcFolder.close(true);
+			targetFolder.close(true);
+		} catch (MessagingException e) {
+			throw new IMAPyException(e);
+		}
+		return yMsg;
+	}
 	
 }

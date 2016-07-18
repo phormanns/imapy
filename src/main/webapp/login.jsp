@@ -42,5 +42,8 @@
 			<p><input type="submit" value=" Absenden "/></p>
 		</form>
 	</div>
+	<script type="text/javascript">
+		if (top != self) { top.location.replace(self.location.href); }
+	</script>
 </body>
 </html>

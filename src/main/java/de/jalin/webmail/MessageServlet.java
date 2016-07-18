@@ -25,6 +25,9 @@ public class MessageServlet extends HttpServlet {
 		try {
 			final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
 			final IMAPySession imap = imapySession.getSession();
+			if (imap == null) {
+				return;
+			}
 			final HttpSession session = request.getSession();
 			String messageId = null;
 			final IMAPyMessage yMsg = (IMAPyMessage) session.getAttribute("message");
@@ -32,9 +35,13 @@ public class MessageServlet extends HttpServlet {
 				messageId = yMsg.getMessageId();
 			}
 			final String pathInfo = request.getPathInfo().substring(1);
-			int slashIndex = pathInfo.indexOf('/');
-			final String folder = pathInfo.substring(0, slashIndex);
-			final String msgIndex = pathInfo.substring(slashIndex + 1);
+			final String[] pathSplit = pathInfo.split("/");
+			final String folder = pathSplit[0];
+			final String msgIndex = pathSplit[1];
+			if (pathSplit.length == 4 && pathSplit[2].equals("moveto")) {
+				imap.moveMessageToFolder(folder, msgIndex, pathSplit[3]);
+				return;
+			}
 			if ("confirmdel".equals(request.getParameter("msgop"))) {
 				imap.removeMessage(folder, msgIndex, messageId);
 				if ("true".equals(session.getAttribute("mobile"))) {
