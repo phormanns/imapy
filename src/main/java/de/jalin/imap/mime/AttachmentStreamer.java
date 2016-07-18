@@ -28,9 +28,11 @@ public class AttachmentStreamer implements MessagePartHandler {
 	public void handle(final BodyPart part) throws IMAPyException {
 		try {
 			counter++;
-			String fileName = part.getFileName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+			String fileName = part.getFileName();
 			if (fileName == null || fileName.isEmpty()) {
 				fileName = "attachment" + counter;
+			} else {
+				fileName = fileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 			}
 			if (attachmentName.equals(fileName) && outputStreamIsOpen) {
 				final InputStream inputStream = part.getInputStream();

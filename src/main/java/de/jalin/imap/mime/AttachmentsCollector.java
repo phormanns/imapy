@@ -30,9 +30,11 @@ public class AttachmentsCollector implements MessagePartHandler {
 		try {
 			counter++;
 			final String contentType = part.getContentType();
-			String fileName = part.getFileName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+			String fileName = part.getFileName();
 			if (fileName == null || fileName.isEmpty()) {
 				fileName = "attachment" + counter;
+			} else {
+				fileName = fileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 			}
 			attachmentsList.put(fileName, contentType);
 		} catch (MessagingException e) {
