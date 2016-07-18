@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import de.jalin.imap.IMAPySession;
+import de.jalin.imap.mime.AttachmentsCollector;
 import de.jalin.imap.IMAPyException;
 import de.jalin.imap.IMAPyMessage;
 
@@ -44,7 +45,10 @@ public class MessageServlet extends HttpServlet {
 				return;
 			}
 			session.setAttribute("folder", folder);
-			session.setAttribute("message", imap.getMessage(folder, msgIndex));
+			final AttachmentsCollector collector = new AttachmentsCollector();
+			final IMAPyMessage yMessage = imap.getMessage(folder, msgIndex, collector);
+			session.setAttribute("message", yMessage);
+			yMessage.addAttachments(collector.getAttachmentsList());
 			imapySession.dispatchTo("/WEB-INF/jsp/message.jsp");
 		} catch (IOException e) {
 			throw new ServletException(e);

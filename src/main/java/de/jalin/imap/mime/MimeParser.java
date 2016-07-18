@@ -18,12 +18,14 @@ import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import de.jalin.imap.IMAPyException;
+
 
 public class MimeParser {
 
 	public static final DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
 
-	public static MessageData parseMimeMessage(final MimeMessage mimeMsg) {
+	public static MessageData parseMimeMessage(final MimeMessage mimeMsg, final MessagePartHandler partHandler) {
 		final String fromEMail = getFromAddress(mimeMsg);
 		final String subject = getSubject(mimeMsg);
 		final Date sentDate = getSentDate(mimeMsg);
@@ -50,7 +52,7 @@ public class MimeParser {
 					}
 				} else if (contentObj instanceof Multipart) {
 					final Multipart multipartContent = (Multipart) contentObj;
-					parseMultipart(msg, multipartContent);
+					parseMultipart(msg, multipartContent, partHandler);
 				} else if (contentObj instanceof InputStream) {
 					final InputStream streamContent = (InputStream) contentObj;
 					msg.setText("IMAPInputStream type=" + type);
@@ -68,7 +70,7 @@ public class MimeParser {
 				} else {
 					msg.setText("Unbekannter Inhalt");
 				}
-			} catch (MessagingException e) {
+			} catch (MessagingException | IMAPyException e) {
 				msg.setText("Fehler beim Lesen des Inhalts der Nachricht " + e.getLocalizedMessage());
 			} finally {
 				if (reader != null) try { reader.close(); } catch (IOException e) { } 
@@ -151,36 +153,36 @@ public class MimeParser {
 		}
 	}
 
-	private static void parseMultipart(MessageData msg, Multipart multipartContent) throws MessagingException, IOException 
+	private static void parseMultipart(MessageData msg, Multipart multipartContent, MessagePartHandler partHandler) throws IMAPyException 
 	{
 		int i = 0;
-		final int parts = multipartContent.getCount();
-		while (i < parts) {
-			final BodyPart bodyPart = multipartContent.getBodyPart(i);
-			final String disposition = bodyPart.getDisposition();
-			String contentType = bodyPart.getContentType();
-			if (contentType != null && ( Part.ATTACHMENT.equalsIgnoreCase(disposition) || Part.INLINE.equalsIgnoreCase(disposition) )) {
-				String attName = "attachment" + i;
-				if (bodyPart.getFileName() != null && !bodyPart.getFileName().isEmpty()) {
-					attName = bodyPart.getFileName();
-				}
-				msg.addAttachment(attName, contentType);
-			} else {
-				contentType = "text/plain";
-			}
-			final Object object = bodyPart.getContent();
-			if (object instanceof String && msg.getFormattedText().length() < 17) {
-				final String text = (String) object;
-				if (contentType.contains("html")) {
-					msg.setHtmlText(text);
+		try {
+			final int parts = multipartContent.getCount();
+			while (i < parts) {
+				final BodyPart bodyPart = multipartContent.getBodyPart(i);
+				final String disposition = bodyPart.getDisposition();
+				String contentType = bodyPart.getContentType();
+				if (contentType != null && ( Part.ATTACHMENT.equalsIgnoreCase(disposition) || Part.INLINE.equalsIgnoreCase(disposition) )) {
+					partHandler.handle(bodyPart);
 				} else {
-					msg.setText(text);
+					contentType = "text/plain";
 				}
+				final Object object = bodyPart.getContent();
+				if (object instanceof String && msg.getFormattedText().length() < 17) {
+					final String text = (String) object;
+					if (contentType.contains("html")) {
+						msg.setHtmlText(text);
+					} else {
+						msg.setText(text);
+					}
+				}
+				if (object instanceof Multipart) {
+					parseMultipart(msg, (Multipart) object, partHandler);
+				}
+				i++;
 			}
-			if (object instanceof Multipart) {
-				parseMultipart(msg, (Multipart) object);
-			}
-			i++;
+		} catch (MessagingException | IOException e) {
+			throw new IMAPyException(e);
 		}
 	}
 

@@ -20,6 +20,7 @@ import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 
 import de.jalin.imap.mime.MessageData;
+import de.jalin.imap.mime.MessagePartHandler;
 import de.jalin.imap.mime.MimeParser;
 
 public class IMAPySession {
@@ -103,7 +104,7 @@ public class IMAPySession {
 		return subject;
 	}
 	
-	public IMAPyMessage getMessage(final String folderName, final String msgId) throws IMAPyException {
+	public IMAPyMessage getMessage(final String folderName, final String msgId, final MessagePartHandler partHandler) throws IMAPyException {
 		final IMAPyMessage yMsg = new IMAPyMessage(); 
 		try {
 			final Folder folder = folders.get(folderName);
@@ -129,8 +130,7 @@ public class IMAPySession {
 			yMsg.setTo(MimeParser.getToAddress(msg));
 			yMsg.setStatus(msg.isSet(Flag.SEEN) ? SEEN : NEW);
 			if (msg instanceof MimeMessage) {
-				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg);
-				yMsg.addAttachments(messageData.getAttachmentsHash());
+				final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg, partHandler);
 				yMsg.setContent(messageData.getFormattedText());
 				yMsg.setMessageId(messageData.getMessageID());
 			} else {
@@ -143,7 +143,7 @@ public class IMAPySession {
 		}
 		return yMsg;
 	}
-
+	
 	public IMAPyMessage removeMessage(final String folderName, final String msgId, final String messageId) throws IMAPyException {
 		final IMAPyMessage yMsg = new IMAPyMessage(); 
 		try {

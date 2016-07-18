@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -21,7 +19,6 @@ public class MessageData implements Serializable {
 	private static final String REGEXP_HTTP_TEXT_LINK = "(https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
 	private static final String HTTP_LINK_REPLACEMENT = "<a href=\"$1\" target=\"_new\">$1</a>";
 	
-	final private Map<String, String> attachmentsHash;
 	final private String from;
 	final private String subject;
 	final private String sentTimestamp;
@@ -32,10 +29,8 @@ public class MessageData implements Serializable {
 	private boolean isNew;
 	private boolean isFlagged;
 
-
 	public MessageData(final String from, final String subject, final String sent, final String messageID) 
 	{
-		this.attachmentsHash = new HashMap<>();
 		this.isNew = true;
 		this.isFlagged = false;
 		this.isHtml = false;
@@ -149,14 +144,6 @@ public class MessageData implements Serializable {
 	public void setHtmlText(final String uncleanHtml) {
 		isHtml = true;
 		text = Jsoup.clean(uncleanHtml, Whitelist.basic());
-	}
-
-	public void addAttachment(String attName, String contentType) {
-		attachmentsHash.put(attName, contentType);
-	}
-
-	public Map<String, String> getAttachmentsHash() {
-		return attachmentsHash;
 	}
 
 }
