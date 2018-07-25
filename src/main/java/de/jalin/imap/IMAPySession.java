@@ -22,6 +22,7 @@ import javax.mail.internet.MimeMessage;
 import de.jalin.imap.mime.MessageData;
 import de.jalin.imap.mime.MessagePartHandler;
 import de.jalin.imap.mime.MimeParser;
+import de.jalin.imap.text.HtmlHelper;
 
 public class IMAPySession {
 
@@ -101,7 +102,7 @@ public class IMAPySession {
 		if (subject.length() > 80) {
 			return subject.substring(0, 79);
 		}
-		return subject;
+		return HtmlHelper.replaceEntities(subject);
 	}
 	
 	public IMAPyMessage getMessage(final String folderName, final String msgId, final MessagePartHandler partHandler) throws IMAPyException {
