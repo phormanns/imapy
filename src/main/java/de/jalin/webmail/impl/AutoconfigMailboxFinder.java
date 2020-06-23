@@ -1,9 +1,11 @@
 package de.jalin.webmail.impl;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,11 +25,16 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
 	public void setLogin(String login, String password) throws IMAPyException {
 		this.password = password;
 		try {
-			final URL url = new URL("http://autoconfig." 
-					+ login.split("@")[1] 
-					+ "/mail/config-v1.1.xml?emailaddress=" + login);		
-			try (InputStream autoconfigStream = url.openConnection().getInputStream()) 
-			{
+			final String emailDomain = login.split("@")[1];
+			URL url = new URL("http://autoconfig."  + emailDomain + "/mail/config-v1.1.xml?emailaddress=" + login);		
+			InputStream autoconfigStream = null;
+			try  {
+				try {
+					autoconfigStream = url.openConnection().getInputStream();
+				} catch (UnknownHostException | FileNotFoundException e) {
+					url = new URL("http://" + emailDomain + "/.well-known/autoconfig/mail/config-v1.1.xml?emailaddress=" + login);
+					autoconfigStream = url.openConnection().getInputStream();
+				}
 				final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 				final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 				final Document document = documentBuilder.parse(autoconfigStream);
@@ -52,6 +59,14 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
 				}
 			} catch (IOException | ParserConfigurationException | SAXException e) {
 				throw new IMAPyException(e);
+			} finally {
+				if (autoconfigStream != null) { 
+					try {
+						autoconfigStream.close();
+					} catch (IOException e) {
+						// do not care
+					} 
+				}
 			}
 		} catch (DOMException | MalformedURLException e) {
 			throw new IMAPyException(e);
