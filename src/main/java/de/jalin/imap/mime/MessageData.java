@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
 import de.jalin.imap.text.HtmlHelper;
 
@@ -143,7 +143,7 @@ public class MessageData implements Serializable {
 
 	public void setHtmlText(final String uncleanHtml) {
 		isHtml = true;
-		text = Jsoup.clean(uncleanHtml, Whitelist.basic());
+		text = Jsoup.clean(uncleanHtml, Safelist.basic());
 	}
 
 }
