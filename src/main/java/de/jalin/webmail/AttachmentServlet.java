@@ -28,6 +28,8 @@ public class AttachmentServlet extends HttpServlet {
 			final String folder = pathItems[0]; 
 			final String messageIdx = pathItems[1]; 
 			final String attachmentName = pathItems[2];
+			final String mimeType = getServletContext().getMimeType(attachmentName);
+			response.setContentType(mimeType);
 			imap.getMessage(folder, messageIdx, new AttachmentStreamer(attachmentName, response.getOutputStream()));
 		} catch (IOException | IMAPyException e) {
 			throw new ServletException(e);
