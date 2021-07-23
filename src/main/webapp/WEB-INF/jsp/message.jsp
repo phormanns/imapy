@@ -49,9 +49,11 @@
  				<a href="<%= request.getContextPath() %>/attachment/<%= message.getFolder() %>/<%= message.getIndex() %>/<%= attachments.get(idx) %>" target=\"_new\"><%= attachments.get(idx) %></a> &nbsp;
 <%
 			}
-		}
  %>
 		</div></div>
+<%
+		}
+ %>
 	</div>
 	<div class="emailcontent">
 		<%= message.getContent() %>
