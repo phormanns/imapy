@@ -4,7 +4,7 @@
 	<groupId>de.jalin.imapy</groupId>
 	<artifactId>IMAPy</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<name>IMAPy Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	

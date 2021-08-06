@@ -47,6 +47,7 @@ public class LoginServlet extends HttpServlet {
 			host = mbxFinder.getHost();
 			user = mbxFinder.getUser();
 			session.setAttribute("email", emailAddr);
+			session.setAttribute("max_list_length", "300");
 			session.setAttribute("imap", new IMAPySession(host, user, password));
 			if ("true".equals(mobile)) {
 				response.sendRedirect("mailbox");

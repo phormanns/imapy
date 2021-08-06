@@ -46,7 +46,7 @@
 <%
 			for (int idx=0; idx<numAttached; idx++) {
  %>
- 				<a href="<%= request.getContextPath() %>/attachment/<%= message.getFolder() %>/<%= message.getIndex() %>/<%= attachments.get(idx) %>" target=\"_new\"><%= attachments.get(idx) %></a> &nbsp;
+ 				<a href="<%= request.getContextPath() %>/attachment/<%= message.getFolder() %>/<%= message.getIndex() %>/<%= attachments.get(idx) %>" target="_new"><%= attachments.get(idx) %></a> &nbsp;
 <%
 			}
  %>

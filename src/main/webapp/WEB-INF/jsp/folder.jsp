@@ -23,29 +23,29 @@
 <%
 	final Object messagesListObj = session.getAttribute("messages");
 	if (messagesListObj instanceof List<?>) {
+		String maxListLengthAttr = (String)session.getAttribute("max_list_length");
+		int maxListLength = Integer.parseInt(maxListLengthAttr); 
+		String targetAttrib = "messagesframe";
+		if ("true".equals(session.getAttribute("mobile"))) { 
+			targetAttrib = "_self";
+		}
 		final List<?> messagesList = (List<?>) messagesListObj;
+		int loopCount = 0;
 		for (final Object messageMapObj : messagesList) {
+			loopCount++;
+			if (loopCount > maxListLength) {
+				break;
+			}
 			if (messageMapObj instanceof IMAPyMessage) {
 				final IMAPyMessage yMessage = (IMAPyMessage) messageMapObj;
-				if ("true".equals(session.getAttribute("mobile"))) {
  %>
 		<li class="message<%= yMessage.getStatus() %>">
-			<a target="_self"
+			<a target="<%= targetAttrib %>"
 				href="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>">
 				<%= yMessage.getTitle() %> [von: <%= yMessage.getAuthor() %>]
 			</a>
 		</li>			
 <%
-				} else {
- %>
-		<li class="message<%= yMessage.getStatus() %>">
-			<a target="messagesframe"
-				href="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>">
-				<%= yMessage.getTitle() %> [von: <%= yMessage.getAuthor() %>]
-			</a>
-		</li>			
-<%
-				}
 			}
 
 		}
