@@ -36,14 +36,6 @@
 								<%= yFolder.getTitle() %> <span class="email-count"><%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %></span>
 							</a>
 						</li>
-		<!-- 			
-		<li id="<%= yFolder.getName() %>" class="<%= ( yFolder.getUnreadMessageCount() > 0 ) ? "foldernewmsgs" : "folderread" %>" 
-			ondragover="event.preventDefault();" 
-			ondrop="event.preventDefault(); var req = new XMLHttpRequest(); req.open('GET', event.dataTransfer.getData('text/plain') + '/moveto/' + event.currentTarget.id, false); req.send(null); reloadOnDrag();">
-			<a href="folder/<%= yFolder.getName() %>" target="foldersframe">
-				<%= yFolder.getTitle() %> (<%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %>)
-			</a>
-		</li>  -->			
 <%
 			}
 		}
@@ -55,6 +47,9 @@
     	</div>
 
 		<div id="list" class="pure-u-1" hx-get="<%= request.getContextPath() %>/folder/INBOX" hx-trigger="load">
+		</div>
+		
+		<div id="main" class="pure-u-1">
 		</div>
 
 	</div>
