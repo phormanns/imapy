@@ -32,8 +32,6 @@ public class LoginServlet extends HttpServlet {
 		if (password == null || password.length() < 3) {
 			throw new ServletException("no valid password given");
 		}
-		final String mobile = request.getParameter("mobile");
-		session.setAttribute("mobile", mobile);
 		String host = null;
 		String user = null;
 		try {
@@ -49,11 +47,7 @@ public class LoginServlet extends HttpServlet {
 			session.setAttribute("email", emailAddr);
 			session.setAttribute("max_list_length", "300");
 			session.setAttribute("imap", new IMAPySession(host, user, password));
-			if ("true".equals(mobile)) {
-				response.sendRedirect("mailbox");
-			} else {
-				response.sendRedirect("desktop.html");
-			}
+			response.sendRedirect("mailbox");
 		} catch (IMAPyException e) {
 			if (e.getCause() instanceof AuthenticationFailedException) {
 				response.sendRedirect("login.jsp");

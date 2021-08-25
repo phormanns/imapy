@@ -1,25 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="de.jalin.imap.*"%>
 <%@ page import="java.util.*"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IMAPy Mailbox <%= session.getAttribute("email") %></title>
-<link href="<%= request.getContextPath() %>/style.css" media="all" rel="stylesheet" type="text/css" />
-</head>
-<body>
-	<ul class="menu">
-<%
-	if ("true".equals(session.getAttribute("mobile"))) {
-%>
-		<li class="menuitem"><a href="<%= request.getContextPath() %>/mailbox">Mailbox</a></li>
-<%
-	}
-%>
-	</ul>
-	<ul class="messages">
+		
 <%
 	final Object messagesListObj = session.getAttribute("messages");
 	if (messagesListObj instanceof List<?>) {
@@ -39,18 +21,23 @@
 			if (messageMapObj instanceof IMAPyMessage) {
 				final IMAPyMessage yMessage = (IMAPyMessage) messageMapObj;
  %>
-		<li class="message<%= yMessage.getStatus() %>">
-			<a target="<%= targetAttrib %>"
-				href="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>">
-				<%= yMessage.getTitle() %> [von: <%= yMessage.getAuthor() %>]
-			</a>
-		</li>			
+		 	<div class="email-item email-item-<%= yMessage.getStatus() %> pure-g">
+		 		<div class="pure-u-1">
+		 			<h5 class="email-name"><%= yMessage.getAuthor() %></h5>
+		 			<h4 class="email-subject"><%= yMessage.getTitle() %></h4>
+		 			<p class="email-desc">Preview</p>
+		 			<!-- 
+					<a target="<%= targetAttrib %>"
+						href="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>">
+						<%= yMessage.getTitle() %> [von: <%= yMessage.getAuthor() %>]
+					</a>  -->
+				</div>	
+			</div>	
+				
 <%
 			}
 
 		}
 	}
  %>
-	</ul>
-</body>
-</html>
+		

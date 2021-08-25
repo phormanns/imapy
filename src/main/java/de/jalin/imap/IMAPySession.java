@@ -26,7 +26,7 @@ import de.jalin.imap.text.HtmlHelper;
 
 public class IMAPySession {
 
-	public static final String NEW = "new";
+	public static final String NEW = "unread";
 	public static final String SEEN = "seen";
 
 	final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm");

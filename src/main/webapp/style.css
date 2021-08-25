@@ -1,53 +1,274 @@
-* { margin:0; padding:0; }
-p { margin:5px 0 10px 0; }
-html { font-family: sans-serif; -moz-text-size-adjust: none; -webkit-text-size-adjust: none; -ms-text-size-adjust: none; }
-body { line-height: 1; color: #000000; background: #f0f0f0; font-family:Helvetica,Arial,sans-serif; font-size:normal; }
-a:link { text-decoration:none; font-weight:normal; color:#000000; }
-a:visited { text-decoration:none; font-weight:normal; color:#000000; }
-a:hover { text-decoration:none; font-weight:normal; color:#000000; }
-a:active { text-decoration:none; font-weight:normal; color:#000000; }
-a:focus { text-decoration:none; font-weight:normal; color:#000000; }
-ul.folders { list-style-type:none; }
-ul.messages { list-style-type:none; }
-li { margin: 0 0; font-size: 1.3em; line-height: 1.4em; }
-li.foldernewmsgs { 
-	border-left-width:0.4em; border-left-style:solid; border-left-color:red; 
-	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; 
-	padding: 0.4em 1.2em; 
+/*
+ * -- BASE STYLES --
+ * Most of these are inherited from Base, but I want to change a few.
+ */
+body {
+    color: #333;
 }
-li.folderread { 
-	border-left-width:0.4em; border-left-style:solid; border-left-color:#b0b0b0;
-	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0;
-	padding: 0.4em 1.2em; 
+
+
+
+a {
+    text-decoration: none;
+    color: #1b98f8;
 }
-li.messagenew { 
-	border-left-width:0.4em; border-left-style:solid; border-left-color:red; 
-	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; 
-	padding: 0.4em 1.2em; 
+
+
+/*
+ * -- HELPER STYLES --
+ * Over-riding some of the .pure-button styles to make my buttons look unique
+ */
+.primary-button,
+.secondary-button {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-radius: 20px;
 }
-li.messageseen { 
-	border-left-width:0.4em; border-left-style:solid; border-left-color:#b0b0b0; 
-	border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0;
-	padding: 0.4em 1.2em; 
+.primary-button {
+    color: #fff;
+    background: #1b98f8;
+    margin: 1em 0;
 }
-div.login{ margin: 1.0em; }
-.login p { margin: 1.6em 0; }
-.menu { display: block; margin: 0.6em 0; }
-.menuitem { display: inline; margin: 0.2em; padding: 0.4em; background: #b0b0b0; }
-.emailcontent { margin: 1.0em 0.4em; }
-.emailcontent pre { font-size: 1.3em; line-height: 1.4em; }
-.emailcontent a:link { text-decoration:underline; font-weight:normal; color:#000000; }
-.emailcontent a:visited { text-decoration:none; font-weight:normal; color:#000000; }
-.emailcontent a:hover { text-decoration:underline; font-weight:normal; color:#808080; }
-.emailcontent a:active { text-decoration:none; font-weight:normal; color:#000000; }
-.emailcontent a:focus { text-decoration:none; font-weight:normal; color:#000000; }
-.emailattached a:link { text-decoration:underline; font-weight:normal; color:#000000; }
-.emailattached a:visited { text-decoration:none; font-weight:normal; color:#000000; }
-.emailattached a:hover { text-decoration:underline; font-weight:normal; color:#808080; }
-.emailattached a:active { text-decoration:none; font-weight:normal; color:#000000; }
-.emailattached a:focus { text-decoration:none; font-weight:normal; color:#000000; }
-.emailheader { border-top-width:0.1em; border-top-style:solid; border-top-color:#d0d0d0; }
-.emailheader h1 { margin: 0.5em 0 0.3em 0.3em; font-size: 1.3em; line-height: 1.4em; }
-.emailheader div { margin: 0em 0.3em 0em 0.3em; font-size: 1.0em; line-height: 1.2em; height: 1.8em; }
-div.label {margin: 0em; padding: 0.1em; color: #a0a0a0; text-align: right; width: 5.6em; }
-div.text {display:inline; margin: 0.1em; padding: 0.1em; left: 6.0em; top: -1.9em; position: relative; }
+.secondary-button {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 0.5em 2em;
+    font-size: 80%;
+}
+
+/*
+ * -- LAYOUT STYLES --
+ * This layout consists of three main elements, `#nav` (navigation bar), `#list` (email list), and `#main` (email content). All 3 elements are within `#layout`
+ */
+#layout, #nav, #list, #main {
+    margin: 0;
+    padding: 0;
+}
+
+/* Make the navigation 100% width on phones */
+#nav {
+    width: 100%;
+    height: 40px;
+    position: relative;
+    background: rgb(37, 42, 58);
+    text-align: center;
+}
+/* Show the "Menu" button on phones */
+#nav .nav-menu-button {
+    display: block;
+    top: 0.5em;
+    right: 0.5em;
+    position: absolute;
+}
+
+/* When "Menu" is clicked, the navbar should be 80% height */
+#nav.active {
+    height: 80%;
+}
+/* Don't show the navigation items... */
+.nav-inner {
+    display: none;
+}
+
+/* ...until the "Menu" button is clicked */
+#nav.active .nav-inner {
+    display: block;
+    padding: 2em 0;
+}
+
+
+/*
+ * -- NAV BAR STYLES --
+ * Styling the default .pure-menu to look a little more unique.
+ */
+#nav .pure-menu {
+    background: transparent;
+    border: none;
+    text-align: left;
+}
+    #nav .pure-menu-link:hover,
+    #nav .pure-menu-link:focus {
+        background: rgb(55, 60, 90);
+    }
+    #nav .pure-menu-link {
+        color: #fff;
+        margin-left: 0.5em;
+    }
+    #nav .pure-menu-heading {
+        border-bottom: none;
+        font-size:110%;
+        color: rgb(75, 113, 151);
+    }
+
+
+/*
+ * -- EMAIL STYLES --
+ * Styles relevant to the email messages, labels, counts, and more.
+ */
+.email-count {
+    color: rgb(75, 113, 151);
+}
+
+.email-label-personal,
+.email-label-work,
+.email-label-travel {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 0.5em;
+    border-radius: 3px;
+}
+.email-label-personal {
+    background: #ffc94c;
+}
+.email-label-work {
+    background: #41ccb4;
+}
+.email-label-travel {
+    background: #40c365;
+}
+
+
+/* Email Item Styles */
+.email-item {
+    padding: 0.9em 1em;
+    border-bottom: 1px solid #ddd;
+    border-left: 6px solid transparent;
+}
+    .email-avatar {
+        border-radius: 3px;
+        margin-right: 0.5em;
+    }
+    .email-name,
+    .email-subject {
+        margin: 0;
+    }
+    .email-name {
+        text-transform: uppercase;
+        color: #999;
+    }
+    .email-desc {
+        font-size: 80%;
+        margin: 0.4em 0;
+    }
+
+.email-item-selected {
+    background: #eee;
+}
+.email-item-unread {
+    border-left: 6px solid #1b98f8;
+}
+
+/* Email Content Styles */
+.email-content-header, .email-content-body, .email-content-footer {
+    padding: 1em 2em;
+}
+    .email-content-header {
+        border-bottom: 1px solid #ddd;
+    }
+
+        .email-content-title {
+            margin: 0.5em 0 0;
+        }
+        .email-content-subtitle {
+            font-size: 1em;
+            margin: 0;
+            font-weight: normal;
+        }
+            .email-content-subtitle span {
+                color: #999;
+            }
+    .email-content-controls {
+        margin-top: 2em;
+        text-align: right;
+    }
+        .email-content-controls .secondary-button {
+            margin-bottom: 0.3em;
+        }
+
+    .email-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+
+/*
+ * -- TABLET (AND UP) MEDIA QUERIES --
+ * On tablets and other medium-sized devices, we want to customize some
+ * of the mobile styles.
+ */
+@media (min-width: 40em) {
+
+    /* Move the layout over so we can fit the nav + list in on the left */
+    #layout {
+        padding-left:720px; /* "left col (nav + list)" width */
+        position: relative;
+    }
+
+    /* These are position:fixed; elements that will be in the left 720px of the screen */
+    #nav, #list {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        overflow: auto;
+    }
+    #nav {
+        margin-left:-720px; /* "left col (nav + list)" width */
+        width:250px;
+        height: 100%;
+    }
+
+    /* Show the menu items on the larger screen */
+    .nav-inner {
+        display: block;
+        padding: 2em 0;
+    }
+
+    /* Hide the "Menu" button on larger screens */
+    #nav .nav-menu-button {
+        display: none;
+    }
+
+    #list {
+        margin-left: -470px;
+        width: 100%;
+        height: 33%;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #main {
+        position: fixed;
+        top: 33%;
+        right: 0;
+        bottom: 0;
+        left: 150px;
+        overflow: auto;
+        width: auto; /* so that it's not 100% */
+    }
+
+}
+
+/*
+ * -- DESKTOP (AND UP) MEDIA QUERIES --
+ * On desktops and other large-sized devices, we want to customize some
+ * of the mobile styles.
+ */
+@media (min-width: 60em) {
+
+    /* This will take up the entire height, and be a little thinner */
+    #list {
+        margin-left: -470px;
+        width:470px;
+        height: 100%;
+        border-right: 1px solid #ddd;
+    }
+
+    /* This will now take up it's own column, so don't need position: fixed; */
+    #main {
+        position: static;
+        margin: 0;
+        padding: 0;
+    }
+}

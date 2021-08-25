@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import de.jalin.imap.IMAPyException;
 import de.jalin.imap.IMAPySession;
 
 public class MailboxServlet extends HttpServlet {
@@ -27,8 +28,9 @@ public class MailboxServlet extends HttpServlet {
 				return;
 			}
 			httpSession.setAttribute("folders", imapSession.getFolders());
+			request.getSession().setAttribute("messages", imapSession.getMessages("INBOX"));
 			imapySession.dispatchTo("/WEB-INF/jsp/mailbox.jsp");
-		} catch (IOException e) {
+		} catch (IOException | IMAPyException e) {
 			throw new ServletException(e);
 		}
 	}
