@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -29,7 +30,7 @@ public class IMAPySession {
 	public static final String NEW = "unread";
 	public static final String SEEN = "seen";
 
-	final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm");
+	final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm", Locale.GERMANY);
 	
 	final private String user;
 	final private String password;
@@ -89,6 +90,7 @@ public class IMAPySession {
 				yMsg.setAuthor(MimeParser.getFromAddress(msg));
 				yMsg.setFolder(folderName);
 				yMsg.setStatus(msg.isSet(Flag.SEEN) ? SEEN : NEW);
+				yMsg.setDate(DF.format(msg.getSentDate()));
 				yMessages.add(0, yMsg);
 			}
 		} catch (MessagingException e) {

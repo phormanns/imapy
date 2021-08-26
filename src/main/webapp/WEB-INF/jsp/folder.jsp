@@ -23,7 +23,7 @@
 		 				hx-target="#main" hx-trigger="click" hx-swap="innerHTML">
 		 			<h5 class="email-name"><%= yMessage.getAuthor() %></h5>
 		 			<h4 class="email-subject"><%= yMessage.getTitle() %></h4>
-		 			<p class="email-desc">Preview</p>
+		 			<p class="email-desc"><%= yMessage.getDate() %></p>
 				</div>	
 			</div>	
 				
