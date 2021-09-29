@@ -18,9 +18,7 @@
                 </div>
 
                 <div class="email-content-controls pure-u-1-2">
-                    <button class="secondary-button pure-button">Reply</button>
-                    <button class="secondary-button pure-button">Forward</button>
-                    <button class="secondary-button pure-button">Move to</button>
+                    <button id="backtolistbutton" class="secondary-button pure-button" onclick="showMessagesList()">Back</button>
                 </div>
             </div>
 

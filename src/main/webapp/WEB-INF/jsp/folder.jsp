@@ -19,6 +19,7 @@
  %>
 		 	<div class="email-item email-item-<%= yMessage.getStatus() %> pure-g"> 
 		 		<div class="pure-u-1"
+		 				onclick="hideMessagesList()"
 		 				hx-get="<%= request.getContextPath() %>/message/<%= yMessage.getFolder() %>/<%= yMessage.getIndex() %>" 
 		 				hx-target="#main" hx-trigger="click" hx-swap="innerHTML">
 		 			<h5 class="email-name"><%= yMessage.getAuthor() %></h5>
