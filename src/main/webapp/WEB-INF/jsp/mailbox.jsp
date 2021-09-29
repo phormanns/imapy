@@ -58,6 +58,20 @@
 			parent.foldersframe.location.reload();
 			parent.mailboxframe.location.reload();
 		}
+		var hideMessagesList = function() {
+			var mediaQueryList = window.matchMedia("(min-width: 40em)");
+			if (!mediaQueryList.matches) {
+				document.getElementById("list").style.display='none';
+				document.getElementById("main").style.display='inline';
+			}
+		}
+		var showMessagesList = function() {
+			var mediaQueryList = window.matchMedia("(min-width: 40em)");
+			if (!mediaQueryList.matches) {
+				document.getElementById("main").style.display='none';
+				document.getElementById("list").style.display='inline';
+			}
+		}
 	</script>
 	<script>
     function getElements() {

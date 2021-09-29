@@ -170,6 +170,8 @@ a {
 }
 .email-content-header {
     border-bottom: 1px solid #ddd;
+    background: rgb(55, 60, 90);
+    color: #fff;
 }
 
 .email-content-title {
@@ -251,6 +253,10 @@ a {
         overflow-y: scroll;
         height: auto;
         width: auto; /* so that it's not 100% */
+    }
+    
+    #backtolistbutton {
+    	display: none;
     }
 
 }
