@@ -27,7 +27,6 @@
 		 			<p class="email-desc"><%= yMessage.getDate() %></p>
 				</div>	
 			</div>	
-				
 <%
 			}
 		}
