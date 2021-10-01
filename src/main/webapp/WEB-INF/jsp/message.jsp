@@ -10,14 +10,14 @@
     
         <div class="email-content" hx-get="<%= request.getContextPath() %>/folder/<%= message.getFolder() %>" hx-trigger="load" hx-target="#list">
             <div class="email-content-header pure-g">
-                <div class="pure-u-1-2">
-                    <h1 class="email-content-title"><%= message.getSubject() %></h1>
+                <div class="pure-u-3-4">
+                    <h2 class="email-content-title"><%= message.getSubject() %></h2>
                     <p class="email-content-subtitle">
                         From <%= message.getFrom() %> <span>at <%= message.getDate() %></span>
                     </p>
                 </div>
 
-                <div class="email-content-controls pure-u-1-2">
+                <div class="email-content-controls pure-u-1-4">
                     <button id="backtolistbutton" class="secondary-button pure-button" onclick="showMessagesList()">Back</button>
                 </div>
             </div>
