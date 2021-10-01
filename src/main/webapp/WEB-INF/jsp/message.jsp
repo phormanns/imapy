@@ -13,7 +13,7 @@
                 <div class="pure-u-1-2">
                     <h1 class="email-content-title"><%= message.getSubject() %></h1>
                     <p class="email-content-subtitle">
-                        From <%= message.getFrom() %> at <span><%= message.getDate() %></span>
+                        From <%= message.getFrom() %> <span>at <%= message.getDate() %></span>
                     </p>
                 </div>
 
