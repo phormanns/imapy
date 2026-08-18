@@ -4,10 +4,18 @@
 
 <%
 	String ctx = request.getContextPath();
-	String folderTitle = request.getParameter("folder");
+	String folderTitle = (String) request.getAttribute("folderName");
+	if (folderTitle == null) {
+		folderTitle = request.getParameter("folder");
+	}
 	if (folderTitle == null) {
 		folderTitle = "INBOX";
 	}
+
+	if (folderTitle.startsWith("INBOX.")) {
+		folderTitle = folderTitle.substring(6);
+	}
+	folderTitle = folderTitle.replace(".", "/");
 
 	int rendered = 0;
 	int maxListLength = Integer.MAX_VALUE;

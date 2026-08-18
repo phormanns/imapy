@@ -26,7 +26,9 @@ public class FolderServlet extends HttpServlet {
 				return;
 			}
 			final String pathInfo = request.getPathInfo();
-			request.getSession().setAttribute("messages", imap.getMessages(pathInfo.substring(1)));
+			final String folderName = pathInfo.substring(1);
+			request.getSession().setAttribute("messages", imap.getMessages(folderName));
+			request.setAttribute("folderName", folderName);
 			imapySession.dispatchTo("/WEB-INF/jsp/folder.jsp");
 		} catch (IOException e) {
 			throw new ServletException(e);
