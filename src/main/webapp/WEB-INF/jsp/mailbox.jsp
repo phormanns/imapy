@@ -1,126 +1,171 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="de.jalin.imap.*"%>
 <%@ page import="java.util.*"%>
+<%
+	String ctx = request.getContextPath();
+	String userEmail = (String) session.getAttribute("email");
+	String userInitial = "";
+	if (userEmail != null && !userEmail.isEmpty()) {
+		int at = userEmail.indexOf("@");
+		String local = at > 0 ? userEmail.substring(0, at) : userEmail;
+		userInitial = local.substring(0, 1).toUpperCase();
+	}
+	String activeFolder = request.getParameter("folder");
+	if (activeFolder == null) {
+		activeFolder = "INBOX";
+	}
+%>
 <!doctype html>
 <html lang="de">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>IMAPy Mailbox <%= session.getAttribute("email") %></title>
-	<link rel="stylesheet" href="<%= request.getContextPath() %>/webjars/purecss/2.0.3/build/pure-min.css">
-	<link rel="stylesheet" href="<%= request.getContextPath() %>/style.css">
-	<script src="<%= request.getContextPath() %>/webjars/htmx.org/1.5.0/dist/htmx.min.js"></script>
+	<title>IMAPy – <%= userEmail != null ? userEmail : "Mailbox" %></title>
+	<link rel="stylesheet" href="<%= ctx %>/style.css">
+	<script src="<%= ctx %>/webjars/htmx.org/1.5.0/dist/htmx.min.js"></script>
 </head>
 <body>
-	<div id="layout" class="content pure-g">
-    	<div id="nav" class="pure-u">
-        	<a href="#" id="menuLink" class="nav-menu-button">Menu</a>
+	<div class="app-shell">
+		<header class="app-header">
+			<div class="app-header-left">
+				<button type="button" class="icon-button nav-toggle" aria-label="Navigation umschalten" onclick="toggleNav()">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+				</button>
+				<a href="<%= ctx %>/mailbox" class="app-brand">
+					<span class="app-brand-mark">iM</span>
+					<span>IMAPy</span>
+				</a>
+			</div>
+			<div class="app-header-right">
+				<% if (userEmail != null) { %>
+					<span class="user-chip" title="<%= userEmail %>">
+						<span class="user-avatar"><%= userInitial %></span>
+						<span><%= userEmail %></span>
+					</span>
+				<% } %>
+			</div>
+		</header>
 
-        	<div class="nav-inner">
-            	<button class="primary-button pure-button">Compose</button>
+		<div class="app-content">
+			<div id="nav-backdrop" class="nav-backdrop" onclick="closeNav()"></div>
 
-            	<div class="pure-menu">
-                	<ul class="pure-menu-list">
-                		
+			<aside id="nav" class="app-nav">
+				<div class="nav-section">
+					<h3 class="nav-section-title">Ordner</h3>
+					<ul class="nav-list">
 <%
 	final Object foldersListObj = session.getAttribute("folders");
 	if (foldersListObj instanceof List<?>) {
-		final List<?> foldersList = (List<?>)foldersListObj;
+		final List<?> foldersList = (List<?>) foldersListObj;
 		for (final Object folderMapObj : foldersList) {
 			if (folderMapObj instanceof IMAPyFolder) {
 				final IMAPyFolder yFolder = (IMAPyFolder) folderMapObj;
-
- %>
-						<li class="pure-menu-item" hx-get="<%= request.getContextPath() %>/folder/<%= yFolder.getName() %>" hx-target="#list" hx-trigger="click" hx-swap="innerHTML" onclick="showMessagesList()">
-							<a href="#" class="pure-menu-link">
-								<%= yFolder.getTitle() %> <span class="email-count"><%= yFolder.getUnreadMessageCount() %>/<%= yFolder.getTotalMessageCount() %></span>
-							</a>
+				String folderName = yFolder.getName();
+				String folderTitle = yFolder.getTitle();
+				int unread = yFolder.getUnreadMessageCount();
+				int total = yFolder.getTotalMessageCount();
+				String itemClass = "nav-item";
+				if (unread > 0) itemClass += " is-unread";
+				if (folderName.equals(activeFolder)) itemClass += " is-active";
+%>
+						<li class="<%= itemClass %>"
+							data-folder="<%= folderName %>"
+							hx-get="<%= ctx %>/folder/<%= folderName %>"
+							hx-target="#list"
+							hx-trigger="click"
+							hx-swap="innerHTML"
+							onclick="selectFolder(this, '<%= folderName %>')">
+							<span class="nav-item-left">
+								<svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+								<span class="nav-item-label"><%= folderTitle %></span>
+							</span>
+							<span class="nav-count"><%= unread %>/<%= total %></span>
 						</li>
 <%
 			}
 		}
 	}
- %>
-         			</ul>
-            	</div>
-        	</div>
-    	</div>
+%>
+					</ul>
+				</div>
+			</aside>
 
-		<div id="list" class="pure-u-1" hx-get="<%= request.getContextPath() %>/folder/INBOX" hx-trigger="load">
-		</div>
-		
-		<div id="main" class="pure-u-1">
-		</div>
+			<section id="list" class="app-list"
+				hx-get="<%= ctx %>/folder/<%= activeFolder %>"
+				hx-trigger="load"
+				hx-swap="innerHTML">
+				<div class="empty-state">
+					<p>Lade Nachrichten…</p>
+				</div>
+			</section>
 
+			<section id="main" class="app-main">
+				<div class="email-content-empty">
+					<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+					<p class="empty-state-title">Wähle eine Nachricht</p>
+					<p>Tippe links auf eine E-Mail, um sie hier zu lesen.</p>
+				</div>
+			</section>
+		</div>
 	</div>
+
 	<script type="text/javascript">
-		var reloadOnDrag = function() { 
-			parent.foldersframe.location.reload();
-			parent.mailboxframe.location.reload();
-		}
-		var hideMessagesList = function() {
-			var mediaQueryList = window.matchMedia("(min-width: 40em)");
+		var mediaQueryList = window.matchMedia("(min-width: 900px)");
+
+		function showMessagesList() {
 			if (!mediaQueryList.matches) {
-				document.getElementById("list").style.display='none';
-				document.getElementById("main").style.display='inline';
+				document.getElementById("main").style.display = 'none';
+				document.getElementById("list").style.display = 'flex';
 			}
 		}
-		var showMessagesList = function() {
-			var mediaQueryList = window.matchMedia("(min-width: 40em)");
+		function hideMessagesList() {
 			if (!mediaQueryList.matches) {
-				document.getElementById("main").style.display='none';
-				document.getElementById("list").style.display='inline';
+				document.getElementById("list").style.display = 'none';
+				document.getElementById("main").style.display = 'block';
 			}
 		}
-	</script>
-	<script>
-	    function getElements() {
-	        return {
-	            menu: document.getElementById('nav'),
-	            menuLink: document.getElementById('menuLink')
-	        };
-	    }
-	
-	    function toggleClass(element, className) {
-	        var classes = element.className.split(/\s+/);
-	        var length = classes.length;
-	        var i = 0;
-	
-	        for (; i < length; i++) {
-	            if (classes[i] === className) {
-	                classes.splice(i, 1);
-	                break;
-	            }
-	        }
-	        // The className is not found
-	        if (length === classes.length) {
-	            classes.push(className);
-	        }
-	
-	        element.className = classes.join(' ');
-	    }
-	
-	    function toggleMenu() {
-	        var active = 'active';
-	        var elements = getElements();
-	
-	        toggleClass(elements.menu, active);
-	    }
-	
-	    function handleEvent(e) {
-	        var elements = getElements();
-	
-	        if (e.target.id === elements.menuLink.id) {
-	            toggleMenu();
-	            e.preventDefault();
-	        } else if (elements.menu.className.indexOf('active') !== -1) {
-	            toggleMenu();
-	        }
-	    }
-	
-	    document.addEventListener('DOMContentLoaded', function () {
-	        document.addEventListener('click', handleEvent);
-	    });
+		function hideCurrentMessage() {
+			showMessagesList();
+			document.getElementById("main").innerHTML = '';
+		}
+
+		function selectFolder(el, folderName) {
+			document.querySelectorAll('.nav-item').forEach(function (n) {
+				n.classList.remove('is-active');
+			});
+			if (el) el.classList.add('is-active');
+			closeNav();
+		}
+
+		function toggleNav() {
+			var nav = document.getElementById('nav');
+			var backdrop = document.getElementById('nav-backdrop');
+			var isOpen = nav.classList.toggle('is-open');
+			if (backdrop) backdrop.classList.toggle('is-open', isOpen);
+		}
+		function closeNav() {
+			var nav = document.getElementById('nav');
+			var backdrop = document.getElementById('nav-backdrop');
+			if (nav) nav.classList.remove('is-open');
+			if (backdrop) backdrop.classList.remove('is-open');
+		}
+
+		document.body.addEventListener('htmx:afterSwap', function (evt) {
+			if (evt.target.id === 'main') {
+				var toolbar = evt.target.querySelector('.email-content-toolbar .back-to-list');
+				if (toolbar) toolbar.style.display = '';
+				hideMessagesList();
+				window.scrollTo(0, 0);
+			}
+		});
+
+		document.body.addEventListener('click', function (e) {
+			var t = e.target.closest('.back-to-list');
+			if (t) {
+				e.preventDefault();
+				hideCurrentMessage();
+			}
+		});
 	</script>
 </body>
 </html>

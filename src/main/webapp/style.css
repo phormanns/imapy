@@ -1,285 +1,771 @@
-/*
- * -- BASE STYLES --
- * Most of these are inherited from Base, but I want to change a few.
- */
-body {
-    color: #333;
+/* =========================================================
+ * IMAPy Webmail - Modern UI
+ * Design tokens, Layout, Components
+ * ========================================================= */
+
+:root {
+    --bg: #f6f7fb;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-muted: #f1f3f8;
+    --border: #e5e8ef;
+    --border-strong: #d4d9e3;
+    --text: #1f2430;
+    --text-muted: #6b7280;
+    --text-subtle: #9aa0ad;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-soft: #eef2ff;
+    --accent: #0ea5e9;
+    --danger: #ef4444;
+    --danger-soft: #fef2f2;
+    --success: #10b981;
+    --warning: #f59e0b;
+
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
+    --shadow-md: 0 6px 18px rgba(15, 23, 42, .08);
+    --shadow-lg: 0 18px 40px rgba(15, 23, 42, .12);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", Menlo, Consolas, monospace;
+
+    --nav-width: 260px;
+    --list-width: 420px;
+    --header-height: 56px;
 }
 
-a {
-    text-decoration: none;
-    color: #1b98f8;
-}
+* { box-sizing: border-box; }
 
-
-/*
- * -- HELPER STYLES --
- * Over-riding some of the .pure-button styles to make my buttons look unique
- */
-.primary-button,
-.secondary-button {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    border-radius: 20px;
-}
-.primary-button {
-    color: #fff;
-    background: #1b98f8;
-    margin: 1em 0;
-}
-.secondary-button {
-    background: #fff;
-    border: 1px solid #ddd;
-    color: #666;
-    padding: 0.5em 2em;
-    font-size: 80%;
-}
-
-/*
- * -- LAYOUT STYLES --
- * This layout consists of three main elements, `#nav` (navigation bar), `#list` (email list), and `#main` (email content). All 3 elements are within `#layout`
- */
-#layout, #nav, #list, #main {
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-#list, #main {
-	height: 50%;
-	width: 100%;
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-hover); }
+
+button { font-family: inherit; }
+
+/* =========================================================
+ * LOGIN
+ * ========================================================= */
+.login-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(79, 70, 229, .15), transparent 60%),
+        radial-gradient(900px 500px at 110% 110%, rgba(14, 165, 233, .18), transparent 60%),
+        var(--bg);
 }
 
-/* Make the navigation 100% width on phones */
-#nav {
+.login-card {
     width: 100%;
-    height: 40px;
-    position: relative;
-    background: rgb(37, 42, 58);
-    text-align: center;
-}
-/* Show the "Menu" button on phones */
-#nav .nav-menu-button {
-    display: block;
-    top: 0.5em;
-    right: 0.5em;
-    position: absolute;
+    max-width: 420px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 2.25rem 2rem 2rem;
 }
 
-/* When "Menu" is clicked, the navbar should be 80% height */
-#nav.active {
-    height: 80%;
-}
-/* Don't show the navigation items... */
-.nav-inner {
-    display: none;
+.login-brand {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    margin-bottom: 1.5rem;
 }
 
-/* ...until the "Menu" button is clicked */
-#nav.active .nav-inner {
-    display: block;
-    padding: 2em 0;
-}
-
-
-/*
- * -- NAV BAR STYLES --
- * Styling the default .pure-menu to look a little more unique.
- */
-#nav .pure-menu {
-    background: transparent;
-    border: none;
-    text-align: left;
-}
-    #nav .pure-menu-link:hover,
-    #nav .pure-menu-link:focus {
-        background: rgb(55, 60, 90);
-    }
-    #nav .pure-menu-link {
-        color: #fff;
-        margin-left: 0.5em;
-    }
-    #nav .pure-menu-heading {
-        border-bottom: none;
-        font-size:110%;
-        color: rgb(75, 113, 151);
-    }
-
-
-/*
- * -- EMAIL STYLES --
- * Styles relevant to the email messages, labels, counts, and more.
- */
-.email-count {
-    color: rgb(75, 113, 151);
-}
-
-.email-label-personal,
-.email-label-work,
-.email-label-travel {
-    width: 15px;
-    height: 15px;
-    display: inline-block;
-    margin-right: 0.5em;
-    border-radius: 3px;
-}
-.email-label-personal {
-    background: #ffc94c;
-}
-.email-label-work {
-    background: #41ccb4;
-}
-.email-label-travel {
-    background: #40c365;
-}
-
-
-/* Email Item Styles */
-.email-item {
-    padding: 0.9em 1em;
-    border-bottom: 1px solid #ddd;
-    border-left: 6px solid transparent;
-}
-    .email-avatar {
-        border-radius: 3px;
-        margin-right: 0.5em;
-    }
-    .email-name,
-    .email-subject {
-        margin: 0;
-    }
-    .email-name {
-        text-transform: uppercase;
-        color: #999;
-    }
-    .email-desc {
-        font-size: 80%;
-        margin: 0.4em 0;
-    }
-
-.email-item-selected {
-    background: #eee;
-}
-.email-item-unread {
-    border-left: 6px solid #1b98f8;
-}
-
-/* Email Content Styles */
-.email-content-header, .email-content-body, .email-content-footer {
-    padding: 1em 2em;
-}
-.email-content-header {
-    border-bottom: 1px solid #ddd;
-    background: rgb(55, 60, 90);
+.login-brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: grid;
+    place-items: center;
     color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: .5px;
+    box-shadow: var(--shadow-sm);
+}
+
+.login-brand-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.login-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 .35rem;
+}
+
+.login-subtitle {
+    margin: 0 0 1.5rem;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.login-error {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-sm);
+    padding: .6rem .8rem;
+    margin-bottom: 1rem;
+    font-size: 13px;
+}
+
+.field {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: .35rem;
+}
+
+.field-input {
+    width: 100%;
+    padding: .7rem .85rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, .15);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    padding: .65rem 1.1rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease,
+                border-color .15s ease, box-shadow .15s ease, transform .05s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(79, 70, 229, .25); }
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+}
+.btn-primary:hover { background: var(--primary-hover); color: #fff; }
+
+.btn-block { width: 100%; }
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+.btn-ghost:hover { background: var(--surface-muted); }
+
+.btn-danger {
+    background: var(--surface);
+    color: var(--danger);
+    border-color: #fecaca;
+}
+.btn-danger:hover { background: var(--danger-soft); }
+
+/* =========================================================
+ * MAILBOX LAYOUT
+ * ========================================================= */
+.app-shell {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+    grid-template-areas:
+        "header"
+        "content";
+}
+
+.app-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    z-index: 5;
+}
+
+.app-header-left,
+.app-header-right {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.app-brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .5px;
+}
+
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .35rem .7rem .35rem .35rem;
+    background: var(--surface-muted);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.user-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #0ea5e9);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.icon-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.icon-button:hover { background: var(--surface-muted); color: var(--text); }
+
+.nav-toggle {
+    display: inline-flex;
+}
+
+.app-content {
+    grid-area: content;
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 0;
+    position: relative;
+}
+
+.app-nav {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+}
+
+.app-nav.is-open { display: flex; }
+
+.nav-section {
+    padding: 1rem .85rem .5rem;
+}
+
+.nav-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-subtle);
+    margin: 0 0 .5rem;
+    padding: 0 .35rem;
+}
+
+.nav-list { list-style: none; padding: 0; margin: 0; }
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .55rem .7rem;
+    border-radius: var(--radius-md);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color .15s ease, color .15s ease;
+    border: 1px solid transparent;
+}
+
+.nav-item:hover { background: var(--surface-muted); }
+.nav-item.is-active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: rgba(79, 70, 229, .25);
+    font-weight: 500;
+}
+
+.nav-item-left {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    min-width: 0;
+}
+
+.nav-item-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-subtle);
+    flex-shrink: 0;
+}
+.nav-item.is-active .nav-item-icon { color: var(--primary); }
+
+.nav-item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-count {
+    font-size: 11px;
+    background: var(--surface-muted);
+    color: var(--text-muted);
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.nav-item.is-active .nav-count {
+    background: rgba(79, 70, 229, .12);
+    color: var(--primary);
+}
+
+.nav-item.is-unread .nav-count {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* ---- list / main ---- */
+.app-list {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-list-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: .9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.app-list-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.app-list-tools { display: flex; gap: .35rem; }
+
+.app-main {
+    background: var(--bg);
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.empty-state {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem;
+}
+
+.empty-state-title {
+    font-weight: 600;
+    color: var(--text);
+    margin: .75rem 0 .35rem;
+}
+
+/* =========================================================
+ * EMAIL LIST ITEMS
+ * ========================================================= */
+.email-item {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+    padding: .9rem 1rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background-color .12s ease;
+    border-left: 3px solid transparent;
+    background: var(--surface);
+}
+
+.email-item:hover { background: var(--surface-muted); }
+.email-item.is-selected {
+    background: var(--primary-soft);
+    border-left-color: var(--primary);
+}
+.email-item.is-unread {
+    border-left-color: var(--primary);
+    background: #fafbff;
+}
+.email-item.is-unread .email-subject,
+.email-item.is-unread .email-name { font-weight: 600; color: var(--text); }
+
+.email-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #818cf8, #22d3ee);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    font-size: 13px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.email-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.email-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.email-name {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.email-time {
+    font-size: 12px;
+    color: var(--text-subtle);
+    flex-shrink: 0;
+}
+
+.email-subject {
+    margin: .15rem 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.email-preview {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================================
+ * EMAIL CONTENT
+ * ========================================================= */
+.email-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.email-content-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: .6rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.email-content-toolbar-left,
+.email-content-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.email-content-header {
+    padding: 1.25rem 1.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
 }
 
 .email-content-title {
-    margin: 0.3em 0;
+    margin: 0 0 .25rem;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
 }
-.email-content-subtitle {
-    font-size: 1em;
+
+.email-content-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem .75rem;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: .35rem;
+}
+
+.email-content-meta strong { color: var(--text); font-weight: 500; }
+
+.email-content-meta-divider {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--text-subtle);
+}
+
+.email-content-body {
+    padding: 1.5rem 1.75rem 2.5rem;
+    background: var(--surface);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 14px;
+}
+
+.email-content-body img { max-width: 100%; height: auto; }
+.email-content-body a { color: var(--primary); }
+.email-content-body blockquote {
+    border-left: 3px solid var(--border-strong);
+    margin: 1em 0;
+    padding: .25em 1em;
+    color: var(--text-muted);
+    background: var(--surface-muted);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.email-content-body pre,
+.email-content-body code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--surface-muted);
+    border-radius: var(--radius-sm);
+}
+.email-content-body pre { padding: .75rem 1rem; overflow-x: auto; }
+.email-content-body code { padding: 1px 5px; }
+.email-content-body table { border-collapse: collapse; max-width: 100%; }
+.email-content-body th,
+.email-content-body td { border: 1px solid var(--border); padding: .35rem .6rem; }
+
+/* =========================================================
+ * ATTACHMENTS
+ * ========================================================= */
+.email-attachments {
     margin: 0;
-    font-weight: normal;
-}
-.email-content-subtitle span {
-    color: #999;
-}
-.email-content-controls {
-    margin-top: 2em;
-    text-align: right;
-}
-.email-content-controls .secondary-button {
-    margin-bottom: 0.3em;
-}
-.email-avatar {
-    width: 40px;
-    height: 40px;
+    padding: 1.25rem 1.75rem 1.5rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
 }
 
-
-/*
- * -- TABLET (AND UP) MEDIA QUERIES --
- * On tablets and other medium-sized devices, we want to customize some
- * of the mobile styles.
- */
-@media (min-width: 40em) {
-
-    /* Move the layout over so we can fit the nav + list in on the left */
-    #layout {
-        padding-left:720px; /* "left col (nav + list)" width */
-        position: relative;
-    }
-
-    /* These are position:fixed; elements that will be in the left 720px of the screen */
-    #nav, #list {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        overflow: auto;
-    }
-    #nav {
-        margin-left:-720px; /* "left col (nav + list)" width */
-        width:250px;
-        height: 100%;
-    }
-
-    /* Show the menu items on the larger screen */
-    .nav-inner {
-        display: block;
-        padding: 2em 0;
-    }
-
-    /* Hide the "Menu" button on larger screens */
-    #nav .nav-menu-button {
-        display: none;
-    }
-
-    #list {
-        left: 250px;
-        right: 0;
-        width: auto;
-        height: 33%;
-        border-bottom: 1px solid #ddd;
-    }
-
-    #main {
-        position: fixed;
-        top: 33%;
-        right: 0;
-        bottom: 0;
-        left: 250px;
-        overflow-x: hidden;
-        overflow-y: scroll;
-        height: auto;
-        width: auto; /* so that it's not 100% */
-    }
-    
-    #backtolistbutton {
-    	display: none;
-    }
-
+.email-attachments-title {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    margin: 0 0 .75rem;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
 }
 
-/*
- * -- DESKTOP (AND UP) MEDIA QUERIES --
- * On desktops and other large-sized devices, we want to customize some
- * of the mobile styles.
- */
-@media (min-width: 80em) {
-
-    /* This will take up the entire height, and be a little thinner */
-    #list {
-        margin-left: 0;
-        width:470px;
-        height: 100%;
-        border-right: 1px solid #ddd;
-    }
-
-    /* This will now take up it's own column, so don't need position: fixed; */
-    #main {
-        position: static;
-        margin: 0;
-        padding: 0;
-    }
+.email-attachments-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
 }
+
+.email-attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    max-width: 280px;
+    padding: .5rem .75rem;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 13px;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.email-attachment:hover {
+    background: var(--primary-soft);
+    border-color: rgba(79, 70, 229, .35);
+    color: var(--primary);
+}
+
+.email-attachment-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+.email-attachment-icon svg { width: 14px; height: 14px; }
+.email-attachment:hover .email-attachment-icon { color: var(--primary); }
+
+.email-attachment-icon--image { color: #0ea5e9; }
+.email-attachment-icon--pdf { color: #ef4444; }
+.email-attachment-icon--archive { color: #f59e0b; }
+.email-attachment-icon--audio,
+.email-attachment-icon--video { color: #8b5cf6; }
+.email-attachment-icon--text { color: #10b981; }
+
+.email-attachment-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.email-content-empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+}
+
+/* =========================================================
+ * RESPONSIVE
+ * ========================================================= */
+@media (min-width: 900px) {
+    .app-shell {
+        grid-template-rows: var(--header-height) 1fr;
+    }
+    .app-content {
+        grid-template-columns: var(--nav-width) var(--list-width) 1fr;
+    }
+    .app-nav {
+        display: flex;
+    }
+    .nav-toggle { display: none; }
+
+    /* Mobile-only helpers when we have the real layout */
+    .hide-on-desktop { display: none !important; }
+}
+
+@media (max-width: 899px) {
+    .app-nav {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        box-shadow: var(--shadow-lg);
+        width: 280px;
+    }
+    .app-nav.is-open ~ .app-list,
+    .app-nav.is-open ~ .app-main {
+        opacity: .35;
+        pointer-events: none;
+    }
+
+    .show-on-mobile { display: inline-flex !important; }
+
+    .email-content-header { padding: 1rem 1rem .85rem; }
+    .email-content-body { padding: 1rem 1rem 1.5rem; }
+    .email-attachments { padding: 1rem 1rem 1.25rem; }
+    .email-attachment { max-width: 100%; }
+}
+
+/* Backdrop for mobile nav */
+.nav-backdrop {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, .35);
+    z-index: 9;
+}
+.nav-backdrop.is-open { display: block; }
