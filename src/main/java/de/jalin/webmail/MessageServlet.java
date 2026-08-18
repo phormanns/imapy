@@ -44,11 +44,7 @@ public class MessageServlet extends HttpServlet {
 			}
 			if ("confirmdel".equals(request.getParameter("msgop"))) {
 				imap.removeMessage(folder, msgIndex, messageId);
-				if ("true".equals(session.getAttribute("mobile"))) {
-					response.sendRedirect(request.getContextPath() + "/folder/" + folder);
-				} else {
-					imapySession.dispatchTo("/WEB-INF/jsp/folder-reload.jsp");
-				}
+				response.sendRedirect(request.getContextPath() + "/folder/" + folder);
 				return;
 			}
 			session.setAttribute("folder", folder);
