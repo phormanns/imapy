@@ -22,7 +22,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>IMAPy – <%= userEmail != null ? userEmail : "Mailbox" %></title>
 	<link rel="stylesheet" href="<%= ctx %>/style.css">
-	<script src="<%= ctx %>/webjars/htmx.org/1.5.0/dist/htmx.min.js"></script>
+	<script src="<%= ctx %>/webjars/htmx.org/2.0.8/dist/htmx.min.js"></script>
 </head>
 <body>
 	<div class="app-shell">
