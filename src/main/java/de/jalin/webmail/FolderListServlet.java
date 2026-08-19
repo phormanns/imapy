@@ -8,13 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.jalin.imap.IMAPySession;
-import de.jalin.imap.IMAPyException;
 
-public class FolderServlet extends HttpServlet {
+public class FolderListServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    public FolderServlet() {
+    public FolderListServlet() {
         super();
     }
 
@@ -26,12 +25,13 @@ public class FolderServlet extends HttpServlet {
             if (imap == null) {
                 return;
             }
-            final String pathInfo = request.getPathInfo();
-            final String folderName = pathInfo.substring(1);
-            request.getSession().setAttribute("messages", imap.getMessages(folderName));
-            request.setAttribute("folderName", folderName);
-            imapySession.dispatchTo("/WEB-INF/jsp/folder.jsp");
-        } catch (IOException | IMAPyException e) {
+            request.getSession().setAttribute("folders", imap.getFolders());
+            final String activeFolder = request.getParameter("folder");
+            if (activeFolder != null && !activeFolder.isEmpty()) {
+                request.setAttribute("activeFolder", activeFolder);
+            }
+            imapySession.dispatchTo("/WEB-INF/jsp/folderlist.jsp");
+        } catch (IOException e) {
             throw new ServletException(e);
         }
     }

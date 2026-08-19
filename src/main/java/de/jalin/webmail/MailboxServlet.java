@@ -28,7 +28,6 @@ public class MailboxServlet extends HttpServlet {
             if (imapSession == null) {
                 return;
             }
-            httpSession.setAttribute("folders", imapSession.getFolders());
             httpSession.setAttribute("messages", imapSession.getMessages("INBOX"));
             imapySession.dispatchTo("/WEB-INF/jsp/mailbox.jsp");
         } catch (IOException | IMAPyException e) {

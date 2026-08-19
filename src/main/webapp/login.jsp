@@ -13,6 +13,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>IMAPy – Anmeldung</title>
+        <link rel="icon" type="image/x-icon" href="<%= ctx%>/favicon.ico">
         <link rel="stylesheet" href="<%= ctx%>/style.css">
     </head>
     <body>
