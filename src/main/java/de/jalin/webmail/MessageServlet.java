@@ -45,7 +45,14 @@ public class MessageServlet extends HttpServlet {
             }
             if ("confirmdel".equals(request.getParameter("msgop"))) {
                 imap.removeMessage(folder, msgIndex, messageId);
-                response.sendRedirect(request.getContextPath() + "/folder/" + folder);
+                session.setAttribute("folder", folder);
+                session.setAttribute("deletedFolder", folder);
+                session.setAttribute("deletedMessageSubject",
+                        yMsg != null ? yMsg.getSubject() : null);
+                response.setHeader("HX-Trigger", "messages-changed");
+                response.setContentType("text/html;charset=UTF-8");
+                request.getRequestDispatcher("/WEB-INF/jsp/message-deleted.jsp")
+                        .forward(request, response);
                 return;
             }
             session.setAttribute("folder", folder);

@@ -42,8 +42,8 @@
 					<button type="button" class="btn btn-danger"
 						hx-get="<%= ctx %>/message/<%= folder %>/<%= index %>?msgop=confirmdel"
 						hx-confirm="Diese Nachricht wirklich löschen?"
-						hx-target="#list"
-						onclick="showMessagesList()">Löschen</button>
+						hx-target="#main"
+						hx-swap="innerHTML">Löschen</button>
 				</div>
 			</div>
 

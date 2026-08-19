@@ -156,6 +156,16 @@
                 }
             });
 
+            document.body.addEventListener('messages-changed', function () {
+                var folder = activeFolderName();
+                var listUrl = '<%= ctx%>/folder/' + folder;
+                var folderListUrl = '<%= ctx%>/folderlist?folder=' + encodeURIComponent(folder);
+                if (window.htmx) {
+                    htmx.ajax('GET', folderListUrl, { target: '#nav', swap: 'innerHTML' });
+                    htmx.ajax('GET', listUrl, { target: '#list', swap: 'innerHTML' });
+                }
+            });
+
             document.body.addEventListener('click', function (e) {
                 var t = e.target.closest('.back-to-list');
                 if (t) {
