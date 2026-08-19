@@ -12,29 +12,30 @@ import de.jalin.imap.IMAPyException;
 
 public class FolderServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
-       
+    private static final long serialVersionUID = 1L;
+
     public FolderServlet() {
         super();
     }
 
-	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
-		try {
-			final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
-			final IMAPySession imap = imapySession.getSession();
-			if (imap == null) {
-				return;
-			}
-			final String pathInfo = request.getPathInfo();
-			final String folderName = pathInfo.substring(1);
-			request.getSession().setAttribute("messages", imap.getMessages(folderName));
-			request.setAttribute("folderName", folderName);
-			imapySession.dispatchTo("/WEB-INF/jsp/folder.jsp");
-		} catch (IOException e) {
-			throw new ServletException(e);
-		} catch (IMAPyException e) {
-			throw new ServletException(e);
-		}
-	}
+    @Override
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
+        try {
+            final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
+            final IMAPySession imap = imapySession.getSession();
+            if (imap == null) {
+                return;
+            }
+            final String pathInfo = request.getPathInfo();
+            final String folderName = pathInfo.substring(1);
+            request.getSession().setAttribute("messages", imap.getMessages(folderName));
+            request.setAttribute("folderName", folderName);
+            imapySession.dispatchTo("/WEB-INF/jsp/folder.jsp");
+        } catch (IOException e) {
+            throw new ServletException(e);
+        } catch (IMAPyException e) {
+            throw new ServletException(e);
+        }
+    }
 
 }

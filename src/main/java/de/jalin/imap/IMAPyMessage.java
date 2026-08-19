@@ -7,120 +7,120 @@ import java.util.Map;
 
 public class IMAPyMessage implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final List<String> attachments;  
+    private final List<String> attachments;
 
-	private int index;
-	private String title;
-	private String author;
-	private String folder;
-	private String status;
-	private String subject;
-	private String from;
-	private String to;
-	private String date;
-	private String content;
-	private String messageId;
+    private int index;
+    private String title;
+    private String author;
+    private String folder;
+    private String status;
+    private String subject;
+    private String from;
+    private String to;
+    private String date;
+    private String content;
+    private String messageId;
 
-	public IMAPyMessage() {
-		attachments = new ArrayList<>();
-	}
-	
-	public int getIndex() {
-		return index;
-	}
-	
-	public void setIndex(int index) {
-		this.index = index;
-	}
+    public IMAPyMessage() {
+        attachments = new ArrayList<>();
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public int getIndex() {
+        return index;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
-	public String getAuthor() {
-		return author;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setAuthor(String author) {
-		this.author = author;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public String getFolder() {
-		return folder;
-	}
+    public String getAuthor() {
+        return author;
+    }
 
-	public void setFolder(String folder) {
-		this.folder = folder;
-	}
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getFolder() {
+        return folder;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setFolder(String folder) {
+        this.folder = folder;
+    }
 
-	public String getSubject() {
-		return subject;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public String getFrom() {
-		return from;
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	public void setFrom(String from) {
-		this.from = from;
-	}
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 
-	public String getTo() {
-		return to;
-	}
+    public String getFrom() {
+        return from;
+    }
 
-	public void setTo(String to) {
-		this.to = to;
-	}
+    public void setFrom(String from) {
+        this.from = from;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getTo() {
+        return to;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setTo(String to) {
+        this.to = to;
+    }
 
-	public String getMessageId() {
-		return messageId;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public void setMessageId(String messageId) {
-		this.messageId = messageId;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	public String getDate() {
-		return date;
-	}
+    public String getMessageId() {
+        return messageId;
+    }
 
-	public void setDate(String date) {
-		this.date = date;
-	}
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
 
-	public void addAttachments(final Map<String, String> map) {
-		attachments.addAll(map.keySet());
-	}
-	
-	public List<String> getAttachments() {
-		return attachments;
-	}
-	
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void addAttachments(final Map<String, String> map) {
+        attachments.addAll(map.keySet());
+    }
+
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
 }

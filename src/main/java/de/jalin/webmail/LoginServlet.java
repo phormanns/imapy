@@ -16,46 +16,41 @@ import de.jalin.webmail.impl.HostsharingMailboxFinder;
 
 public class LoginServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
-       
+    private static final long serialVersionUID = 1L;
+
     public LoginServlet() {
         super();
     }
 
-	protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-		final HttpSession session = request.getSession();
-		final String emailAddr = request.getParameter("email");
-		if (emailAddr == null || emailAddr.length() < 5) {
-			throw new ServletException("no valid email address given");
-		}
-		final String password = request.getParameter("password");
-		if (password == null || password.length() < 3) {
-			throw new ServletException("no valid password given");
-		}
-		String host = null;
-		String user = null;
-		try {
-			MailboxFinder mbxFinder;
-			if (emailAddr.contains("@")) {
-				mbxFinder = new AutoconfigMailboxFinder();
-			} else {
-				mbxFinder = new HostsharingMailboxFinder();
-			}
-			mbxFinder.setLogin(emailAddr, password);
-			host = mbxFinder.getHost();
-			user = mbxFinder.getUser();
-			session.setAttribute("email", emailAddr);
-			session.setAttribute("max_list_length", "300");
-			session.setAttribute("imap", new IMAPySession(host, user, password));
-			response.sendRedirect("mailbox");
-		} catch (IMAPyException e) {
-			if (e.getCause() instanceof AuthenticationFailedException) {
-				response.sendRedirect("login.jsp");
-			} else {
-				throw new ServletException(e);
-			}
-		}
-		
-	}
+    @Override
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+        final HttpSession session = request.getSession();
+        final String emailAddr = request.getParameter("email");
+        if (emailAddr == null || emailAddr.length() < 5) {
+            throw new ServletException("no valid email address given");
+        }
+        final String password = request.getParameter("password");
+        if (password == null || password.length() < 3) {
+            throw new ServletException("no valid password given");
+        }
+        try {
+            MailboxFinder mbxFinder;
+            if (emailAddr.contains("@")) {
+                mbxFinder = new AutoconfigMailboxFinder();
+            } else {
+                mbxFinder = new HostsharingMailboxFinder();
+            }
+            mbxFinder.setLogin(emailAddr, password);
+            final String host = mbxFinder.getHost();
+            final String user = mbxFinder.getUser();
+            session.setAttribute("email", emailAddr);
+            session.setAttribute("max_list_length", "300");
+            session.setAttribute("imap", new IMAPySession(host, user, password));
+            response.sendRedirect("mailbox");
+        } catch (IMAPyException e) {
+            response.sendRedirect("login.jsp?error=" + e.getLocalizedMessage());
+        }
+
+    }
 
 }

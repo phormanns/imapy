@@ -6,6 +6,6 @@ import de.jalin.imap.IMAPyException;
 
 public interface MessagePartHandler {
 
-	public void handle(BodyPart part) throws IMAPyException;
-	
+    public void handle(BodyPart part) throws IMAPyException;
+
 }
