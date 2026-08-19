@@ -60,6 +60,7 @@ public class MessageServlet extends HttpServlet {
             final IMAPyMessage yMessage = imap.getMessage(folder, msgIndex, collector);
             session.setAttribute("message", yMessage);
             yMessage.addAttachments(collector.getAttachmentsList());
+            response.setHeader("HX-Trigger", "messages-changed");
             imapySession.dispatchTo("/WEB-INF/jsp/message.jsp");
         } catch (IOException | IMAPyException e) {
             throw new ServletException(e);

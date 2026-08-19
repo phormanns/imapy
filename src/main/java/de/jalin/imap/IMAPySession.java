@@ -85,7 +85,6 @@ public class IMAPySession {
             fp.add(FetchProfile.Item.CONTENT_INFO);
             fp.add(FetchProfile.Item.FLAGS);
             folder.fetch(messages, fp);
-            folder.close(false);
             for (Message msg : messages) {
                 final IMAPyMessage yMsg = new IMAPyMessage();
                 yMsg.setIndex(msg.getMessageNumber());
@@ -96,6 +95,7 @@ public class IMAPySession {
                 yMsg.setDate(DF.format(msg.getSentDate()));
                 yMessages.add(0, yMsg);
             }
+            folder.close(false);
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
