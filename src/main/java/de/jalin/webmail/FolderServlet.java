@@ -1,14 +1,14 @@
 package de.jalin.webmail;
 
+import de.jalin.imap.IMAPyException;
+import de.jalin.imap.IMAPyMessage;
+import de.jalin.imap.IMAPySession;
 import java.io.IOException;
-
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import de.jalin.imap.IMAPySession;
-import de.jalin.imap.IMAPyException;
 
 public class FolderServlet extends HttpServlet {
 
@@ -28,7 +28,8 @@ public class FolderServlet extends HttpServlet {
             }
             final String pathInfo = request.getPathInfo();
             final String folderName = pathInfo.substring(1);
-            request.getSession().setAttribute("messages", imap.getMessages(folderName));
+            final List<IMAPyMessage> messages = imap.getMessages(folderName);
+            request.getSession().setAttribute("messages", messages);
             request.setAttribute("folderName", folderName);
             imapySession.dispatchTo("/WEB-INF/jsp/folder.jsp");
         } catch (IOException | IMAPyException e) {

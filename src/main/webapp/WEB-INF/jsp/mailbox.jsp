@@ -109,6 +109,15 @@
                 closeNav();
             }
 
+            function selectMessage(el, folderName, messageIndex) {
+                document.querySelectorAll('.email-item').forEach(function (n) {
+                    n.classList.remove('is-active');
+                });
+                if (el)
+                    el.classList.add('is-active');
+                hideMessagesList();
+            }
+
             function toggleNav() {
                 var nav = document.getElementById('nav');
                 var backdrop = document.getElementById('nav-backdrop');

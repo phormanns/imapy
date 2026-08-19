@@ -165,6 +165,7 @@ public class IMAPySession {
             yMsg.setIndex(msgIndx);
             final boolean messageIdChecked = (messageIDtoCheck != null && messageIDtoCheck.equals(messageId)) || (messageId == null && messageIDtoCheck == null);
             if (messageIdChecked && msg != null) {
+                folder.open(Folder.READ_WRITE);
                 msg.setFlag(Flag.DELETED, true);
             }
             folder.close(true);

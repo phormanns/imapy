@@ -28,6 +28,15 @@
     }
 
     final Object messagesListObj = session.getAttribute("messages");
+
+    String activeMessageFolder = null;
+    int activeMessageIndex = -1;
+    final Object activeMsgObj = session.getAttribute("message");
+    if (activeMsgObj instanceof IMAPyMessage) {
+        final IMAPyMessage activeMsg = (IMAPyMessage) activeMsgObj;
+        activeMessageFolder = activeMsg.getFolder();
+        activeMessageIndex = activeMsg.getIndex();
+    }
 %>
 
 <header class="app-list-header">
@@ -61,6 +70,9 @@
                 if ("unread".equalsIgnoreCase(status)) {
                     cls += " is-unread";
                 }
+                if (folder.equals(activeMessageFolder) && index == activeMessageIndex) {
+                    cls += " is-active";
+                }
 
                 String initial = "?";
                 if (author != null && !author.isEmpty()) {
@@ -74,11 +86,12 @@
                 }
 %>
     <div class="<%= cls%>"
+         data-message-index="<%= index%>"
          hx-get="<%= ctx%>/message/<%= folder%>/<%= index%>"
          hx-target="#main"
          hx-trigger="click"
          hx-swap="innerHTML"
-         onclick="hideMessagesList()">
+         onclick="selectMessage(this, '<%= folder%>', <%= index%>)">
         <div class="email-avatar"><%= initial%></div>
         <div class="email-body">
             <div class="email-row">

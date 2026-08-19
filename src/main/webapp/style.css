@@ -475,6 +475,14 @@ button { font-family: inherit; }
 .email-item.is-unread .email-subject,
 .email-item.is-unread .email-name { font-weight: 600; color: var(--text); }
 
+.email-item.is-active {
+    background: var(--primary-soft);
+    border-left-color: var(--primary);
+    color: var(--primary);
+}
+.email-item.is-active .email-subject,
+.email-item.is-active .email-name { color: var(--primary); }
+
 .email-avatar {
     width: 38px;
     height: 38px;
