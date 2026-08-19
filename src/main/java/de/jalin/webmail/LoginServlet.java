@@ -27,11 +27,11 @@ public class LoginServlet extends HttpServlet {
         final HttpSession session = request.getSession();
         final String emailAddr = request.getParameter("email");
         if (emailAddr == null || emailAddr.length() < 5) {
-            throw new ServletException("no valid email address given");
+            response.sendRedirect("login.jsp?error=nologin");
         }
         final String password = request.getParameter("password");
         if (password == null || password.length() < 3) {
-            throw new ServletException("no valid password given");
+            response.sendRedirect("login.jsp?error=nopassword");
         }
         try {
             MailboxFinder mbxFinder;
