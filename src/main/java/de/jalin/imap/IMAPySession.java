@@ -95,7 +95,8 @@ public class IMAPySession {
                 yMsg.setDate(DF.format(msg.getSentDate()));
                 yMessages.add(0, yMsg);
             }
-            folder.close(false);
+            if (folder.isOpen())
+                folder.close(false);
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
@@ -143,7 +144,8 @@ public class IMAPySession {
                 throw new IMAPyException("unknown message type");
             }
             msg.setFlag(Flag.SEEN, true);
-            folder.close(true);
+            if (folder.isOpen())
+                folder.close(true);
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
@@ -165,10 +167,10 @@ public class IMAPySession {
             yMsg.setIndex(msgIndx);
             final boolean messageIdChecked = (messageIDtoCheck != null && messageIDtoCheck.equals(messageId)) || (messageId == null && messageIDtoCheck == null);
             if (messageIdChecked && msg != null) {
-                folder.open(Folder.READ_WRITE);
                 msg.setFlag(Flag.DELETED, true);
             }
-            folder.close(true);
+            if (folder.isOpen())
+                folder.close(true);
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
@@ -216,8 +218,10 @@ public class IMAPySession {
             msg.setFlag(Flag.DELETED, true);
             yMsg.setFolder(targetFolderName);
             yMsg.setIndex(msgIndx);
-            srcFolder.close(true);
-            targetFolder.close(true);
+            if (srcFolder.isOpen())
+                srcFolder.close(true);
+            if (targetFolder.isOpen())
+                targetFolder.close(true);
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
