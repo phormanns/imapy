@@ -73,6 +73,9 @@ public class IMAPySession {
         final List<IMAPyMessage> yMessages = new ArrayList<>();
         try {
             final Folder folder = folders.get(folderName);
+            if (folder == null) {
+                return yMessages;
+            }
             if (!folder.isOpen()) {
                 folder.open(Folder.READ_ONLY);
             }
@@ -189,8 +192,9 @@ public class IMAPySession {
         final Folder[] children = parent.listSubscribed();
         for (final Folder child : children) {
             final int type = child.getType();
-            if ((type & Folder.HOLDS_MESSAGES) > 0) {
-                folders.put(child.getFullName(), child);
+            final String fullName = child.getFullName();
+            if (("INBOX".equalsIgnoreCase(fullName)) || (type & Folder.HOLDS_MESSAGES) > 0) {
+                folders.put(fullName, child);
             }
             if ((type & Folder.HOLDS_FOLDERS) > 0) {
                 getChildren(child);
