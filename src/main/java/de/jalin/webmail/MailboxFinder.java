@@ -4,12 +4,10 @@ import de.jalin.imap.IMAPyException;
 
 public interface MailboxFinder {
 
-    public void setLogin(String login, String password) throws IMAPyException;
+    public void setLogin(String login) throws IMAPyException;
 
     public String getHost();
 
     public String getUser();
-
-    public String getPassword();
 
 }

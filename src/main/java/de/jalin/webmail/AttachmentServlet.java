@@ -24,6 +24,9 @@ public class AttachmentServlet extends HttpServlet {
         try {
             final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
             final IMAPySession imap = imapySession.getSession();
+            if (imap == null) {
+                return;
+            }
             final String pathInfo = request.getPathInfo();
             final String[] pathItems = pathInfo.substring(1).split("/");
             final String folder = pathItems[0];

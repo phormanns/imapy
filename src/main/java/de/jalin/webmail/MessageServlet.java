@@ -30,6 +30,31 @@ public class MessageServlet extends HttpServlet {
                 return;
             }
             final HttpSession session = request.getSession();
+            final String pathInfo = request.getPathInfo().substring(1);
+            final String[] pathSplit = pathInfo.split("/");
+            final String folder = pathSplit[0];
+            final String msgIndex = pathSplit[1];
+            session.setAttribute("folder", folder);
+            final AttachmentsCollector collector = new AttachmentsCollector();
+            final IMAPyMessage yMessage = imap.getMessage(folder, msgIndex, collector);
+            session.setAttribute("message", yMessage);
+            yMessage.addAttachments(collector.getAttachmentsList());
+            response.setHeader("HX-Trigger", "messages-changed");
+            imapySession.dispatchTo("/WEB-INF/jsp/message.jsp");
+        } catch (IOException | IMAPyException e) {
+            throw new ServletException(e);
+        }
+    }
+
+    @Override
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
+        try {
+            final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
+            final IMAPySession imap = imapySession.getSession();
+            if (imap == null) {
+                return;
+            }
+            final HttpSession session = request.getSession();
             String messageId = null;
             final IMAPyMessage yMsg = (IMAPyMessage) session.getAttribute("message");
             if (yMsg != null) {

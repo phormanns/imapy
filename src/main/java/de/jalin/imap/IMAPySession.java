@@ -33,13 +33,13 @@ public class IMAPySession {
     final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm", Locale.GERMANY);
 
     final private String user;
-    final private String password;
+    final private char[] password;
     final private String host;
     final private SortedMap<String, Folder> folders;
 
     public IMAPySession(String host, String user, String password) throws IMAPyException {
         this.user = user;
-        this.password = password;
+        this.password = password.toCharArray();
         this.host = host;
         folders = new TreeMap<>();
         initFolders();
@@ -181,7 +181,7 @@ public class IMAPySession {
         try {
             final Session session = Session.getDefaultInstance(new Properties());
             try (Store store = session.getStore("imaps")) {
-                store.connect(host, user, password);
+                store.connect(host, user, new String(password));
                 getChildren(store.getDefaultFolder());
             }
         } catch (NoSuchProviderException e) {

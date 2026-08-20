@@ -22,19 +22,18 @@ import org.xml.sax.SAXException;
 public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
 
     @Override
-    public void setLogin(String login, String password) throws IMAPyException {
-        this.setPassword(password);
+    public void setLogin(String login) throws IMAPyException {
         try {
             final String emailDomain = login.split("@")[1];
             InputStream autoconfigStream = null;
             try {
-                final URI uriAutoconfigSubdomain = new URI("http://autoconfig." + emailDomain + "/mail/config-v1.1.xml?emailaddress=" + login);
+                final URI uriAutoconfigSubdomain = new URI("https://autoconfig." + emailDomain + "/mail/config-v1.1.xml?emailaddress=" + login);
                 URL url = uriAutoconfigSubdomain.toURL();
                 try {
                     final URLConnection urlConnection = url.openConnection();
                     autoconfigStream = urlConnection.getInputStream();
                 } catch (UnknownHostException | FileNotFoundException e) {
-                    final URI uriAutoconfigWellknown = new URI("http://" + emailDomain + "/.well-known/autoconfig/mail/config-v1.1.xml?emailaddress=" + login);
+                    final URI uriAutoconfigWellknown = new URI("https://" + emailDomain + "/.well-known/autoconfig/mail/config-v1.1.xml?emailaddress=" + login);
                     url = uriAutoconfigWellknown.toURL();
                     final URLConnection urlConnection = url.openConnection();
                     autoconfigStream = urlConnection.getInputStream();

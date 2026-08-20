@@ -23,11 +23,11 @@ public class MailboxServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
             final WebmailHttpSession imapySession = new WebmailHttpSession(request, response);
-            final HttpSession httpSession = request.getSession();
             final IMAPySession imapSession = imapySession.getSession();
             if (imapSession == null) {
                 return;
             }
+            final HttpSession httpSession = request.getSession();
             httpSession.setAttribute("messages", imapSession.getMessages("INBOX"));
             imapySession.dispatchTo("/WEB-INF/jsp/mailbox.jsp");
         } catch (IOException | IMAPyException e) {

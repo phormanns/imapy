@@ -4,6 +4,7 @@
 
 <%
 	String ctx = request.getContextPath();
+        String csrfToken = (String) session.getAttribute("csrf_token");
 %>
 
 <%
@@ -34,16 +35,16 @@
 			hx-swap="innerHTML">
 			<div class="email-content-toolbar">
 				<div class="email-content-toolbar-left">
-					<button type="button" class="icon-button back-to-list" aria-label="Zurück zur Liste">
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-					</button>
+                                    <button type="button" class="icon-button back-to-list" aria-label="Zurück zur Liste">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                                    </button>
 				</div>
 				<div class="email-content-toolbar-right">
-					<button type="button" class="btn btn-danger"
-						hx-get="<%= ctx %>/message/<%= folder %>/<%= index %>?msgop=confirmdel"
-						hx-confirm="Diese Nachricht wirklich löschen?"
-						hx-target="#main"
-						hx-swap="innerHTML">Löschen</button>
+                                    <button type="button" class="btn btn-danger"
+                                        hx-post="<%= ctx %>/message/<%= folder %>/<%= index %>?msgop=confirmdel&csrf_token=<%= csrfToken %>"
+					hx-confirm="Diese Nachricht wirklich löschen?"
+					hx-target="#main"
+					hx-swap="innerHTML">Löschen</button>
 				</div>
 			</div>
 

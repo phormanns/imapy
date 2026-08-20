@@ -51,6 +51,7 @@
                         <input id="password" class="field-input" type="password" name="password"
                                size="48" maxlength="48" autocomplete="current-password" required>
                     </div>
+                    <input type="hidden" name="csrf_token" value="${sessionScope.csrf_token}"> 
                     <button type="submit" class="btn btn-primary btn-block">Anmelden</button>
                 </form>
             </div>

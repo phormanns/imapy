@@ -6,7 +6,6 @@ public abstract class AbstractMailboxFinder implements MailboxFinder {
 
     private String host;
     private String user;
-    private String password;
 
     @Override
     public String getHost() {
@@ -18,21 +17,12 @@ public abstract class AbstractMailboxFinder implements MailboxFinder {
         return user;
     }
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
     public void setHost(String host) {
         this.host = host;
     }
 
     public void setUser(String user) {
         this.user = user;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
 }
