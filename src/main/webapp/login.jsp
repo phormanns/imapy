@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%
     String email = request.getParameter("email");
     if (email == null) {
@@ -6,6 +7,7 @@
     }
     String error = request.getParameter("error");
     String ctx = request.getContextPath();
+    pageContext.setAttribute("ctx", ctx);
 %>
 <!doctype html>
 <html lang="de">
@@ -13,8 +15,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>IMAPy – Anmeldung</title>
-        <link rel="icon" type="image/x-icon" href="<%= ctx%>/favicon.ico">
-        <link rel="stylesheet" href="<%= ctx%>/style.css">
+        <link rel="icon" type="image/x-icon" href="<c:out value="${ctx}"/>/favicon.ico">
+        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css">
     </head>
     <body>
         <div class="login-shell">
@@ -43,7 +45,7 @@
                     <div class="field">
                         <label class="field-label" for="email">Postfach / Benutzer</label>
                         <input id="email" class="field-input" type="text" name="email"
-                               value="<%= email%>" size="48" maxlength="72"
+                               value="<c:out value="${param.email}"/>" size="48" maxlength="72"
                                autocomplete="username" required autofocus>
                     </div>
                     <div class="field">

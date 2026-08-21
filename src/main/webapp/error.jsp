@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%
     String ctx = request.getContextPath();
+    pageContext.setAttribute("ctx", ctx);
 %>
 <!doctype html>
 <html lang="de">
@@ -8,8 +10,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>IMAPy – Fehler</title>
-        <link rel="icon" type="image/x-icon" href="<%= ctx%>/favicon.ico">
-        <link rel="stylesheet" href="<%= ctx%>/style.css">
+        <link rel="icon" type="image/x-icon" href="<c:out value="${ctx}"/>/favicon.ico">
+        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css">
     </head>
     <body>
         <div class="login-shell">
@@ -23,7 +25,7 @@
                 <p class="login-subtitle">Dir fehlen die Rechte, die letzte Aktion auszuführen.</p>
 
                 <div class="login-error">
-                    out.print("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
+                    <p>Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</p>
                 </div>
 
             </div>

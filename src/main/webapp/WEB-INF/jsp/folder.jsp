@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ page import="de.jalin.imap.*"%>
 <%@ page import="java.util.*"%>
 
@@ -37,10 +38,13 @@
         activeMessageFolder = activeMsg.getFolder();
         activeMessageIndex = activeMsg.getIndex();
     }
+
+    pageContext.setAttribute("ctx", ctx);
+    pageContext.setAttribute("folderTitle", folderTitle);
 %>
 
 <header class="app-list-header">
-    <h2 class="app-list-title"><%= folderTitle%></h2>
+    <h2 class="app-list-title"><c:out value="${folderTitle}"/></h2>
     <div class="app-list-tools">
         <button type="button" class="icon-button" aria-label="Aktualisieren"
                 onclick="refreshMailbox()">
@@ -84,21 +88,28 @@
                     }
                     initial = display.substring(0, 1).toUpperCase();
                 }
+                pageContext.setAttribute("cls", cls);
+                pageContext.setAttribute("index", index);
+                pageContext.setAttribute("folder", folder);
+                pageContext.setAttribute("initial", initial);
+                pageContext.setAttribute("author", author);
+                pageContext.setAttribute("date", date);
+                pageContext.setAttribute("title", title);
 %>
-    <div class="<%= cls%>"
-         data-message-index="<%= index%>"
-         hx-get="<%= ctx%>/message/<%= folder%>/<%= index%>"
+    <div class="<c:out value="${cls}"/>"
+         data-message-index="<c:out value="${index}"/>"
+         hx-get="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${index}"/>"
          hx-target="#main"
          hx-trigger="click"
          hx-swap="innerHTML"
-         onclick="selectMessage(this, '<%= folder%>', <%= index%>)">
-        <div class="email-avatar"><%= initial%></div>
+         onclick="selectMessage(this, '<c:out value="${folder}"/>', <c:out value="${index}"/>)">
+        <div class="email-avatar"><c:out value="${initial}"/></div>
         <div class="email-body">
             <div class="email-row">
-                <p class="email-name"><%= author%></p>
-                <span class="email-time"><%= date%></span>
+                <p class="email-name"><c:out value="${author}"/></p>
+                <span class="email-time"><c:out value="${date}"/></span>
             </div>
-            <p class="email-subject"><%= title%></p>
+            <p class="email-subject"><c:out value="${title}"/></p>
         </div>
     </div>
 <%

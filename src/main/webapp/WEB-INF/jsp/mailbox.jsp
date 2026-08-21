@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ page import="java.util.*"%>
 <%
     String ctx = request.getContextPath();
@@ -13,16 +14,20 @@
     if (activeFolder == null) {
         activeFolder = "INBOX";
     }
+    pageContext.setAttribute("ctx", ctx);
+    pageContext.setAttribute("userEmail", userEmail);
+    pageContext.setAttribute("userInitial", userInitial);
+    pageContext.setAttribute("activeFolder", activeFolder);
 %>
 <!doctype html>
 <html lang="de">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>IMAPy – <%= userEmail != null ? userEmail : "Mailbox"%></title>
-        <link rel="icon" type="image/x-icon" href="<%= ctx%>/favicon.ico">
-        <link rel="stylesheet" href="<%= ctx%>/style.css">
-        <script src="<%= ctx%>/webjars/htmx.org/2.0.10/dist/htmx.min.js"></script>
+        <title>IMAPy – <c:out value="${empty userEmail ? 'Mailbox' : userEmail}"/></title>
+        <link rel="icon" type="image/x-icon" href="<c:out value="${ctx}"/>/favicon.ico">
+        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css">
+        <script src="<c:out value="${ctx}"/>/webjars/htmx.org/2.0.10/dist/htmx.min.js"></script>
     </head>
     <body>
         <div class="app-shell">
@@ -31,25 +36,25 @@
                     <button type="button" class="icon-button nav-toggle" aria-label="Navigation umschalten" onclick="toggleNav()">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                     </button>
-                    <a href="<%= ctx%>/mailbox" class="app-brand">
+                    <a href="<c:out value="${ctx}"/>/mailbox" class="app-brand">
                         <span class="app-brand-mark">iM</span>
                         <span>IMAPy</span>
                     </a>
                 </div>
                 <div class="app-header-right">
-                    <% if (userEmail != null) {%>
-                    <span class="user-chip" title="<%= userEmail%>">
-                        <span class="user-avatar"><%= userInitial%></span>
-                        <span><%= userEmail%></span>
+                    <c:if test="${not empty userEmail}">
+                    <span class="user-chip" title="<c:out value="${userEmail}"/>">
+                        <span class="user-avatar"><c:out value="${userInitial}"/></span>
+                        <span><c:out value="${userEmail}"/></span>
                     </span>
-                    <form class="logout-form" method="post" action="<%= ctx%>/logout">
+                    <form class="logout-form" method="post" action="<c:out value="${ctx}"/>/logout">
                         <input type="hidden" name="csrf_token" value="${sessionScope.csrf_token}"> 
                         <button type="submit" class="btn btn-ghost" title="Abmelden">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             <span>Abmelden</span>
                         </button>
                     </form>
-                    <% } %>
+                    </c:if>
                 </div>
             </header>
 
@@ -57,7 +62,7 @@
                 <div id="nav-backdrop" class="nav-backdrop" onclick="closeNav()"></div>
 
                 <aside id="nav" class="app-nav"
-                       hx-get="<%= ctx%>/folderlist"
+                       hx-get="<c:out value="${ctx}"/>/folderlist"
                        hx-trigger="load"
                        hx-swap="innerHTML">
                     <div class="nav-section">
@@ -69,7 +74,7 @@
                 </aside>
 
                 <section id="list" class="app-list"
-                         hx-get="<%= ctx%>/folder/<%= activeFolder%>"
+                         hx-get="<c:out value="${ctx}"/>/folder/<c:out value="${activeFolder}"/>"
                          hx-trigger="load"
                          hx-swap="innerHTML">
                     <div class="empty-state">
@@ -152,8 +157,8 @@
 
             function refreshMailbox() {
                 var folder = activeFolderName();
-                var listUrl = '<%= ctx%>/folder/' + folder;
-                var folderListUrl = '<%= ctx%>/folderlist?folder=' + encodeURIComponent(folder);
+                var listUrl = '<c:out value="${ctx}"/>/folder/' + folder;
+                var folderListUrl = '<c:out value="${ctx}"/>/folderlist?folder=' + encodeURIComponent(folder);
                 if (window.htmx) {
                     htmx.ajax('GET', folderListUrl, { target: '#nav', swap: 'innerHTML' });
                     htmx.ajax('GET', listUrl, { target: '#list', swap: 'innerHTML' });
@@ -174,8 +179,8 @@
 
             document.body.addEventListener('messages-changed', function () {
                 var folder = activeFolderName();
-                var listUrl = '<%= ctx%>/folder/' + folder;
-                var folderListUrl = '<%= ctx%>/folderlist?folder=' + encodeURIComponent(folder);
+                var listUrl = '<c:out value="${ctx}"/>/folder/' + folder;
+                var folderListUrl = '<c:out value="${ctx}"/>/folderlist?folder=' + encodeURIComponent(folder);
                 if (window.htmx) {
                     htmx.ajax('GET', folderListUrl, { target: '#nav', swap: 'innerHTML' });
                     htmx.ajax('GET', listUrl, { target: '#list', swap: 'innerHTML' });
