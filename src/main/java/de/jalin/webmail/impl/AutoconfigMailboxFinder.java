@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.IDN;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -24,42 +23,8 @@ import org.xml.sax.SAXException;
 
 public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
 
-    private static boolean isUnsafeAddress(InetAddress address) {
-        return address.isAnyLocalAddress()
-                || address.isLoopbackAddress()
-                || address.isLinkLocalAddress()
-                || address.isSiteLocalAddress()
-                || address.isMulticastAddress();
-    }
-
-    private static String normalizeAndValidateDomain(String domain) throws IMAPyException {
-        if (domain == null || domain.isBlank()) {
-            throw new IMAPyException("Invalid email domain");
-        }
-        final String asciiDomain;
-        try {
-            asciiDomain = IDN.toASCII(domain.trim(), IDN.USE_STD3_ASCII_RULES).toLowerCase();
-        } catch (IllegalArgumentException e) {
-            throw new IMAPyException(e);
-        }
-        if (asciiDomain.length() > 253 || !asciiDomain.matches("^[a-z0-9](?:[a-z0-9-\\.]*[a-z0-9])?$") || !asciiDomain.contains(".")) {
-            throw new IMAPyException("Invalid email domain");
-        }
-        if ("localhost".equals(asciiDomain) || asciiDomain.endsWith(".localhost") || asciiDomain.endsWith(".local")) {
-            throw new IMAPyException("Unsafe email domain");
-        }
-        try {
-            for (InetAddress address : InetAddress.getAllByName(asciiDomain)) {
-                if (isUnsafeAddress(address)) {
-                    throw new IMAPyException("Unsafe email domain");
-                }
-            }
-        } catch (UnknownHostException e) {
-            // Keep previous behavior: unknown domains are handled later by connection attempts.
-        }
-        return asciiDomain;
-    }
-
+    
+    
     @Override
     public void setLogin(String login) throws IMAPyException {
         try {
@@ -99,15 +64,33 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
                     final Node node = inServersNodes.item(idx);
                     final Node item = node.getAttributes().getNamedItem("type");
                     if (item != null && "imap".equals(item.getNodeValue())) {
+                        // Placeholders:
+                        // %EMAILADDRESS% (full email address of the user, usually entered by the user)
+                        // %EMAILLOCALPART% (email address, part before @)
+                        // %EMAILDOMAIN% (email address, part after @)
                         final NodeList childNodes = node.getChildNodes();
                         final int childsListLength = childNodes.getLength();
                         for (int childsIdx = 0; childsIdx < childsListLength; childsIdx++) {
                             final Node child = childNodes.item(childsIdx);
-                            if ("hostname".equals(child.getNodeName())) {
-                                this.setHost(child.getTextContent());
+                            final String nodeName = child.getNodeName();
+                            if ("hostname".equals(nodeName)) {
+                                final String textContent = child.getTextContent();
+                                String hostName = textContent;
+                                if (textContent.contains("%EMAILDOMAIN%")) {
+                                    hostName = textContent.replace("%EMAILDOMAIN%", login.split("@")[1]);
+                                }
+                                this.setHost(hostName);
                             }
-                            if ("username".equals(child.getNodeName())) {
-                                this.setUser(child.getTextContent());
+                            if ("username".equals(nodeName)) {
+                                final String textContent = child.getTextContent();
+                                String loginUser = textContent;
+                                if ("%EMAILADDRESS%".equalsIgnoreCase(textContent)) {
+                                    loginUser = login;
+                                }
+                                if ("%EMAILLOCALPART%".equalsIgnoreCase(textContent)) {
+                                    loginUser = login.split("@")[0];
+                                }
+                                this.setUser(loginUser);
                             }
                         }
                     }
@@ -126,6 +109,42 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
         } catch (DOMException e) {
             throw new IMAPyException(e);
         }
+    }
+
+        private static boolean isUnsafeAddress(InetAddress address) {
+        return address.isAnyLocalAddress()
+                || address.isLoopbackAddress()
+                || address.isLinkLocalAddress()
+                || address.isSiteLocalAddress()
+                || address.isMulticastAddress();
+    }
+
+    private static String normalizeAndValidateDomain(String domain) throws IMAPyException {
+        if (domain == null || domain.isBlank()) {
+            throw new IMAPyException("Invalid email domain");
+        }
+        final String asciiDomain;
+        try {
+            asciiDomain = IDN.toASCII(domain.trim(), IDN.USE_STD3_ASCII_RULES).toLowerCase();
+        } catch (IllegalArgumentException e) {
+            throw new IMAPyException(e);
+        }
+        if (asciiDomain.length() > 253 || !asciiDomain.matches("^[a-z0-9](?:[a-z0-9-\\.]*[a-z0-9])?$") || !asciiDomain.contains(".")) {
+            throw new IMAPyException("Invalid email domain");
+        }
+        if ("localhost".equals(asciiDomain) || asciiDomain.endsWith(".localhost") || asciiDomain.endsWith(".local")) {
+            throw new IMAPyException("Unsafe email domain");
+        }
+        try {
+            for (InetAddress address : InetAddress.getAllByName(asciiDomain)) {
+                if (isUnsafeAddress(address)) {
+                    throw new IMAPyException("Unsafe email domain");
+                }
+            }
+        } catch (UnknownHostException e) {
+            // Keep previous behavior: unknown domains are handled later by connection attempts.
+        }
+        return asciiDomain;
     }
 
 }

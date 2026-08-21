@@ -2,7 +2,6 @@ package de.jalin.webmail;
 
 import java.io.IOException;
 
-import jakarta.mail.AuthenticationFailedException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 
 import de.jalin.imap.IMAPyException;
 import de.jalin.imap.IMAPySession;
-import de.jalin.imap.text.EmailValidator;
 import de.jalin.webmail.impl.AutoconfigMailboxFinder;
 import de.jalin.webmail.impl.HostsharingMailboxFinder;
 
@@ -38,10 +36,6 @@ public class LoginServlet extends HttpServlet {
         }
         MailboxFinder mbxFinder;
         if (emailAddr.contains("@")) {
-            if (!EmailValidator.isValidEmailAddress(emailAddr)) {
-                response.sendRedirect("login.jsp?error=invalid");
-                return;
-            }
             mbxFinder = new AutoconfigMailboxFinder();
         } else {
             mbxFinder = new HostsharingMailboxFinder();
