@@ -22,13 +22,9 @@
                 <h1 class="login-title">Keine Berechtigung</h1>
                 <p class="login-subtitle">Dir fehlen die Rechte, die letzte Aktion auszuführen.</p>
 
-                <% if (error != null && !error.isEmpty()) { %>
                 <div class="login-error">
-                    <%
-                        out.print("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
-                    %>
+                    out.print("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
                 </div>
-                <% }%>
 
             </div>
         </div>
