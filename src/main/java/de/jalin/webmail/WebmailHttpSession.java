@@ -22,6 +22,7 @@ public class WebmailHttpSession {
         imapSession = (IMAPySession) httpSession.getAttribute("imap");
         if (imapSession == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
+            throw new IllegalStateException("no valid session");
         }
     }
 
