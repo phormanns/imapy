@@ -112,12 +112,17 @@ public class IMAPySession {
     }
 
     public IMAPyMessage getMessage(final String folderName, final String msgId, final MessagePartHandler partHandler) throws IMAPyException {
+        int msgIndx;
+        try {
+            msgIndx = Integer.parseInt(msgId);
+        } catch (NumberFormatException ne) {
+            throw new IMAPyException(ne);
+        }
         final IMAPyMessage yMsg = new IMAPyMessage();
         try {
             final Folder folder = folders.get(folderName);
             folder.open(Folder.READ_WRITE);
             final int messageCount = folder.getMessageCount();
-            int msgIndx = Integer.parseInt(msgId);
             if (msgIndx > messageCount) {
                 msgIndx = messageCount - 1;
             }

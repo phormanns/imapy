@@ -29,6 +29,9 @@ public class AttachmentServlet extends HttpServlet {
             }
             final String pathInfo = request.getPathInfo();
             final String[] pathItems = pathInfo.substring(1).split("/");
+            if (pathItems.length < 3) {
+                throw new ServletException("servlet path error");
+            }
             final String folder = pathItems[0];
             final String messageIdx = pathItems[1];
             final String attachmentName = pathItems[2];

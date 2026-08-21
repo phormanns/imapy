@@ -23,7 +23,9 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-        final HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
+        session.invalidate();
+        session = request.getSession(true);
         final String emailAddr = request.getParameter("email");
         if (emailAddr == null || emailAddr.length() < 5) {
             response.sendRedirect("login.jsp?error=invalid");

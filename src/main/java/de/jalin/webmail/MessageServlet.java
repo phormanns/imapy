@@ -32,6 +32,9 @@ public class MessageServlet extends HttpServlet {
             final HttpSession session = request.getSession();
             final String pathInfo = request.getPathInfo().substring(1);
             final String[] pathSplit = pathInfo.split("/");
+            if (pathSplit.length != 2) {
+                throw new ServletException("servlet path error");
+            }
             final String folder = pathSplit[0];
             final String msgIndex = pathSplit[1];
             session.setAttribute("folder", folder);
@@ -62,6 +65,9 @@ public class MessageServlet extends HttpServlet {
             }
             final String pathInfo = request.getPathInfo().substring(1);
             final String[] pathSplit = pathInfo.split("/");
+            if (pathSplit.length < 2) {
+                throw new ServletException("servlet path error");
+            }
             final String folder = pathSplit[0];
             final String msgIndex = pathSplit[1];
             if (pathSplit.length == 4 && pathSplit[2].equals("moveto")) {

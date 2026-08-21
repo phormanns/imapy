@@ -1,5 +1,6 @@
 package de.jalin.webmail;
 
+import jakarta.mail.Session;
 import java.io.IOException;
 import java.util.UUID;
 import jakarta.servlet.Filter;
@@ -20,7 +21,7 @@ public class CSRFTokenFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
         final HttpServletResponse httpResponse = (HttpServletResponse) response;
-        final HttpSession httpSession = httpRequest.getSession(true);
+        final HttpSession httpSession = httpRequest.getSession();
         String sessionToken = (String) httpSession.getAttribute(CSRF_TOKEN_ID);
         if ("GET".equalsIgnoreCase(httpRequest.getMethod())) {
             if (sessionToken == null) {
