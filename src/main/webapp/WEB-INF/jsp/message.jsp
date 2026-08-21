@@ -8,6 +8,7 @@
     String csrfToken = (String) session.getAttribute("csrf_token");
     pageContext.setAttribute("ctx", ctx);
     pageContext.setAttribute("csrfToken", csrfToken);
+    pageContext.setAttribute("deleteParams", "{ \"msgop\": \"confirmdel\", \"csrf_token\": \"" + csrfToken + "\" }");
 %>
 
 <%
@@ -51,11 +52,12 @@
                                      </button>
                 </div>
                 <div class="email-content-toolbar-right">
-                                     <button type="button" class="btn btn-danger"
-                                         hx-post="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${index}"/>?msgop=confirmdel&csrf_token=<c:out value="${csrfToken}"/>"
-                    hx-confirm="Diese Nachricht wirklich löschen?"
-                    hx-target="#main"
-                    hx-swap="innerHTML">Löschen</button>
+                    <button type="button" class="btn btn-danger"
+                       hx-post="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${index}"/>"
+                       hx-vals="<c:out value="${deleteParams}"/>"
+                       hx-confirm="Diese Nachricht wirklich löschen?"
+                       hx-target="#main"
+                       hx-swap="innerHTML">Löschen</button>
                 </div>
             </div>
 
