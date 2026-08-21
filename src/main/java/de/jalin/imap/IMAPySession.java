@@ -10,15 +10,15 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.mail.FetchProfile;
-import javax.mail.Flags.Flag;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.FetchProfile;
+import jakarta.mail.Flags.Flag;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMessage;
 
 import de.jalin.imap.mime.MessageData;
 import de.jalin.imap.mime.MessagePartHandler;
