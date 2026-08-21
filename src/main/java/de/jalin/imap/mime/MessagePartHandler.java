@@ -1,6 +1,6 @@
 package de.jalin.imap.mime;
 
-import javax.mail.BodyPart;
+import jakarta.mail.BodyPart;
 
 import de.jalin.imap.IMAPyException;
 

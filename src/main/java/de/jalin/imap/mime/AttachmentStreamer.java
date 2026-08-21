@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
+import jakarta.mail.BodyPart;
+import jakarta.mail.MessagingException;
 
 import de.jalin.imap.IMAPyException;
 

@@ -3,8 +3,8 @@ package de.jalin.imap.mime;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
+import jakarta.mail.BodyPart;
+import jakarta.mail.MessagingException;
 
 import de.jalin.imap.IMAPyException;
 
