@@ -4,6 +4,8 @@ import de.jalin.imap.IMAPyException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.IDN;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,10 +24,50 @@ import org.xml.sax.SAXException;
 
 public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
 
+    private static boolean isUnsafeAddress(InetAddress address) {
+        return address.isAnyLocalAddress()
+                || address.isLoopbackAddress()
+                || address.isLinkLocalAddress()
+                || address.isSiteLocalAddress()
+                || address.isMulticastAddress();
+    }
+
+    private static String normalizeAndValidateDomain(String domain) throws IMAPyException {
+        if (domain == null || domain.isBlank()) {
+            throw new IMAPyException("Invalid email domain");
+        }
+        final String asciiDomain;
+        try {
+            asciiDomain = IDN.toASCII(domain.trim(), IDN.USE_STD3_ASCII_RULES).toLowerCase();
+        } catch (IllegalArgumentException e) {
+            throw new IMAPyException(e);
+        }
+        if (asciiDomain.length() > 253 || !asciiDomain.matches("^[a-z0-9](?:[a-z0-9-\\.]*[a-z0-9])?$") || !asciiDomain.contains(".")) {
+            throw new IMAPyException("Invalid email domain");
+        }
+        if ("localhost".equals(asciiDomain) || asciiDomain.endsWith(".localhost") || asciiDomain.endsWith(".local")) {
+            throw new IMAPyException("Unsafe email domain");
+        }
+        try {
+            for (InetAddress address : InetAddress.getAllByName(asciiDomain)) {
+                if (isUnsafeAddress(address)) {
+                    throw new IMAPyException("Unsafe email domain");
+                }
+            }
+        } catch (UnknownHostException e) {
+            // Keep previous behavior: unknown domains are handled later by connection attempts.
+        }
+        return asciiDomain;
+    }
+
     @Override
     public void setLogin(String login) throws IMAPyException {
         try {
-            final String emailDomain = login.split("@")[1];
+            final String[] loginParts = login.split("@", 2);
+            if (loginParts.length != 2) {
+                throw new IMAPyException("Invalid login");
+            }
+            final String emailDomain = normalizeAndValidateDomain(loginParts[1]);
             InputStream autoconfigStream = null;
             try {
                 final URI uriAutoconfigSubdomain = new URI("https://autoconfig." + emailDomain + "/mail/config-v1.1.xml?emailaddress=" + login);
