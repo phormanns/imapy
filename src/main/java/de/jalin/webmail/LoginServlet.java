@@ -28,18 +28,18 @@ public class LoginServlet extends HttpServlet {
         final HttpSession session = request.getSession();
         final String emailAddr = request.getParameter("email");
         if (emailAddr == null || emailAddr.length() < 5) {
-            response.sendRedirect("login.jsp?error=nologin");
+            response.sendRedirect("login.jsp?error=invalid");
             return;
         }
         final String password = request.getParameter("password");
         if (password == null || password.length() < 3) {
-            response.sendRedirect("login.jsp?error=nopassword");
+            response.sendRedirect("login.jsp?error=invalid");
             return;
         }
         MailboxFinder mbxFinder;
         if (emailAddr.contains("@")) {
             if (!EmailValidator.isValidEmailAddress(emailAddr)) {
-                response.sendRedirect("login.jsp?error=invalidlogin");
+                response.sendRedirect("login.jsp?error=invalid");
                 return;
             }
             mbxFinder = new AutoconfigMailboxFinder();
@@ -55,7 +55,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("imap", new IMAPySession(host, user, password));
             response.sendRedirect("mailbox");
         } catch (IMAPyException e) {
-            response.sendRedirect("login.jsp?error=loginfail");
+            response.sendRedirect("login.jsp?error=invalid");
         }
 
     }
