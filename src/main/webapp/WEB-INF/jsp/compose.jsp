@@ -45,7 +45,16 @@
                 onclick="execComposeCommand('insertUnorderedList')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         </button>
+        <span class="compose-tool-divider"></span>
+        <button type="button" class="compose-tool" title="Anlage anhängen"
+                onclick="composePickFiles()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <input type="file" id="compose-file" class="compose-file-input" multiple
+               onchange="composeFilesChanged(this)">
     </div>
+
+    <ul class="compose-attachments" id="compose-attachments" hidden></ul>
 
     <div id="compose-editor" class="compose-editor" contenteditable="true"
          data-placeholder="Nachricht schreiben …"></div>

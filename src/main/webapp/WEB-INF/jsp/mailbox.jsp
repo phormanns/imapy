@@ -94,6 +94,7 @@
 
         <script type="text/javascript">
             var csrfToken = '<c:out value="${sessionScope.csrf_token}"/>';
+            var composeFiles = [];
             var mediaQueryList = window.matchMedia("(min-width: 900px)");
 
             function showMessagesList() {
@@ -209,6 +210,74 @@
                 document.execCommand(cmd, false, null);
             }
 
+            function composePickFiles() {
+                var input = document.getElementById('compose-file');
+                if (input) {
+                    input.click();
+                }
+            }
+
+            function composeFilesChanged(input) {
+                if (!input.files) {
+                    return;
+                }
+                for (var i = 0; i < input.files.length; i++) {
+                    var file = input.files[i];
+                    var exists = composeFiles.some(function (f) {
+                        return f.name === file.name && f.size === file.size;
+                    });
+                    if (!exists) {
+                        composeFiles.push(file);
+                    }
+                }
+                input.value = '';
+                renderComposeFiles();
+            }
+
+            function renderComposeFiles() {
+                var list = document.getElementById('compose-attachments');
+                if (!list) {
+                    return;
+                }
+                list.innerHTML = '';
+                if (!composeFiles.length) {
+                    list.hidden = true;
+                    return;
+                }
+                list.hidden = false;
+                composeFiles.forEach(function (file, idx) {
+                    var li = document.createElement('li');
+                    li.className = 'compose-attachment';
+                    var label = document.createElement('span');
+                    label.className = 'compose-attachment-name';
+                    label.textContent = file.name + ' (' + formatComposeSize(file.size) + ')';
+                    label.title = file.name;
+                    var remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'compose-attachment-remove';
+                    remove.title = 'Anlage entfernen';
+                    remove.setAttribute('aria-label', 'Anlage ' + file.name + ' entfernen');
+                    remove.textContent = '×';
+                    remove.addEventListener('click', function () {
+                        composeFiles.splice(idx, 1);
+                        renderComposeFiles();
+                    });
+                    li.appendChild(label);
+                    li.appendChild(remove);
+                    list.appendChild(li);
+                });
+            }
+
+            function formatComposeSize(bytes) {
+                if (bytes >= 1048576) {
+                    return (bytes / 1048576).toFixed(1) + ' MB';
+                }
+                if (bytes >= 1024) {
+                    return Math.round(bytes / 1024) + ' KB';
+                }
+                return bytes + ' B';
+            }
+
             function sendCompose(btn) {
                 var to = document.getElementById('compose-to').value.trim();
                 var subject = document.getElementById('compose-subject').value.trim();
@@ -227,22 +296,26 @@
                 }
                 var inReplyToEl = document.getElementById('compose-in-reply-to');
                 var referencesEl = document.getElementById('compose-references');
-                var body = 'csrf_token=' + encodeURIComponent(csrfToken)
-                        + '&to=' + encodeURIComponent(to)
-                        + '&subject=' + encodeURIComponent(subject)
-                        + '&body=' + encodeURIComponent(html)
-                        + '&inReplyTo=' + encodeURIComponent(inReplyToEl ? inReplyToEl.value : '')
-                        + '&references=' + encodeURIComponent(referencesEl ? referencesEl.value : '');
-                fetch('<c:out value="${ctx}"/>/compose', {
+                var data = new FormData();
+                data.append('csrf_token', csrfToken);
+                data.append('to', to);
+                data.append('subject', subject);
+                data.append('body', html);
+                data.append('inReplyTo', inReplyToEl ? inReplyToEl.value : '');
+                data.append('references', referencesEl ? referencesEl.value : '');
+                composeFiles.forEach(function (file) {
+                    data.append('attachment', file, file.name);
+                });
+                fetch('<c:out value="${ctx}"/>/compose?csrf_token=' + encodeURIComponent(csrfToken), {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-                    body: body
+                    body: data
                 }).then(function (res) {
                     if (!res.ok) {
                         throw new Error('HTTP ' + res.status);
                     }
                     return res.text();
                 }).then(function (fragment) {
+                    composeFiles = [];
                     var main = document.getElementById('main');
                     if (main) {
                         main.innerHTML = fragment;
@@ -291,6 +364,7 @@
                             return;
                         }
                         main.innerHTML = fragment;
+                        composeFiles = [];
                         hideMessagesList();
                         window.scrollTo(0, 0);
                         var toEl = document.getElementById('compose-to');
@@ -361,6 +435,8 @@
                     var toolbar = evt.target.querySelector('.email-content-toolbar .back-to-list');
                     if (toolbar)
                         toolbar.style.display = '';
+                    composeFiles = [];
+                    renderComposeFiles();
                     hideMessagesList();
                     window.scrollTo(0, 0);
                 }

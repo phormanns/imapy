@@ -8,15 +8,18 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jakarta.activation.DataHandler;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -46,11 +49,11 @@ public class SMTPySession {
     }
 
     public void sendMail(final String from, final String to, final String subject, final String htmlBody) throws IMAPyException {
-        sendMail(from, to, subject, htmlBody, null, null);
+        sendMail(from, to, subject, htmlBody, null, null, null);
     }
 
     public void sendMail(final String from, final String to, final String subject, final String htmlBody,
-                         final String inReplyTo, final String references) throws IMAPyException {
+                         final String inReplyTo, final String references, final List<MailAttachment> attachments) throws IMAPyException {
         try {
             final Properties props = new Properties();
             props.put("mail.smtp.host", host);
@@ -78,10 +81,21 @@ public class SMTPySession {
             textPart.setText(toPlainText(htmlBody), "UTF-8");
             final MimeBodyPart htmlPart = new MimeBodyPart();
             htmlPart.setContent(htmlBody == null ? "" : htmlBody, "text/html; charset=UTF-8");
-            final Multipart multipart = new MimeMultipart("alternative");
-            multipart.addBodyPart(textPart);
-            multipart.addBodyPart(htmlPart);
-            msg.setContent(multipart);
+            final Multipart alternative = new MimeMultipart("alternative");
+            alternative.addBodyPart(textPart);
+            alternative.addBodyPart(htmlPart);
+            if (attachments == null || attachments.isEmpty()) {
+                msg.setContent(alternative);
+            } else {
+                final Multipart mixed = new MimeMultipart("mixed");
+                final MimeBodyPart contentWrapper = new MimeBodyPart();
+                contentWrapper.setContent(alternative);
+                mixed.addBodyPart(contentWrapper);
+                for (final MailAttachment attachment : attachments) {
+                    mixed.addBodyPart(attachmentPart(attachment));
+                }
+                msg.setContent(mixed);
+            }
             msg.saveChanges();
             try (Transport transport = session.getTransport("smtp")) {
                 transport.connect(host, port, user, new String(password));
@@ -90,6 +104,18 @@ public class SMTPySession {
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
+    }
+
+    private static MimeBodyPart attachmentPart(final MailAttachment attachment) throws MessagingException {
+        final String contentType = attachment.getContentType() == null || attachment.getContentType().isBlank()
+                ? "application/octet-stream"
+                : attachment.getContentType();
+        final ByteArrayDataSource dataSource = new ByteArrayDataSource(attachment.getData(), contentType);
+        final MimeBodyPart part = new MimeBodyPart();
+        part.setDataHandler(new DataHandler(dataSource));
+        part.setFileName(attachment.getFileName());
+        part.setDisposition(Part.ATTACHMENT);
+        return part;
     }
 
     private static void setThreadingHeaders(final MimeMessage msg, final String inReplyTo, final String references) throws MessagingException {

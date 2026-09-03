@@ -1,16 +1,27 @@
 package de.jalin.webmail;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import de.jalin.imap.IMAPyException;
+import de.jalin.imap.MailAttachment;
 import de.jalin.imap.SMTPySession;
 
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 25L * 1024 * 1024,
+        maxRequestSize = 30L * 1024 * 1024
+)
 public class ComposeServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -55,8 +66,9 @@ public class ComposeServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Empfaenger fehlt");
                 return;
             }
+            final List<MailAttachment> attachments = collectAttachments(request);
             try {
-                smtp.sendMail(from, to, subject, body, inReplyTo, references);
+                smtp.sendMail(from, to, subject, body, inReplyTo, references, attachments);
             } catch (IMAPyException e) {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Versand fehlgeschlagen");
                 return;
@@ -66,6 +78,32 @@ public class ComposeServlet extends HttpServlet {
         } catch (IOException e) {
             throw new ServletException(e);
         }
+    }
+    private List<MailAttachment> collectAttachments(final HttpServletRequest request) throws IOException, ServletException {
+        final List<MailAttachment> attachments = new ArrayList<>();
+        for (final Part part : request.getParts()) {
+            if (!"attachment".equals(part.getName())) {
+                continue;
+            }
+            final String submittedName = part.getSubmittedFileName();
+            if (submittedName == null || submittedName.isBlank()) {
+                continue;
+            }
+            final byte[] data;
+            try (InputStream in = part.getInputStream()) {
+                data = in.readAllBytes();
+            }
+            if (data.length == 0) {
+                continue;
+            }
+            String fileName = submittedName.replace('\\', '/');
+            fileName = fileName.substring(fileName.lastIndexOf('/') + 1).trim();
+            if (fileName.isEmpty()) {
+                fileName = "Anhang";
+            }
+            attachments.add(new MailAttachment(fileName, part.getContentType(), data));
+        }
+        return attachments;
     }
 
 }
