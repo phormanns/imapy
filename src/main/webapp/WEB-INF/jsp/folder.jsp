@@ -97,7 +97,11 @@
                 pageContext.setAttribute("title", title);
 %>
     <div class="<c:out value="${cls}"/>"
+         data-folder="<c:out value="${folder}"/>"
          data-message-uid="<c:out value="${messageUid}"/>"
+         draggable="true"
+         ondragstart="dragMessageStart(event, this)"
+         ondragend="messageDragEnd(event, this)"
          hx-get="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${messageUid}"/>"
          hx-target="#main"
          hx-trigger="click"

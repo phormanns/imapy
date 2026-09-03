@@ -93,6 +93,7 @@
         </div>
 
         <script type="text/javascript">
+            var csrfToken = '<c:out value="${sessionScope.csrf_token}"/>';
             var mediaQueryList = window.matchMedia("(min-width: 900px)");
 
             function showMessagesList() {
@@ -128,6 +129,75 @@
                 if (el)
                     el.classList.add('is-active');
                 hideMessagesList();
+            }
+
+            function dragMessageStart(evt, el) {
+                var folder = el.getAttribute('data-folder');
+                var uid = el.getAttribute('data-message-uid');
+                if (!folder || !uid) {
+                    evt.preventDefault();
+                    return;
+                }
+                el.classList.add('is-dragging');
+                evt.dataTransfer.effectAllowed = 'move';
+                evt.dataTransfer.setData('text/plain', JSON.stringify({folder: folder, uid: uid}));
+            }
+
+            function messageDragEnd(evt, el) {
+                el.classList.remove('is-dragging');
+                document.querySelectorAll('.nav-item.drag-over').forEach(function (n) {
+                    n.classList.remove('drag-over');
+                });
+            }
+
+            function folderDragOver(evt, el) {
+                evt.preventDefault();
+                evt.dataTransfer.dropEffect = 'move';
+                el.classList.add('drag-over');
+            }
+
+            function folderDragLeave(evt, el) {
+                if (!el.contains(evt.relatedTarget)) {
+                    el.classList.remove('drag-over');
+                }
+            }
+
+            function folderDrop(evt, el) {
+                evt.preventDefault();
+                el.classList.remove('drag-over');
+                var payload = null;
+                try {
+                    payload = JSON.parse(evt.dataTransfer.getData('text/plain'));
+                } catch (e) {
+                    payload = null;
+                }
+                if (!payload || !payload.folder || !payload.uid) {
+                    return false;
+                }
+                var targetFolder = el.getAttribute('data-folder');
+                if (!targetFolder || payload.folder === targetFolder) {
+                    return false;
+                }
+                moveMessageToFolder(payload.folder, payload.uid, targetFolder);
+                return false;
+            }
+
+            function moveMessageToFolder(srcFolder, uid, targetFolder) {
+                var url = '<c:out value="${ctx}"/>/message/' + encodeURIComponent(srcFolder)
+                        + '/' + encodeURIComponent(uid) + '/moveto/' + encodeURIComponent(targetFolder);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                    body: 'csrf_token=' + encodeURIComponent(csrfToken)
+                }).then(function (res) {
+                    if (res.ok) {
+                        refreshMailbox();
+                    } else {
+                        alert('Nachricht konnte nicht verschoben werden (HTTP ' + res.status + ')');
+                    }
+                }).catch(function () {
+                    alert('Nachricht konnte nicht verschoben werden');
+                });
             }
 
             function toggleNav() {

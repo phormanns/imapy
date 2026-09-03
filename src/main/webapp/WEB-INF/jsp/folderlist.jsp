@@ -47,7 +47,10 @@
             hx-target="#list"
             hx-trigger="click"
             hx-swap="innerHTML"
-            onclick="selectFolder(this, '<c:out value="${folderName}"/>')">
+            onclick="selectFolder(this, '<c:out value="${folderName}"/>')"
+            ondragover="folderDragOver(event, this)"
+            ondragleave="folderDragLeave(event, this)"
+            ondrop="folderDrop(event, this)">
             <span class="nav-item-left">
                 <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                 <span class="nav-item-label"><c:out value="${folderTitle}"/></span>
