@@ -31,12 +31,12 @@
     final Object messagesListObj = session.getAttribute("messages");
 
     String activeMessageFolder = null;
-    int activeMessageIndex = -1;
+    long activeMessageUid = -1;
     final Object activeMsgObj = session.getAttribute("message");
     if (activeMsgObj instanceof IMAPyMessage) {
         final IMAPyMessage activeMsg = (IMAPyMessage) activeMsgObj;
         activeMessageFolder = activeMsg.getFolder();
-        activeMessageIndex = activeMsg.getIndex();
+        activeMessageUid = activeMsg.getUid();
     }
 
     pageContext.setAttribute("ctx", ctx);
@@ -68,13 +68,13 @@
                 String date = yMessage.getDate();
                 String status = yMessage.getStatus();
                 String folder = yMessage.getFolder();
-                int index = yMessage.getIndex();
+                long messageUid = yMessage.getUid();
 
                 String cls = "email-item";
                 if ("unread".equalsIgnoreCase(status)) {
                     cls += " is-unread";
                 }
-                if (folder.equals(activeMessageFolder) && index == activeMessageIndex) {
+                if (folder.equals(activeMessageFolder) && messageUid == activeMessageUid) {
                     cls += " is-active";
                 }
 
@@ -89,7 +89,7 @@
                     initial = display.substring(0, 1).toUpperCase();
                 }
                 pageContext.setAttribute("cls", cls);
-                pageContext.setAttribute("index", index);
+                pageContext.setAttribute("messageUid", messageUid);
                 pageContext.setAttribute("folder", folder);
                 pageContext.setAttribute("initial", initial);
                 pageContext.setAttribute("author", author);
@@ -97,12 +97,12 @@
                 pageContext.setAttribute("title", title);
 %>
     <div class="<c:out value="${cls}"/>"
-         data-message-index="<c:out value="${index}"/>"
-         hx-get="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${index}"/>"
+         data-message-uid="<c:out value="${messageUid}"/>"
+         hx-get="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${messageUid}"/>"
          hx-target="#main"
          hx-trigger="click"
          hx-swap="innerHTML"
-         onclick="selectMessage(this, '<c:out value="${folder}"/>', <c:out value="${index}"/>)">
+         onclick="selectMessage(this, '<c:out value="${folder}"/>', <c:out value="${messageUid}"/>)">
         <div class="email-avatar"><c:out value="${initial}"/></div>
         <div class="email-body">
             <div class="email-row">

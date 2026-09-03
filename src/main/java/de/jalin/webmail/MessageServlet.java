@@ -36,10 +36,10 @@ public class MessageServlet extends HttpServlet {
                 throw new ServletException("servlet path error");
             }
             final String folder = pathSplit[0];
-            final String msgIndex = pathSplit[1];
+            final String msgUid = pathSplit[1];
             session.setAttribute("folder", folder);
             final AttachmentsCollector collector = new AttachmentsCollector();
-            final IMAPyMessage yMessage = imap.getMessage(folder, msgIndex, collector);
+            final IMAPyMessage yMessage = imap.getMessage(folder, msgUid, collector);
             session.setAttribute("message", yMessage);
             yMessage.addAttachments(collector.getAttachmentsList());
             response.setHeader("HX-Trigger", "messages-changed");
@@ -69,13 +69,13 @@ public class MessageServlet extends HttpServlet {
                 throw new ServletException("servlet path error");
             }
             final String folder = pathSplit[0];
-            final String msgIndex = pathSplit[1];
+            final String msgUid = pathSplit[1];
             if (pathSplit.length == 4 && pathSplit[2].equals("moveto")) {
-                imap.moveMessageToFolder(folder, msgIndex, pathSplit[3]);
+                imap.moveMessageToFolder(folder, msgUid, pathSplit[3]);
                 return;
             }
             if ("confirmdel".equals(request.getParameter("msgop"))) {
-                imap.removeMessage(folder, msgIndex, messageId);
+                imap.removeMessage(folder, msgUid, messageId);
                 session.setAttribute("folder", folder);
                 session.setAttribute("deletedFolder", folder);
                 session.setAttribute("deletedMessageSubject",
@@ -88,7 +88,7 @@ public class MessageServlet extends HttpServlet {
             }
             session.setAttribute("folder", folder);
             final AttachmentsCollector collector = new AttachmentsCollector();
-            final IMAPyMessage yMessage = imap.getMessage(folder, msgIndex, collector);
+            final IMAPyMessage yMessage = imap.getMessage(folder, msgUid, collector);
             session.setAttribute("message", yMessage);
             yMessage.addAttachments(collector.getAttachmentsList());
             response.setHeader("HX-Trigger", "messages-changed");

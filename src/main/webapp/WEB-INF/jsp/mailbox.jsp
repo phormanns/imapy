@@ -121,7 +121,7 @@
                 closeNav();
             }
 
-            function selectMessage(el, folderName, messageIndex) {
+            function selectMessage(el, folderName, messageUid) {
                 document.querySelectorAll('.email-item').forEach(function (n) {
                     n.classList.remove('is-active');
                 });

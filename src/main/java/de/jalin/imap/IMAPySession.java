@@ -1,7 +1,8 @@
 package de.jalin.imap;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,11 +14,14 @@ import java.util.TreeMap;
 import jakarta.mail.FetchProfile;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
+import jakarta.mail.FolderClosedException;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.NoSuchProviderException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import jakarta.mail.StoreClosedException;
+import jakarta.mail.UIDFolder;
 import jakarta.mail.internet.MimeMessage;
 
 import de.jalin.imap.mime.MessageData;
@@ -30,35 +34,54 @@ public class IMAPySession {
     public static final String NEW = "unread";
     public static final String SEEN = "seen";
 
-    final static private DateFormat DF = new SimpleDateFormat("EEE dd.MM.yyyy  HH:mm", Locale.GERMANY);
+    final static private DateTimeFormatter DF = DateTimeFormatter.ofPattern("EEE dd.MM.yyyy  HH:mm", Locale.GERMANY);
 
     final private String user;
     final private char[] password;
     final private String host;
-    final private SortedMap<String, Folder> folders;
+    final private Store store;
+    final private SortedMap<String, String> folders;
 
     public IMAPySession(String host, String user, String password) throws IMAPyException {
         this.user = user;
         this.password = password.toCharArray();
         this.host = host;
-        folders = new TreeMap<>();
-        initFolders();
+        this.folders = new TreeMap<>();
+        try {
+            final Session session = Session.getInstance(new Properties());
+            this.store = session.getStore("imaps");
+        } catch (NoSuchProviderException e) {
+            throw new IMAPyException(e);
+        }
+        ensureConnected();
+        try {
+            refreshFolders();
+        } catch (MessagingException e) {
+            throw new IMAPyException(e);
+        }
     }
 
-    public List<IMAPyFolder> getFolders() {
+    public synchronized void disconnect() {
+        try {
+            if (store.isConnected()) {
+                store.close();
+            }
+        } catch (MessagingException e) {
+        }
+    }
+
+    public List<IMAPyFolder> getFolders() throws IMAPyException {
+        ensureConnected();
         final List<IMAPyFolder> fdList = new ArrayList<>();
         for (final String fdName : folders.keySet()) {
-            final Folder fd = folders.get(fdName);
             final IMAPyFolder yFolder = new IMAPyFolder();
             yFolder.setName(fdName);
-            yFolder.setTitle(fd.getName());
+            yFolder.setTitle(folders.get(fdName));
             try {
-                final int messageCount = fd.getMessageCount();
-                final int unreadMessageCount = fd.getUnreadMessageCount();
-                final int newMessageCount = fd.getNewMessageCount();
-                yFolder.setNewMessageCount(newMessageCount);
-                yFolder.setUnreadMessageCount(unreadMessageCount);
-                yFolder.setTotalMessageCount(messageCount);
+                final Folder fd = store.getFolder(fdName);
+                yFolder.setTotalMessageCount(fd.getMessageCount());
+                yFolder.setUnreadMessageCount(fd.getUnreadMessageCount());
+                yFolder.setNewMessageCount(fd.getNewMessageCount());
             } catch (MessagingException e) {
                 yFolder.setNewMessageCount(-999);
                 yFolder.setUnreadMessageCount(-999);
@@ -70,70 +93,47 @@ public class IMAPySession {
     }
 
     public List<IMAPyMessage> getMessages(final String folderName) throws IMAPyException {
-        final List<IMAPyMessage> yMessages = new ArrayList<>();
-        try {
-            final Folder folder = folders.get(folderName);
-            if (folder == null) {
-                return yMessages;
-            }
-            if (!folder.isOpen()) {
-                folder.open(Folder.READ_ONLY);
-            }
+        return onFolder(folderName, Folder.READ_ONLY, false, folder -> {
+            final List<IMAPyMessage> yMessages = new ArrayList<>();
             final Message[] messages = folder.getMessages();
             final FetchProfile fp = new FetchProfile();
             fp.add(FetchProfile.Item.ENVELOPE);
             fp.add(FetchProfile.Item.CONTENT_INFO);
             fp.add(FetchProfile.Item.FLAGS);
+            fp.add(UIDFolder.FetchProfileItem.UID);
             folder.fetch(messages, fp);
-            for (Message msg : messages) {
+            for (final Message msg : messages) {
                 final IMAPyMessage yMsg = new IMAPyMessage();
-                yMsg.setIndex(msg.getMessageNumber());
+                yMsg.setUid(((UIDFolder) folder).getUID(msg));
                 yMsg.setTitle(shorten(msg));
                 yMsg.setAuthor(MimeParser.getFromAddress(msg));
                 yMsg.setFolder(folderName);
                 yMsg.setStatus(msg.isSet(Flag.SEEN) ? SEEN : NEW);
-                yMsg.setDate(DF.format(msg.getSentDate()));
+                final Date sentDate = msg.getSentDate();
+                if (sentDate != null) {
+                    yMsg.setDate(formatDate(sentDate));
+                }
                 yMessages.add(0, yMsg);
             }
-            if (folder.isOpen())
-                folder.close(false);
-        } catch (MessagingException e) {
-            throw new IMAPyException(e);
-        }
-        return yMessages;
+            return yMessages;
+        });
     }
 
-    private String shorten(final Message msg) {
-        final String subject = MimeParser.getSubject(msg);
-        if (subject.length() > 80) {
-            return subject.substring(0, 79);
-        }
-        return HtmlHelper.replaceEntities(subject);
-    }
-
-    public IMAPyMessage getMessage(final String folderName, final String msgId, final MessagePartHandler partHandler) throws IMAPyException {
-        int msgIndx;
-        try {
-            msgIndx = Integer.parseInt(msgId);
-        } catch (NumberFormatException ne) {
-            throw new IMAPyException(ne);
-        }
-        final IMAPyMessage yMsg = new IMAPyMessage();
-        try {
-            final Folder folder = folders.get(folderName);
-            folder.open(Folder.READ_WRITE);
-            final int messageCount = folder.getMessageCount();
-            if (msgIndx > messageCount) {
-                msgIndx = messageCount - 1;
+    public IMAPyMessage getMessage(final String folderName, final String uid, final MessagePartHandler partHandler) throws IMAPyException {
+        final long uidValue = parseUid(uid);
+        return onFolder(folderName, Folder.READ_WRITE, false, folder -> {
+            final Message msg = ((UIDFolder) folder).getMessageByUID(uidValue);
+            if (msg == null) {
+                throw new IMAPyException("Nachricht mit UID " + uidValue + " nicht gefunden in Ordner " + folderName);
             }
-            final Message msg = folder.getMessage(msgIndx);
+            final IMAPyMessage yMsg = new IMAPyMessage();
             yMsg.setFolder(folderName);
-            yMsg.setIndex(msgIndx);
+            yMsg.setUid(uidValue);
             final Date sentDate = msg.getSentDate();
             if (sentDate != null) {
-                yMsg.setDate(DF.format(sentDate));
+                yMsg.setDate(formatDate(sentDate));
             } else {
-                yMsg.setDate(DF.format(new Date()));
+                yMsg.setDate(formatDate(new Date()));
             }
             yMsg.setTitle(shorten(msg));
             yMsg.setAuthor(MimeParser.getFromAddress(msg));
@@ -149,88 +149,191 @@ public class IMAPySession {
                 throw new IMAPyException("unknown message type");
             }
             msg.setFlag(Flag.SEEN, true);
-            if (folder.isOpen())
-                folder.close(true);
-        } catch (MessagingException e) {
-            throw new IMAPyException(e);
-        }
-        return yMsg;
+            return yMsg;
+        });
     }
 
-    public IMAPyMessage removeMessage(final String folderName, final String msgId, final String messageId) throws IMAPyException {
+    public IMAPyMessage removeMessage(final String folderName, final String uid, final String messageId) throws IMAPyException {
+        final long uidValue = parseUid(uid);
         final IMAPyMessage yMsg = new IMAPyMessage();
-        try {
-            final Folder folder = folders.get(folderName);
-            folder.open(Folder.READ_WRITE);
-            int msgIndx = Integer.parseInt(msgId);
-            final Message msg = folder.getMessage(msgIndx);
+        yMsg.setFolder(folderName);
+        yMsg.setUid(uidValue);
+        return onFolder(folderName, Folder.READ_WRITE, true, folder -> {
+            final Message msg = ((UIDFolder) folder).getMessageByUID(uidValue);
+            if (msg == null) {
+                throw new IMAPyException("Nachricht mit UID " + uidValue + " nicht gefunden in Ordner " + folderName);
+            }
             String messageIDtoCheck = null;
             if (msg instanceof MimeMessage) {
                 messageIDtoCheck = MimeParser.getMessageID((MimeMessage) msg);
             }
-            yMsg.setFolder(folderName);
-            yMsg.setIndex(msgIndx);
             final boolean messageIdChecked = (messageIDtoCheck != null && messageIDtoCheck.equals(messageId)) || (messageId == null && messageIDtoCheck == null);
-            if (messageIdChecked && msg != null) {
+            if (messageIdChecked) {
                 msg.setFlag(Flag.DELETED, true);
             }
-            if (folder.isOpen())
-                folder.close(true);
-        } catch (MessagingException e) {
-            throw new IMAPyException(e);
-        }
-        return yMsg;
+            return yMsg;
+        });
     }
 
-    private void initFolders() throws IMAPyException {
-        try {
-            final Session session = Session.getDefaultInstance(new Properties());
-            try (Store store = session.getStore("imaps")) {
-                store.connect(host, user, new String(password));
-                getChildren(store.getDefaultFolder());
+    public IMAPyMessage moveMessageToFolder(final String sourceFolderName, final String uid, final String targetFolderName) throws IMAPyException {
+        final long uidValue = parseUid(uid);
+        return withRetry(() -> {
+            final Folder srcFolder = getStoreFolder(sourceFolderName);
+            final Folder targetFolder = getStoreFolder(targetFolderName);
+            try {
+                srcFolder.open(Folder.READ_WRITE);
+                final Message msg = ((UIDFolder) srcFolder).getMessageByUID(uidValue);
+                if (msg == null) {
+                    throw new IMAPyException("Nachricht mit UID " + uidValue + " nicht gefunden in Ordner " + sourceFolderName);
+                }
+                targetFolder.open(Folder.READ_WRITE);
+                try {
+                    srcFolder.copyMessages(new Message[]{msg}, targetFolder);
+                    msg.setFlag(Flag.DELETED, true);
+                } finally {
+                    closeQuietly(targetFolder, false);
+                }
+            } finally {
+                closeQuietly(srcFolder, true);
             }
-        } catch (NoSuchProviderException e) {
-            throw new IMAPyException(e);
+            final IMAPyMessage yMsg = new IMAPyMessage();
+            yMsg.setFolder(targetFolderName);
+            yMsg.setUid(uidValue);
+            return yMsg;
+        });
+    }
+
+    private synchronized void ensureConnected() throws IMAPyException {
+        try {
+            if (!store.isConnected()) {
+                store.connect(host, user, new String(password));
+            }
         } catch (MessagingException e) {
             throw new IMAPyException(e);
         }
     }
 
-    private void getChildren(final Folder parent) throws MessagingException {
+    private <T> T onFolder(final String folderName, final int mode, final boolean expunge, final FolderOperation<T> op) throws IMAPyException {
+        return withRetry(() -> {
+            final Folder folder = getStoreFolder(folderName);
+            try {
+                folder.open(mode);
+                return op.run(folder);
+            } finally {
+                closeQuietly(folder, expunge);
+            }
+        });
+    }
+
+    private <T> T withRetry(final StoreOperation<T> op) throws IMAPyException {
+        try {
+            ensureConnected();
+            return op.run();
+        } catch (final MessagingException | IMAPyException e) {
+            if (!isConnectionFailure(e)) {
+                throw asImapy(e);
+            }
+            try {
+                ensureConnected();
+            } catch (final IMAPyException connectError) {
+                throw asImapy(e);
+            }
+            try {
+                return op.run();
+            } catch (final MessagingException | IMAPyException e2) {
+                throw asImapy(e2);
+            }
+        }
+    }
+
+    private Folder getStoreFolder(final String folderName) throws IMAPyException {
+        if (!folders.containsKey(folderName)) {
+            throw new IMAPyException("Ordner nicht gefunden: " + folderName);
+        }
+        try {
+            return store.getFolder(folderName);
+        } catch (MessagingException e) {
+            throw new IMAPyException(e);
+        }
+    }
+
+    private void refreshFolders() throws MessagingException {
+        folders.clear();
+        collectFolders(store.getDefaultFolder());
+    }
+
+    private void collectFolders(final Folder parent) throws MessagingException {
         final Folder[] children = parent.listSubscribed();
         for (final Folder child : children) {
             final int type = child.getType();
             final String fullName = child.getFullName();
             if (("INBOX".equalsIgnoreCase(fullName)) || (type & Folder.HOLDS_MESSAGES) > 0) {
-                folders.put(fullName, child);
+                folders.put(fullName, child.getName());
             }
             if ((type & Folder.HOLDS_FOLDERS) > 0) {
-                getChildren(child);
+                collectFolders(child);
             }
         }
     }
 
-    public IMAPyMessage moveMessageToFolder(final String sourceFolderName, final String msgIndex, final String targetFolderName) throws IMAPyException {
-        final IMAPyMessage yMsg = new IMAPyMessage();
+    private static void closeQuietly(final Folder folder, final boolean expunge) {
         try {
-            final Folder srcFolder = folders.get(sourceFolderName);
-            srcFolder.open(Folder.READ_WRITE);
-            final Folder targetFolder = folders.get(targetFolderName);
-            targetFolder.open(Folder.READ_WRITE);
-            int msgIndx = Integer.parseInt(msgIndex);
-            final Message msg = srcFolder.getMessage(msgIndx);
-            srcFolder.copyMessages(new Message[]{msg}, targetFolder);
-            msg.setFlag(Flag.DELETED, true);
-            yMsg.setFolder(targetFolderName);
-            yMsg.setIndex(msgIndx);
-            if (srcFolder.isOpen())
-                srcFolder.close(true);
-            if (targetFolder.isOpen())
-                targetFolder.close(true);
+            if (folder.isOpen()) {
+                folder.close(expunge);
+            }
         } catch (MessagingException e) {
+        }
+    }
+
+    private static boolean isConnectionFailure(final Throwable t) {
+        Throwable cause = t;
+        while (cause != null) {
+            if (cause instanceof FolderClosedException
+                    || cause instanceof StoreClosedException
+                    || cause instanceof IllegalStateException
+                    || cause instanceof IOException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
+    }
+
+    private static IMAPyException asImapy(final Exception e) {
+        if (e instanceof IMAPyException) {
+            return (IMAPyException) e;
+        }
+        return new IMAPyException(e);
+    }
+
+    private static long parseUid(final String uid) throws IMAPyException {
+        try {
+            return Long.parseLong(uid);
+        } catch (NumberFormatException e) {
             throw new IMAPyException(e);
         }
-        return yMsg;
+    }
+
+    private static String formatDate(final Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).format(DF);
+    }
+
+    private String shorten(final Message msg) {
+        final String subject = MimeParser.getSubject(msg);
+        if (subject.length() > 80) {
+            return subject.substring(0, 79);
+        }
+        return HtmlHelper.replaceEntities(subject);
+    }
+
+    @FunctionalInterface
+    private interface StoreOperation<T> {
+        T run() throws MessagingException, IMAPyException;
+    }
+
+    @FunctionalInterface
+    private interface FolderOperation<T> {
+        T run(Folder folder) throws MessagingException, IMAPyException;
     }
 
 }

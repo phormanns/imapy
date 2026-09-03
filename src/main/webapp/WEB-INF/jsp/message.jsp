@@ -19,7 +19,7 @@
         String subject = message.getSubject();
         String date = message.getDate();
         String folder = message.getFolder();
-        int index = message.getIndex();
+        long messageUid = message.getUid();
         String content = message.getContent();
         List<String> attachments = message.getAttachments();
 
@@ -35,7 +35,7 @@
         pageContext.setAttribute("subject", subject);
         pageContext.setAttribute("date", date);
         pageContext.setAttribute("folder", folder);
-        pageContext.setAttribute("index", index);
+        pageContext.setAttribute("messageUid", messageUid);
         pageContext.setAttribute("content", content);
         pageContext.setAttribute("initial", initial);
         pageContext.setAttribute("attachments", attachments);
@@ -53,7 +53,7 @@
                 </div>
                 <div class="email-content-toolbar-right">
                     <button type="button" class="btn btn-danger"
-                       hx-post="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${index}"/>"
+                        hx-post="<c:out value="${ctx}"/>/message/<c:out value="${folder}"/>/<c:out value="${messageUid}"/>"
                        hx-vals="<c:out value="${deleteParams}"/>"
                        hx-confirm="Diese Nachricht wirklich löschen?"
                        hx-target="#main"
@@ -74,7 +74,7 @@
                         pageContext.setAttribute("attCount", attCount);
 %>
                     <span class="email-content-meta-divider"></span>
-                    <a class="email-content-attachments-hint" href="#attachments-<c:out value="${folder}"/>-<c:out value="${index}"/>" title="Zu den Anlagen springen">
+                    <a class="email-content-attachments-hint" href="#attachments-<c:out value="${folder}"/>-<c:out value="${messageUid}"/>" title="Zu den Anlagen springen">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                         <span><c:out value="${attCount}"/> Anlage<c:out value="${attCount == 1 ? '' : 'n'}"/></span>
                     </a>
@@ -92,7 +92,7 @@
             if (attachments != null && !attachments.isEmpty()) {
                 pageContext.setAttribute("attCount", attachments.size());
 %>
-            <section class="email-attachments" id="attachments-<c:out value="${folder}"/>-<c:out value="${index}"/>" aria-label="Anlagen">
+            <section class="email-attachments" id="attachments-<c:out value="${folder}"/>-<c:out value="${messageUid}"/>" aria-label="Anlagen">
                 <h3 class="email-attachments-title">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                     <span><c:out value="${attCount}"/> Anlage<c:out value="${attCount == 1 ? '' : 'n'}"/></span>
@@ -118,7 +118,7 @@
 %>
                     <li>
                         <a class="email-attachment"
-                            href="<c:out value="${ctx}"/>/attachment/<c:out value="${folder}"/>/<c:out value="${index}"/>/<c:out value="${safeName}"/>"
+                            href="<c:out value="${ctx}"/>/attachment/<c:out value="${folder}"/>/<c:out value="${messageUid}"/>/<c:out value="${safeName}"/>"
                             target="_blank"
                             rel="noopener"
                             download="<c:out value="${safeName}"/>"

@@ -11,7 +11,7 @@ public class IMAPyMessage implements Serializable {
 
     private final List<String> attachments;
 
-    private int index;
+    private long uid;
     private String title;
     private String author;
     private String folder;
@@ -27,12 +27,12 @@ public class IMAPyMessage implements Serializable {
         attachments = new ArrayList<>();
     }
 
-    public int getIndex() {
-        return index;
+    public long getUid() {
+        return uid;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setUid(long uid) {
+        this.uid = uid;
     }
 
     public String getTitle() {

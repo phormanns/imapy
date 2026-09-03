@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import de.jalin.imap.IMAPyException;
 import de.jalin.imap.IMAPySession;
 
 public class FolderListServlet extends HttpServlet {
@@ -31,7 +32,7 @@ public class FolderListServlet extends HttpServlet {
                 request.setAttribute("activeFolder", activeFolder);
             }
             imapySession.dispatchTo("/WEB-INF/jsp/folderlist.jsp");
-        } catch (IOException e) {
+        } catch (IOException | IMAPyException e) {
             throw new ServletException(e);
         }
     }
