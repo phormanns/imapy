@@ -40,12 +40,18 @@ public class SMTPySession {
     private final int port;
     private final String user;
     private final char[] password;
+    private final boolean requireStartTls;
 
     public SMTPySession(final String host, final int port, final String user, final String password) {
+        this(host, port, user, password, true);
+    }
+
+    SMTPySession(final String host, final int port, final String user, final String password, final boolean requireStartTls) {
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password.toCharArray();
+        this.requireStartTls = requireStartTls;
     }
 
     public void sendMail(final String from, final String to, final String subject, final String htmlBody) throws IMAPyException {
@@ -61,7 +67,7 @@ public class SMTPySession {
             props.put("mail.smtp.auth", "true");
             if (port == 465) {
                 props.put("mail.smtp.ssl.enable", "true");
-            } else {
+            } else if (requireStartTls) {
                 props.put("mail.smtp.starttls.enable", "true");
                 props.put("mail.smtp.starttls.required", "true");
             }
@@ -118,7 +124,7 @@ public class SMTPySession {
         return part;
     }
 
-    private static void setThreadingHeaders(final MimeMessage msg, final String inReplyTo, final String references) throws MessagingException {
+    static void setThreadingHeaders(final MimeMessage msg, final String inReplyTo, final String references) throws MessagingException {
         final List<String> referenceIds = extractMessageIds(references);
         if (isValidMessageId(inReplyTo)) {
             msg.setHeader("In-Reply-To", "<" + inReplyTo + ">");
@@ -129,7 +135,7 @@ public class SMTPySession {
         }
     }
 
-    private static List<String> extractMessageIds(final String headerValue) {
+    static List<String> extractMessageIds(final String headerValue) {
         final List<String> ids = new ArrayList<>();
         if (headerValue != null) {
             final Matcher matcher = MESSAGE_ID_PATTERN.matcher(headerValue);
@@ -140,11 +146,11 @@ public class SMTPySession {
         return ids;
     }
 
-    private static boolean isValidMessageId(final String messageId) {
+    static boolean isValidMessageId(final String messageId) {
         return messageId != null && !messageId.isBlank() && messageId.matches(MSG_ID_ATOM + "@" + MSG_ID_ATOM);
     }
 
-    private static String toPlainText(final String htmlBody) {
+    static String toPlainText(final String htmlBody) {
         if (htmlBody == null || htmlBody.isBlank()) {
             return "";
         }
