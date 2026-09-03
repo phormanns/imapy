@@ -23,6 +23,7 @@ public class MessageData implements Serializable {
     final private String messageID;
 
     private String text;
+    private String references;
     private boolean isHtml;
     private boolean isNew;
     private boolean isFlagged;
@@ -48,6 +49,14 @@ public class MessageData implements Serializable {
 
     public String getMessageID() {
         return messageID;
+    }
+
+    public String getReferences() {
+        return references;
+    }
+
+    public void setReferences(final String references) {
+        this.references = references;
     }
 
     public String getSubject() {

@@ -22,6 +22,7 @@ public class IMAPyMessage implements Serializable {
     private String date;
     private String content;
     private String messageId;
+    private String references;
 
     public IMAPyMessage() {
         attachments = new ArrayList<>();
@@ -105,6 +106,14 @@ public class IMAPyMessage implements Serializable {
 
     public void setMessageId(String messageId) {
         this.messageId = messageId;
+    }
+
+    public String getReferences() {
+        return references;
+    }
+
+    public void setReferences(String references) {
+        this.references = references;
     }
 
     public String getDate() {

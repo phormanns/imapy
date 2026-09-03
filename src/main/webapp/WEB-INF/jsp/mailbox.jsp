@@ -200,6 +200,125 @@
                 });
             }
 
+            function execComposeCommand(cmd) {
+                var editor = document.getElementById('compose-editor');
+                if (!editor) {
+                    return;
+                }
+                editor.focus();
+                document.execCommand(cmd, false, null);
+            }
+
+            function sendCompose(btn) {
+                var to = document.getElementById('compose-to').value.trim();
+                var subject = document.getElementById('compose-subject').value.trim();
+                var editor = document.getElementById('compose-editor');
+                var html = editor ? editor.innerHTML : '';
+                if (!to) {
+                    alert('Bitte einen Empfänger angeben.');
+                    return;
+                }
+                if (!subject && !(editor && editor.innerText.trim())) {
+                    alert('Bitte einen Betreff oder eine Nachricht eingeben.');
+                    return;
+                }
+                if (btn) {
+                    btn.disabled = true;
+                }
+                var inReplyToEl = document.getElementById('compose-in-reply-to');
+                var referencesEl = document.getElementById('compose-references');
+                var body = 'csrf_token=' + encodeURIComponent(csrfToken)
+                        + '&to=' + encodeURIComponent(to)
+                        + '&subject=' + encodeURIComponent(subject)
+                        + '&body=' + encodeURIComponent(html)
+                        + '&inReplyTo=' + encodeURIComponent(inReplyToEl ? inReplyToEl.value : '')
+                        + '&references=' + encodeURIComponent(referencesEl ? referencesEl.value : '');
+                fetch('<c:out value="${ctx}"/>/compose', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                    body: body
+                }).then(function (res) {
+                    if (!res.ok) {
+                        throw new Error('HTTP ' + res.status);
+                    }
+                    return res.text();
+                }).then(function (fragment) {
+                    var main = document.getElementById('main');
+                    if (main) {
+                        main.innerHTML = fragment;
+                    }
+                    hideMessagesList();
+                    document.body.dispatchEvent(new Event('messages-changed'));
+                }).catch(function (err) {
+                    alert('Die Nachricht konnte nicht gesendet werden (' + err.message + ').');
+                }).finally(function () {
+                    if (btn) {
+                        btn.disabled = false;
+                    }
+                });
+            }
+
+            function quoteMessage(text) {
+                return text.split('\n').map(function (line) {
+                    return line.length ? '> ' + line : '>';
+                }).join('\n');
+            }
+
+            function openReply(btn) {
+                var to = btn.getAttribute('data-reply-to') || '';
+                var subject = (btn.getAttribute('data-reply-subject') || '').trim();
+                if (subject && !/^re:/i.test(subject)) {
+                    subject = 'Re: ' + subject;
+                }
+                var replyDate = btn.getAttribute('data-reply-date') || '';
+                var messageId = btn.getAttribute('data-reply-message-id') || '';
+                var origReferences = btn.getAttribute('data-reply-references') || '';
+                var bodyEl = document.querySelector('.email-content-body');
+                var quoted = '';
+                if (bodyEl && bodyEl.innerText.trim()) {
+                    var original = bodyEl.innerText.replace(/\r\n/g, '\n').trim();
+                    quoted = 'Am ' + replyDate + ' schrieb ' + to + ':\n' + quoteMessage(original);
+                }
+                fetch('<c:out value="${ctx}"/>/compose', {method: 'GET'})
+                    .then(function (res) {
+                        if (!res.ok) {
+                            throw new Error('HTTP ' + res.status);
+                        }
+                        return res.text();
+                    }).then(function (fragment) {
+                        var main = document.getElementById('main');
+                        if (!main) {
+                            return;
+                        }
+                        main.innerHTML = fragment;
+                        hideMessagesList();
+                        window.scrollTo(0, 0);
+                        var toEl = document.getElementById('compose-to');
+                        var subjEl = document.getElementById('compose-subject');
+                        var editor = document.getElementById('compose-editor');
+                        if (toEl) {
+                            toEl.value = to;
+                        }
+                        if (subjEl) {
+                            subjEl.value = subject;
+                        }
+                        var inReplyToEl = document.getElementById('compose-in-reply-to');
+                        var referencesEl = document.getElementById('compose-references');
+                        if (inReplyToEl) {
+                            inReplyToEl.value = messageId;
+                        }
+                        if (referencesEl) {
+                            referencesEl.value = origReferences;
+                        }
+                        if (editor) {
+                            editor.innerText = quoted ? quoted + '\n\n' : '';
+                            editor.focus();
+                        }
+                    }).catch(function (err) {
+                        alert('Antwort kann nicht erstellt werden (' + err.message + ').');
+                    });
+            }
+
             function toggleNav() {
                 var nav = document.getElementById('nav');
                 var backdrop = document.getElementById('nav-backdrop');

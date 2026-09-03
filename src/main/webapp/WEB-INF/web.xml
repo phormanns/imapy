@@ -55,6 +55,14 @@
         <url-pattern>/folderlist</url-pattern>
     </servlet-mapping>
     <servlet>
+        <servlet-name>ComposeServlet</servlet-name>
+        <servlet-class>de.jalin.webmail.ComposeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ComposeServlet</servlet-name>
+        <url-pattern>/compose</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>de.jalin.webmail.LoginServlet</servlet-class>
     </servlet>

@@ -36,6 +36,8 @@
         pageContext.setAttribute("date", date);
         pageContext.setAttribute("folder", folder);
         pageContext.setAttribute("messageUid", messageUid);
+        pageContext.setAttribute("messageId", message.getMessageId());
+        pageContext.setAttribute("references", message.getReferences());
         pageContext.setAttribute("content", content);
         pageContext.setAttribute("initial", initial);
         pageContext.setAttribute("attachments", attachments);
@@ -62,7 +64,19 @@
             </div>
 
             <header class="email-content-header">
-                <h1 class="email-content-title"><c:out value="${subject}"/></h1>
+                <div class="email-content-title-row">
+                    <h1 class="email-content-title"><c:out value="${subject}"/></h1>
+                    <button type="button" class="btn btn-ghost reply-button"
+                            data-reply-to="<c:out value="${from}"/>"
+                            data-reply-subject="<c:out value="${subject}"/>"
+                            data-reply-date="<c:out value="${date}"/>"
+                            data-reply-message-id="<c:out value="${messageId}"/>"
+                            data-reply-references="<c:out value="${references}"/>"
+                            onclick="openReply(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+                        Antworten
+                    </button>
+                </div>
                 <div class="email-content-meta">
                     <span class="email-avatar"><c:out value="${initial}"/></span>
                     <strong><c:out value="${from}"/></strong>

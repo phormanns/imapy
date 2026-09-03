@@ -145,6 +145,7 @@ public class IMAPySession {
                 final MessageData messageData = MimeParser.parseMimeMessage((MimeMessage) msg, partHandler);
                 yMsg.setContent(messageData.getFormattedText());
                 yMsg.setMessageId(messageData.getMessageID());
+                yMsg.setReferences(messageData.getReferences());
             } else {
                 throw new IMAPyException("unknown message type");
             }

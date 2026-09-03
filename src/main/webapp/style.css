@@ -591,6 +591,24 @@ button { font-family: inherit; }
     line-height: 1.3;
 }
 
+.email-content-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 0 .25rem;
+}
+.email-content-title-row .email-content-title {
+    min-width: 0;
+    margin: 0;
+}
+.reply-button {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+
 .email-content-meta {
     display: flex;
     flex-wrap: wrap;
@@ -810,3 +828,82 @@ button { font-family: inherit; }
     border-color: var(--primary);
     box-shadow: inset 0 0 0 1px var(--primary);
 }
+
+/* Compose view */
+.compose-header {
+    display: block;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border);
+}
+.compose-field {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    border-bottom: 1px solid var(--border);
+}
+.compose-field:last-child { border-bottom: none; }
+.compose-field label {
+    flex: 0 0 3.5rem;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.compose-field input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    color: var(--text);
+    padding: .7rem 0;
+    outline: none;
+}
+.compose-toolbar {
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .4rem .75rem;
+    border-bottom: 1px solid var(--border);
+}
+.compose-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 .45rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.compose-tool:hover {
+    background: var(--surface-muted);
+    color: var(--text);
+    border-color: var(--border);
+}
+.compose-tool-italic { font-style: italic; }
+.compose-tool-divider {
+    width: 1px;
+    height: 1.2rem;
+    margin: 0 .35rem;
+    background: var(--border);
+}
+.compose-editor {
+    min-height: 16rem;
+    padding: 1rem;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    overflow-y: auto;
+}
+.compose-editor:empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-subtle);
+}
+.compose-editor ul { padding-left: 1.4rem; }
+.compose-editor img { max-width: 100%; }

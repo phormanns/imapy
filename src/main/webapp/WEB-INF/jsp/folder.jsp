@@ -46,6 +46,12 @@
 <header class="app-list-header">
     <h2 class="app-list-title"><c:out value="${folderTitle}"/></h2>
     <div class="app-list-tools">
+        <button type="button" class="icon-button" aria-label="Neue E-Mail" title="Neue E-Mail"
+                hx-get="<c:out value="${ctx}"/>/compose"
+                hx-target="#main"
+                hx-swap="innerHTML">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
         <button type="button" class="icon-button" aria-label="Aktualisieren"
                 onclick="refreshMailbox()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>

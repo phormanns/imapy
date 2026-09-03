@@ -31,6 +31,13 @@ public class MimeParser {
         final String messageID = getMessageID(mimeMsg);
         final MessageData msg = new MessageData(fromEMail, subject, df.format(sentDate), messageID);
         try {
+            final String[] refs = mimeMsg.getHeader("References");
+            if (refs != null && refs.length > 0 && refs[0] != null && !refs[0].isBlank()) {
+                msg.setReferences(refs[0]);
+            }
+        } catch (MessagingException e) {
+        }
+        try {
             final Flags flags = mimeMsg.getFlags();
             final boolean seen = flags.contains(Flags.Flag.SEEN);
             msg.setNew(!seen);
