@@ -68,25 +68,26 @@ public class MessageData implements Serializable {
     }
 
     public void setText(final String text) {
-        if (text != null && text.length() > 29) {
-            final String leadingText29 = text.substring(0, 29);
-            if (leadingText29.startsWith("<p")
-                    || leadingText29.startsWith("<span")
-                    || leadingText29.contains("<html")
-                    || leadingText29.contains("<div")) {
+        if (text == null) {
+            return;
+        }
+        final String leadingText29 = text.length() > 29 ? text.substring(0, 29) : text;
+        if (leadingText29.startsWith("<p")
+                || leadingText29.startsWith("<span")
+                || leadingText29.contains("<html")
+                || leadingText29.contains("<div")) {
+            setHtmlText(text);
+            return;
+        }
+        if (text.length() > 59) {
+            final String leadingText59 = text.substring(0, 59);
+            if (leadingText59.contains("<!DOCTYPE html")
+                    || leadingText59.contains("<!DOCTYPE HTML")) {
                 setHtmlText(text);
                 return;
             }
-            if (text.length() > 59) {
-                final String leadingText59 = text.substring(0, 59);
-                if (leadingText59.contains("<!DOCTYPE html")
-                        || leadingText59.contains("<!DOCTYPE HTML")) {
-                    setHtmlText(text);
-                    return;
-                }
-            }
-            this.text = text;
         }
+        this.text = text;
     }
 
     public String getFormattedText() {
