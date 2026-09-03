@@ -77,11 +77,13 @@ public class MessageData implements Serializable {
                 setHtmlText(text);
                 return;
             }
-            final String leadingText59 = text.substring(0, 59);
-            if (leadingText59.contains("<!DOCTYPE html")
-                    || leadingText59.contains("<!DOCTYPE HTML")) {
-                setHtmlText(text);
-                return;
+            if (text.length() > 59) {
+                final String leadingText59 = text.substring(0, 59);
+                if (leadingText59.contains("<!DOCTYPE html")
+                        || leadingText59.contains("<!DOCTYPE HTML")) {
+                    setHtmlText(text);
+                    return;
+                }
             }
             this.text = text;
         }
