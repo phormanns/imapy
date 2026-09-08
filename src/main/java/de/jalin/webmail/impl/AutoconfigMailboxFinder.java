@@ -8,7 +8,6 @@ import java.net.IDN;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import javax.xml.XMLConstants;
@@ -23,8 +22,6 @@ import org.xml.sax.SAXException;
 
 public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
 
-    
-    
     @Override
     public void setLogin(String login) throws IMAPyException {
         try {
@@ -35,66 +32,8 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
             final String emailDomain = normalizeAndValidateDomain(loginParts[1]);
             InputStream autoconfigStream = null;
             try {
-                final URI uriAutoconfigSubdomain = new URI("https://autoconfig." + emailDomain + "/mail/config-v1.1.xml?emailaddress=" + login);
-                URL url = uriAutoconfigSubdomain.toURL();
-                try {
-                    final URLConnection urlConnection = url.openConnection();
-                    autoconfigStream = urlConnection.getInputStream();
-                } catch (UnknownHostException | FileNotFoundException e) {
-                    final URI uriAutoconfigWellknown = new URI("https://" + emailDomain + "/.well-known/autoconfig/mail/config-v1.1.xml?emailaddress=" + login);
-                    url = uriAutoconfigWellknown.toURL();
-                    final URLConnection urlConnection = url.openConnection();
-                    autoconfigStream = urlConnection.getInputStream();
-                }
-                final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-                documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-                documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-                documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-                documentBuilderFactory.setXIncludeAware(false);
-                documentBuilderFactory.setExpandEntityReferences(false);
-                documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-                documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-                final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                final Document document = documentBuilder.parse(autoconfigStream);
-                final NodeList inServersNodes = document.getElementsByTagName("incomingServer");
-                final int listLength = inServersNodes.getLength();
-                for (int idx = 0; idx < listLength; idx++) {
-                    final Node node = inServersNodes.item(idx);
-                    final Node item = node.getAttributes().getNamedItem("type");
-                    if (item != null && "imap".equals(item.getNodeValue())) {
-                        // Placeholders:
-                        // %EMAILADDRESS% (full email address of the user, usually entered by the user)
-                        // %EMAILLOCALPART% (email address, part before @)
-                        // %EMAILDOMAIN% (email address, part after @)
-                        final NodeList childNodes = node.getChildNodes();
-                        final int childsListLength = childNodes.getLength();
-                        for (int childsIdx = 0; childsIdx < childsListLength; childsIdx++) {
-                            final Node child = childNodes.item(childsIdx);
-                            final String nodeName = child.getNodeName();
-                            if ("hostname".equals(nodeName)) {
-                                final String textContent = child.getTextContent();
-                                String hostName = textContent;
-                                if (textContent.contains("%EMAILDOMAIN%")) {
-                                    hostName = textContent.replace("%EMAILDOMAIN%", login.split("@")[1]);
-                                }
-                                this.setHost(hostName);
-                            }
-                            if ("username".equals(nodeName)) {
-                                final String textContent = child.getTextContent();
-                                String loginUser = textContent;
-                                if ("%EMAILADDRESS%".equalsIgnoreCase(textContent)) {
-                                    loginUser = login;
-                                }
-                                if ("%EMAILLOCALPART%".equalsIgnoreCase(textContent)) {
-                                    loginUser = login.split("@")[0];
-                                }
-                                this.setUser(loginUser);
-                            }
-                        }
-                    }
-                }
+                autoconfigStream = openAutoconfigStream(emailDomain, login);
+                parseAutoconfig(autoconfigStream, login);
             } catch (IOException | URISyntaxException | ParserConfigurationException | SAXException e) {
                 throw new IMAPyException(e);
             } finally {
@@ -111,7 +50,77 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
         }
     }
 
-        private static boolean isUnsafeAddress(InetAddress address) {
+    InputStream openAutoconfigStream(final String emailDomain, final String login) throws IOException, URISyntaxException {
+        final URI uriAutoconfigSubdomain = new URI("https://autoconfig." + emailDomain + "/mail/config-v1.1.xml?emailaddress=" + login);
+        try {
+            return openStream(uriAutoconfigSubdomain);
+        } catch (UnknownHostException | FileNotFoundException e) {
+            final URI uriAutoconfigWellknown = new URI("https://" + emailDomain + "/.well-known/autoconfig/mail/config-v1.1.xml?emailaddress=" + login);
+            return openStream(uriAutoconfigWellknown);
+        }
+    }
+
+    InputStream openStream(final URI uri) throws IOException {
+        final URLConnection urlConnection = uri.toURL().openConnection();
+        return urlConnection.getInputStream();
+    }
+
+    void parseAutoconfig(final InputStream configStream, final String login) throws ParserConfigurationException, SAXException, IOException {
+        final Document document = newSecureDocumentBuilder().parse(configStream);
+        final NodeList inServersNodes = document.getElementsByTagName("incomingServer");
+        final int listLength = inServersNodes.getLength();
+        for (int idx = 0; idx < listLength; idx++) {
+            final Node node = inServersNodes.item(idx);
+            final Node item = node.getAttributes().getNamedItem("type");
+            if (item != null && "imap".equals(item.getNodeValue())) {
+                // Placeholders:
+                // %EMAILADDRESS% (full email address of the user, usually entered by the user)
+                // %EMAILLOCALPART% (email address, part before @)
+                // %EMAILDOMAIN% (email address, part after @)
+                final NodeList childNodes = node.getChildNodes();
+                final int childsListLength = childNodes.getLength();
+                for (int childsIdx = 0; childsIdx < childsListLength; childsIdx++) {
+                    final Node child = childNodes.item(childsIdx);
+                    final String nodeName = child.getNodeName();
+                    if ("hostname".equals(nodeName)) {
+                        final String textContent = child.getTextContent();
+                        String hostName = textContent;
+                        if (textContent.contains("%EMAILDOMAIN%")) {
+                            hostName = textContent.replace("%EMAILDOMAIN%", login.split("@")[1]);
+                        }
+                        this.setHost(hostName);
+                    }
+                    if ("username".equals(nodeName)) {
+                        final String textContent = child.getTextContent();
+                        String loginUser = textContent;
+                        if ("%EMAILADDRESS%".equalsIgnoreCase(textContent)) {
+                            loginUser = login;
+                        }
+                        if ("%EMAILLOCALPART%".equalsIgnoreCase(textContent)) {
+                            loginUser = login.split("@")[0];
+                        }
+                        this.setUser(loginUser);
+                    }
+                }
+            }
+        }
+    }
+
+    private static DocumentBuilder newSecureDocumentBuilder() throws ParserConfigurationException {
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        documentBuilderFactory.setXIncludeAware(false);
+        documentBuilderFactory.setExpandEntityReferences(false);
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        return documentBuilderFactory.newDocumentBuilder();
+    }
+
+    static boolean isUnsafeAddress(InetAddress address) {
         return address.isAnyLocalAddress()
                 || address.isLoopbackAddress()
                 || address.isLinkLocalAddress()
@@ -119,7 +128,7 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
                 || address.isMulticastAddress();
     }
 
-    private static String normalizeAndValidateDomain(String domain) throws IMAPyException {
+    static String normalizeAndValidateDomain(String domain) throws IMAPyException {
         if (domain == null || domain.isBlank()) {
             throw new IMAPyException("Invalid email domain");
         }
