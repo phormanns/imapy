@@ -45,13 +45,13 @@
                     <c:if test="${not empty userEmail}">
                     <span class="user-chip" title="<c:out value="${userEmail}"/>">
                         <span class="user-avatar"><c:out value="${userInitial}"/></span>
-                        <span><c:out value="${userEmail}"/></span>
+                        <span class="user-email"><c:out value="${userEmail}"/></span>
                     </span>
                     <form class="logout-form" method="post" action="<c:out value="${ctx}"/>/logout">
-                        <input type="hidden" name="csrf_token" value="${sessionScope.csrf_token}"> 
-                        <button type="submit" class="btn btn-ghost" title="Abmelden">
+                        <input type="hidden" name="csrf_token" value="${sessionScope.csrf_token}">
+                        <button type="submit" class="btn btn-ghost" title="Abmelden" aria-label="Abmelden">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            <span>Abmelden</span>
+                            <span class="logout-label">Abmelden</span>
                         </button>
                     </form>
                     </c:if>

@@ -234,6 +234,7 @@ button { font-family: inherit; }
     display: flex;
     align-items: center;
     gap: .75rem;
+    min-width: 0;
 }
 
 .app-brand {
@@ -242,6 +243,8 @@ button { font-family: inherit; }
     gap: .6rem;
     font-weight: 600;
     color: var(--text);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .app-brand-mark {
@@ -266,9 +269,17 @@ button { font-family: inherit; }
     border-radius: 999px;
     font-size: 13px;
     color: var(--text-muted);
+    min-width: 0;
 }
 
-.logout-form { margin: 0; display: inline-flex; }
+.user-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.logout-form { margin: 0; display: inline-flex; flex-shrink: 0; }
 .logout-form .btn { padding: .35rem .75rem; font-size: 13px; }
 
 .user-avatar {
@@ -808,6 +819,9 @@ button { font-family: inherit; }
     .email-content-body { padding: 1rem 1rem 1.5rem; }
     .email-attachments { padding: 1rem 1rem 1.25rem; }
     .email-attachment { max-width: 100%; }
+
+    .logout-label { display: none; }
+    .logout-form .btn { padding: .35rem .55rem; }
 }
 
 /* Backdrop for mobile nav */
