@@ -43,20 +43,28 @@ public class IMAPySession {
     final private SortedMap<String, String> folders;
 
     public IMAPySession(String host, String user, String password) throws IMAPyException {
+        this(defaultStore(), host, user, password);
+    }
+
+    IMAPySession(final Store store, final String host, final String user, final String password) throws IMAPyException {
         this.user = user;
         this.password = password.toCharArray();
         this.host = host;
         this.folders = new TreeMap<>();
-        try {
-            final Session session = Session.getInstance(new Properties());
-            this.store = session.getStore("imaps");
-        } catch (NoSuchProviderException e) {
-            throw new IMAPyException(e);
-        }
+        this.store = store;
         ensureConnected();
         try {
             refreshFolders();
         } catch (MessagingException e) {
+            throw new IMAPyException(e);
+        }
+    }
+
+    private static Store defaultStore() throws IMAPyException {
+        try {
+            final Session session = Session.getInstance(new Properties());
+            return session.getStore("imaps");
+        } catch (NoSuchProviderException e) {
             throw new IMAPyException(e);
         }
     }
