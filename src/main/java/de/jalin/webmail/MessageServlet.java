@@ -30,8 +30,11 @@ public class MessageServlet extends HttpServlet {
                 return;
             }
             final HttpSession session = request.getSession();
-            final String pathInfo = request.getPathInfo().substring(1);
-            final String[] pathSplit = pathInfo.split("/");
+            final String pathInfo = request.getPathInfo();
+            if (pathInfo == null) {
+                throw new ServletException("servlet path error");
+            }
+            final String[] pathSplit = pathInfo.substring(1).split("/");
             if (pathSplit.length != 2) {
                 throw new ServletException("servlet path error");
             }
@@ -63,8 +66,11 @@ public class MessageServlet extends HttpServlet {
             if (yMsg != null) {
                 messageId = yMsg.getMessageId();
             }
-            final String pathInfo = request.getPathInfo().substring(1);
-            final String[] pathSplit = pathInfo.split("/");
+            final String pathInfo = request.getPathInfo();
+            if (pathInfo == null) {
+                throw new ServletException("servlet path error");
+            }
+            final String[] pathSplit = pathInfo.substring(1).split("/");
             if (pathSplit.length < 2) {
                 throw new ServletException("servlet path error");
             }

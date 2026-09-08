@@ -62,7 +62,7 @@ public class LoginServlet extends HttpServlet {
 
     }
 
-    private static String smtpHost(final String configuredHost, final String imapHost) {
+    static String smtpHost(final String configuredHost, final String imapHost) {
         if (configuredHost != null && !configuredHost.isBlank()) {
             return configuredHost;
         }
@@ -72,7 +72,7 @@ public class LoginServlet extends HttpServlet {
         return imapHost;
     }
 
-    private static int smtpPort(final String configuredPort) {
+    static int smtpPort(final String configuredPort) {
         if (configuredPort != null && !configuredPort.isBlank()) {
             try {
                 return Integer.parseInt(configuredPort);
