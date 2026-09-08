@@ -96,7 +96,7 @@ public class MessageData implements Serializable {
         }
         final int maxlen = 84;
         final StringBuffer formated = new StringBuffer("<p>\n");
-        int blank = maxlen - 10;
+        int blank;
         boolean isPreFormatted = false;
         try {
             final BufferedReader reader = new BufferedReader(new StringReader(text));

@@ -22,13 +22,12 @@ import de.jalin.imap.IMAPyException;
 
 public class MimeParser {
 
-    public static final DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
-
     public static MessageData parseMimeMessage(final MimeMessage mimeMsg, final MessagePartHandler partHandler) {
         final String fromEMail = getFromAddress(mimeMsg);
         final String subject = getSubject(mimeMsg);
         final Date sentDate = getSentDate(mimeMsg);
         final String messageID = getMessageID(mimeMsg);
+        final DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
         final MessageData msg = new MessageData(fromEMail, subject, df.format(sentDate), messageID);
         try {
             final String[] refs = mimeMsg.getHeader("References");
