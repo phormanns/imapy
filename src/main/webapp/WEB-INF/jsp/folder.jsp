@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ page import="de.jalin.imap.*"%>
+<%@ page import="de.jalin.webmail.*"%>
 <%@ page import="java.util.*"%>
 
 <%
@@ -94,6 +95,7 @@
                     }
                     initial = display.substring(0, 1).toUpperCase();
                 }
+                pageContext.setAttribute("avatarStyle", AvatarColor.backgroundStyle(author));
                 pageContext.setAttribute("cls", cls);
                 pageContext.setAttribute("messageUid", messageUid);
                 pageContext.setAttribute("folder", folder);
@@ -113,7 +115,7 @@
          hx-trigger="click"
          hx-swap="innerHTML"
          onclick="selectMessage(this, '<c:out value="${folder}"/>', <c:out value="${messageUid}"/>)">
-        <div class="email-avatar"><c:out value="${initial}"/></div>
+        <div class="email-avatar" style="<c:out value="${avatarStyle}"/>"><c:out value="${initial}"/></div>
         <div class="email-body">
             <div class="email-row">
                 <p class="email-name"><c:out value="${author}"/></p>

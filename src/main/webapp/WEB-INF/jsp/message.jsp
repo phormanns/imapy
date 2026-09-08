@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ page import="de.jalin.imap.*"%>
+<%@ page import="de.jalin.webmail.*"%>
 <%@ page import="java.util.*"%>
 
 <%
@@ -40,6 +41,7 @@
         pageContext.setAttribute("references", message.getReferences());
         pageContext.setAttribute("content", content);
         pageContext.setAttribute("initial", initial);
+        pageContext.setAttribute("avatarStyle", AvatarColor.backgroundStyle(from));
         pageContext.setAttribute("attachments", attachments);
 %>
         <div class="email-content"
@@ -81,7 +83,7 @@
                     </button>
                 </div>
                 <div class="email-content-meta">
-                    <span class="email-avatar"><c:out value="${initial}"/></span>
+                    <span class="email-avatar" style="<c:out value="${avatarStyle}"/>"><c:out value="${initial}"/></span>
                     <strong><c:out value="${from}"/></strong>
                     <span class="email-content-meta-divider"></span>
                     <span><c:out value="${date}"/></span>
