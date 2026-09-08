@@ -1,0 +1,29 @@
+From: alice@example.org
+To: bob@example.org
+Subject: Mit Anhaengen
+Message-ID: <mix-1@example.org>
+References: <ref-1@example.org> <ref-2@example.org>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIX-9"
+
+--MIX-9
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Anbei die Unterlagen.
+
+--MIX-9
+Content-Type: application/pdf; name="bericht.pdf"
+Content-Disposition: attachment; filename="bericht.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjQK
+
+--MIX-9
+Content-Type: image/png
+Content-Disposition: inline; filename="bild.png"
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgoAAAANSUhEUg
+
+--MIX-9--

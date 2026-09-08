@@ -1,0 +1,8 @@
+From: alice@example.org
+To: bob@example.org
+Subject: HTML Nachricht
+Message-ID: <html-1@example.org>
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<html><body><p>Hallo Welt</p><script>alert('xss')</script></body></html>

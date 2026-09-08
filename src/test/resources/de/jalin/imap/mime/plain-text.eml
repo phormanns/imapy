@@ -1,0 +1,10 @@
+From: Alice Beispiel <Alice@Example.org>
+To: bob@example.org
+Subject: Einfacher Text
+Date: Thu, 3 Sep 2026 10:15:00 +0200
+Message-ID: <plain-1@example.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hallo Bob,
+Grüße, Alice

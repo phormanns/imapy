@@ -1,0 +1,17 @@
+From: alice@example.org
+Subject: Kurz dann HTML
+Message-ID: <short-1@example.org>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="BOUND-7"
+
+--BOUND-7
+Content-Type: text/plain; charset=UTF-8
+
+Kurz
+
+--BOUND-7
+Content-Type: text/html; charset=UTF-8
+
+<html><body><p>Die laengere HTML-Version</p></body></html>
+
+--BOUND-7--

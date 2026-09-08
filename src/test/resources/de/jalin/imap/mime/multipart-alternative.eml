@@ -1,0 +1,19 @@
+From: alice@example.org
+To: bob@example.org
+Subject: Alternative Teile
+Message-ID: <alt-1@example.org>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="BOUND-42"
+
+--BOUND-42
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Das ist die Text-Version der Nachricht.
+
+--BOUND-42
+Content-Type: text/html; charset=UTF-8
+
+<html><body><p>Das ist die HTML-Version der Nachricht.</p></body></html>
+
+--BOUND-42--
