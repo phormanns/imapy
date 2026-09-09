@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ page import="java.util.*"%>
+<%@ page import="de.jalin.webmail.AvatarColor"%>
 <%
     String ctx = request.getContextPath();
     String userEmail = (String) session.getAttribute("email");
@@ -17,6 +18,7 @@
     pageContext.setAttribute("ctx", ctx);
     pageContext.setAttribute("userEmail", userEmail);
     pageContext.setAttribute("userInitial", userInitial);
+    pageContext.setAttribute("avatarStyle", AvatarColor.backgroundStyle(userEmail));
     pageContext.setAttribute("activeFolder", activeFolder);
 %>
 <!doctype html>
@@ -38,13 +40,13 @@
                     </button>
                     <a href="<c:out value="${ctx}"/>/mailbox" class="app-brand">
                         <span class="app-brand-mark">iM</span>
-                        <span>IMAPy</span>
+                        <span class="app-brand-name">IMAPy</span>
                     </a>
                 </div>
                 <div class="app-header-right">
                     <c:if test="${not empty userEmail}">
                     <span class="user-chip" title="<c:out value="${userEmail}"/>">
-                        <span class="user-avatar"><c:out value="${userInitial}"/></span>
+                        <span class="user-avatar" style="<c:out value="${avatarStyle}"/>"><c:out value="${userInitial}"/></span>
                         <span class="user-email"><c:out value="${userEmail}"/></span>
                     </span>
                     <form class="logout-form" method="post" action="<c:out value="${ctx}"/>/logout">
