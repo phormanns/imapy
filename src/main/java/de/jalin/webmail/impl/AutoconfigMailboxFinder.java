@@ -68,6 +68,7 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
     void parseAutoconfig(final InputStream configStream, final String emailAddress) throws ParserConfigurationException, SAXException, IOException {
         final Document document = newSecureDocumentBuilder().parse(configStream);
         parseIncomingServer(document, emailAddress);
+        parseOutgoingServer(document, emailAddress);
     }
 
     private void parseIncomingServer(final Document document, final String emailAddress) throws DOMException {
