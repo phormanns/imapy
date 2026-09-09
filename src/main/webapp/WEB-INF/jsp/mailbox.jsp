@@ -28,7 +28,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>IMAPy – <c:out value="${empty userEmail ? 'Mailbox' : userEmail}"/></title>
         <link rel="icon" type="image/x-icon" href="<c:out value="${ctx}"/>/favicon.ico">
-        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css">
+        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css?v=4">
         <script src="<c:out value="${ctx}"/>/webjars/htmx.org/2.0.10/dist/htmx.min.js"></script>
     </head>
     <body>
@@ -98,6 +98,7 @@
             var csrfToken = '<c:out value="${sessionScope.csrf_token}"/>';
             var composeFiles = [];
             var mediaQueryList = window.matchMedia("(min-width: 900px)");
+            var selectedUids = {};
 
             function showMessagesList() {
                 if (!mediaQueryList.matches) {
@@ -122,16 +123,112 @@
                 });
                 if (el)
                     el.classList.add('is-active');
+                clearSelection();
                 closeNav();
             }
 
-            function selectMessage(el, folderName, messageUid) {
+function selectMessage(el, folderName, messageUid) {
                 document.querySelectorAll('.email-item').forEach(function (n) {
                     n.classList.remove('is-active');
                 });
                 if (el)
                     el.classList.add('is-active');
-                hideMessagesList();
+                closeNav();
+            }
+
+            function toggleSelection(evt, checkbox, folderName, messageUid) {
+                if (evt) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                }
+                if (selectedUids[messageUid]) {
+                    delete selectedUids[messageUid];
+                } else {
+                    selectedUids[messageUid] = true;
+                }
+                updateSelectionUI();
+            }
+
+            function updateSelectionUI() {
+                var count = 0;
+                for (var uid in selectedUids) {
+                    if (Object.prototype.hasOwnProperty.call(selectedUids, uid)) {
+                        count++;
+                    }
+                }
+                var list = document.getElementById('list');
+                if (list) {
+                    list.querySelectorAll('.email-item').forEach(function (item) {
+                        var uid = item.getAttribute('data-message-uid');
+                        var selected = !!selectedUids[uid];
+                        var cb = item.querySelector('.email-check');
+                        if (cb) {
+                            cb.classList.toggle('is-checked', selected);
+                            cb.setAttribute('aria-checked', selected ? 'true' : 'false');
+                        }
+                        item.classList.toggle('is-selected', selected);
+                    });
+                }
+                var bar = document.getElementById('selection-bar');
+                if (bar) {
+                    bar.hidden = count === 0;
+                }
+                var countEl = document.getElementById('selection-count');
+                if (countEl) {
+                    countEl.textContent = count + ' ausgewählt';
+                }
+                var deleteBtn = document.getElementById('selection-delete');
+                if (deleteBtn) {
+                    deleteBtn.disabled = count === 0;
+                }
+            }
+
+            function clearSelection() {
+                selectedUids = {};
+                var list = document.getElementById('list');
+                if (list) {
+                    list.querySelectorAll('.email-item.is-selected').forEach(function (item) {
+                        item.classList.remove('is-selected');
+                    });
+                }
+                updateSelectionUI();
+            }
+
+            function deleteSelectedMessages() {
+                var uids = [];
+                for (var uid in selectedUids) {
+                    if (Object.prototype.hasOwnProperty.call(selectedUids, uid)) {
+                        uids.push(uid);
+                    }
+                }
+                if (!uids.length) {
+                    return;
+                }
+                var label = uids.length === 1 ? 'Nachricht' : 'Nachrichten';
+                if (!window.confirm(uids.length + ' ' + label + ' wirklich löschen?')) {
+                    return;
+                }
+                var folder = activeFolderName();
+                var url = '<c:out value="${ctx}"/>/message/' + encodeURIComponent(folder) + '/delete';
+                fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                    body: 'uids=' + encodeURIComponent(uids.join(',')) + '&csrf_token=' + encodeURIComponent(csrfToken)
+                }).then(function (res) {
+                    if (!res.ok) {
+                        throw new Error('HTTP ' + res.status);
+                    }
+                    return res.text();
+                }).then(function (fragment) {
+                    clearSelection();
+                    var main = document.getElementById('main');
+                    if (main) {
+                        main.innerHTML = fragment;
+                    }
+                    refreshMailbox();
+                }).catch(function (err) {
+                    alert('Nachrichten konnten nicht gelöscht werden (' + err.message + ').');
+                });
             }
 
             function dragMessageStart(evt, el) {
@@ -433,6 +530,9 @@
             }
 
             document.body.addEventListener('htmx:afterSwap', function (evt) {
+                if (evt.target.id === 'list') {
+                    updateSelectionUI();
+                }
                 if (evt.target.id === 'main') {
                     var toolbar = evt.target.querySelector('.email-content-toolbar .back-to-list');
                     if (toolbar)

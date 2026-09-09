@@ -16,7 +16,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>IMAPy – Anmeldung</title>
         <link rel="icon" type="image/x-icon" href="<c:out value="${ctx}"/>/favicon.ico">
-        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css">
+        <link rel="stylesheet" href="<c:out value="${ctx}"/>/style.css?v=4">
     </head>
     <body>
         <div class="login-shell">

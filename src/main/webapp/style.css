@@ -511,6 +511,77 @@ button { font-family: inherit; }
     text-transform: uppercase;
 }
 
+.email-avatar-wrap {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+}
+
+.email-avatar-wrap > .email-avatar {
+    position: absolute;
+    inset: 0;
+}
+
+.email-check {
+    position: absolute;
+    inset: 0;
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    background: var(--surface);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: background-color .12s ease, color .12s ease;
+}
+
+.email-check::after {
+    content: "✓";
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.email-check:hover { background: var(--primary-soft); }
+.email-check.is-checked {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.email-item:hover .email-check,
+.email-item.is-selected .email-check { display: flex; }
+
+.email-item:hover .email-avatar,
+.email-item.is-selected .email-avatar { display: none; }
+
+.selection-bar {
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: 0 1rem;
+    background: var(--primary-soft);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    z-index: 1;
+}
+
+.selection-bar:not([hidden]) { display: flex; }
+
+.selection-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+}
+
 .email-body {
     flex: 1;
     min-width: 0;

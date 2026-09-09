@@ -9,6 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -96,6 +98,23 @@ public class MessageServletTest {
         verify(httpSession).setAttribute("folder", "INBOX");
         verify(httpSession).setAttribute("deletedFolder", "INBOX");
         verify(httpSession).setAttribute("deletedMessageSubject", stored.getSubject());
+        verify(response).setHeader("HX-Trigger", "messages-changed");
+        verify(response).setContentType("text/html;charset=UTF-8");
+        verify(dispatcher).forward(request, response);
+    }
+
+    @Test
+    public void deletesMultipleMessagesOnDeletePath() throws Exception {
+        when(request.getPathInfo()).thenReturn("/INBOX/delete");
+        when(request.getParameter("uids")).thenReturn("42, 43");
+        when(imap.removeMessages(eq("INBOX"), any())).thenReturn(2);
+        when(request.getRequestDispatcher("/WEB-INF/jsp/messages-deleted.jsp")).thenReturn(dispatcher);
+
+        servlet.doPost(request, response);
+
+        verify(imap).removeMessages("INBOX", List.of(42L, 43L));
+        verify(httpSession).setAttribute("deletedCount", 2);
+        verify(httpSession).setAttribute("deletedFolder", "INBOX");
         verify(response).setHeader("HX-Trigger", "messages-changed");
         verify(response).setContentType("text/html;charset=UTF-8");
         verify(dispatcher).forward(request, response);

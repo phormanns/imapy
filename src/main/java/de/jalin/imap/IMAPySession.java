@@ -213,6 +213,20 @@ public class IMAPySession {
         });
     }
 
+    public int removeMessages(final String folderName, final List<Long> uids) throws IMAPyException {
+        return onFolder(folderName, Folder.READ_WRITE, true, folder -> {
+            int removed = 0;
+            for (final long uidValue : uids) {
+                final Message msg = ((UIDFolder) folder).getMessageByUID(uidValue);
+                if (msg != null) {
+                    msg.setFlag(Flag.DELETED, true);
+                    removed++;
+                }
+            }
+            return removed;
+        });
+    }
+
     public IMAPyMessage moveMessageToFolder(final String sourceFolderName, final String uid, final String targetFolderName) throws IMAPyException {
         final long uidValue = parseUid(uid);
         return withRetry(() -> {

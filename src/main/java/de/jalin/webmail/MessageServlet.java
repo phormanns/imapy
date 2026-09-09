@@ -1,6 +1,9 @@
 package de.jalin.webmail;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -76,6 +79,25 @@ public class MessageServlet extends HttpServlet {
             }
             final String folder = pathSplit[0];
             final String msgUid = pathSplit[1];
+            if (pathSplit.length == 2 && "delete".equals(pathSplit[1])) {
+                final List<String> uidValues = Arrays.asList(request.getParameter("uids").split(","));
+                final List<Long> uidList = new ArrayList<>();
+                for (final String uidValue : uidValues) {
+                    final String trimmed = uidValue.trim();
+                    if (!trimmed.isEmpty()) {
+                        uidList.add(Long.parseLong(trimmed));
+                    }
+                }
+                final int removed = imap.removeMessages(folder, uidList);
+                session.setAttribute("folder", folder);
+                session.setAttribute("deletedCount", removed);
+                session.setAttribute("deletedFolder", folder);
+                response.setHeader("HX-Trigger", "messages-changed");
+                response.setContentType("text/html;charset=UTF-8");
+                request.getRequestDispatcher("/WEB-INF/jsp/messages-deleted.jsp")
+                        .forward(request, response);
+                return;
+            }
             if (pathSplit.length == 4 && pathSplit[2].equals("moveto")) {
                 imap.moveMessageToFolder(folder, msgUid, pathSplit[3]);
                 return;

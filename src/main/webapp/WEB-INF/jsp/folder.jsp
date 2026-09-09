@@ -58,6 +58,16 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
     </div>
+    <div class="selection-bar" id="selection-bar" hidden>
+        <span class="selection-count" id="selection-count">0 ausgewählt</span>
+        <span class="selection-actions">
+            <button type="button" class="btn btn-danger" id="selection-delete" onclick="deleteSelectedMessages()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                <span>Löschen</span>
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="clearSelection()">Auswahl aufheben</button>
+        </span>
+    </div>
 </header>
 
 <%
@@ -115,7 +125,12 @@
          hx-trigger="click"
          hx-swap="innerHTML"
          onclick="selectMessage(this, '<c:out value="${folder}"/>', <c:out value="${messageUid}"/>)">
-        <div class="email-avatar" style="<c:out value="${avatarStyle}"/>"><c:out value="${initial}"/></div>
+        <div class="email-avatar-wrap">
+            <div class="email-check" role="checkbox" aria-checked="false" tabindex="0" aria-label="Nachricht auswählen"
+                 onclick="toggleSelection(event, this, '<c:out value="${folder}"/>', <c:out value="${messageUid}"/>)"
+                 onkeydown="if (event.key === 'Enter' || event.key === ' ') { toggleSelection(event, this, '<c:out value="${folder}"/>', <c:out value="${messageUid}"/>); }"></div>
+            <div class="email-avatar" style="<c:out value="${avatarStyle}"/>"><c:out value="${initial}"/></div>
+        </div>
         <div class="email-body">
             <div class="email-row">
                 <p class="email-name"><c:out value="${author}"/></p>

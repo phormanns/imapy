@@ -202,6 +202,32 @@ public class IMAPySessionTest {
     }
 
     @Test
+    public void removesMessagesByUid() throws Exception {
+        deliveredMessage("alice@example.org", "Eins", "eins");
+        deliveredMessage("bob@example.org", "Zwei", "zwei");
+        deliveredMessage("carol@example.org", "Drei", "drei");
+        imap = newSession();
+        final List<IMAPyMessage> messages = imap.getMessages("INBOX");
+        final long uidNewest = messages.get(0).getUid();
+        final long uidMiddle = messages.get(1).getUid();
+        final int removed = imap.removeMessages("INBOX", List.of(uidNewest, uidMiddle));
+        assertEquals(2, removed);
+        final List<IMAPyMessage> remaining = imap.getMessages("INBOX");
+        assertEquals(1, remaining.size());
+        assertEquals("Eins", remaining.get(0).getTitle());
+    }
+
+    @Test
+    public void ignoresUnknownUidsWhenRemovingMessages() throws Exception {
+        deliveredMessage("alice@example.org", "Bleib liegen", "nicht loeschen");
+        imap = newSession();
+        final long uid = imap.getMessages("INBOX").get(0).getUid();
+        final int removed = imap.removeMessages("INBOX", List.of(uid + 9999L, uid + 8888L));
+        assertEquals(0, removed);
+        assertEquals(1, imap.getMessages("INBOX").size());
+    }
+
+    @Test
     public void keepsMessageWhenMessageIdDoesNotMatch() throws Exception {
         deliveredMessage("alice@example.org", "Bleib liegen", "nicht loeschen");
         imap = newSession();
