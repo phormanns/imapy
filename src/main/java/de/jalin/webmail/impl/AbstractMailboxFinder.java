@@ -4,25 +4,45 @@ import de.jalin.webmail.MailboxFinder;
 
 public abstract class AbstractMailboxFinder implements MailboxFinder {
 
-    private String host;
-    private String user;
+    private String imapHost;
+    private String smtpHost;
+    private String imapUser;
+    private String smtpUser;
 
     @Override
-    public String getHost() {
-        return host;
+    public String getImapHost() {
+        return imapHost;
     }
 
     @Override
-    public String getUser() {
-        return user;
+    public String getImapUser() {
+        return imapUser;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    @Override
+    public String getSmtpHost() {
+        return smtpHost;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    @Override
+    public String getSmtpUser() {
+        return smtpUser;
+    }
+    
+    public void setImapHost(String imapHost) {
+        this.imapHost = imapHost;
+    }
+
+    public void setImapUser(String imapUser) {
+        this.imapUser = imapUser;
+    }
+
+    public void setSmtpHost(String smtpHost) {
+        this.smtpHost = smtpHost;
+    }
+
+    public void setSmtpUser(String smtpUser) {
+        this.smtpUser = smtpUser;
     }
 
 }

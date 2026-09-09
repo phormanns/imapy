@@ -6,8 +6,12 @@ public interface MailboxFinder {
 
     public void setLogin(String login) throws IMAPyException;
 
-    public String getHost();
+    public String getImapHost();
 
-    public String getUser();
+    public String getImapUser();
+
+    public String getSmtpHost();
+
+    public String getSmtpUser();
 
 }

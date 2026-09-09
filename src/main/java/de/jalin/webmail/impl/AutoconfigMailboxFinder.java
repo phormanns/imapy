@@ -65,44 +65,79 @@ public class AutoconfigMailboxFinder extends AbstractMailboxFinder {
         return urlConnection.getInputStream();
     }
 
-    void parseAutoconfig(final InputStream configStream, final String login) throws ParserConfigurationException, SAXException, IOException {
+    void parseAutoconfig(final InputStream configStream, final String emailAddress) throws ParserConfigurationException, SAXException, IOException {
         final Document document = newSecureDocumentBuilder().parse(configStream);
+        parseIncomingServer(document, emailAddress);
+    }
+
+    private void parseIncomingServer(final Document document, final String emailAddress) throws DOMException {
         final NodeList inServersNodes = document.getElementsByTagName("incomingServer");
         final int listLength = inServersNodes.getLength();
         for (int idx = 0; idx < listLength; idx++) {
             final Node node = inServersNodes.item(idx);
-            final Node item = node.getAttributes().getNamedItem("type");
-            if (item != null && "imap".equals(item.getNodeValue())) {
-                // Placeholders:
-                // %EMAILADDRESS% (full email address of the user, usually entered by the user)
-                // %EMAILLOCALPART% (email address, part before @)
-                // %EMAILDOMAIN% (email address, part after @)
-                final NodeList childNodes = node.getChildNodes();
-                final int childsListLength = childNodes.getLength();
-                for (int childsIdx = 0; childsIdx < childsListLength; childsIdx++) {
-                    final Node child = childNodes.item(childsIdx);
-                    final String nodeName = child.getNodeName();
-                    if ("hostname".equals(nodeName)) {
-                        final String textContent = child.getTextContent();
-                        String hostName = textContent;
-                        if (textContent.contains("%EMAILDOMAIN%")) {
-                            hostName = textContent.replace("%EMAILDOMAIN%", login.split("@")[1]);
-                        }
-                        this.setHost(hostName);
+            evalServerElement(node, emailAddress, "imap");
+        }
+    }
+
+    private void parseOutgoingServer(final Document document, final String emailAddress) throws DOMException {
+        final NodeList inServersNodes = document.getElementsByTagName("outgoingServer");
+        final int listLength = inServersNodes.getLength();
+        for (int idx = 0; idx < listLength; idx++) {
+            final Node node = inServersNodes.item(idx);
+            evalServerElement(node, emailAddress, "smtp");
+        }
+    }
+
+    private void evalServerElement(final Node node, final String emailAddress, final String protocol) throws DOMException {
+        final Node item = node.getAttributes().getNamedItem("type");
+        if (item != null && protocol.equalsIgnoreCase(item.getNodeValue())) {
+            // Placeholders:
+            // %EMAILADDRESS% (full email address of the user, usually entered by the user)
+            // %EMAILLOCALPART% (email address, part before @)
+            // %EMAILDOMAIN% (email address, part after @)
+            final NodeList childNodes = node.getChildNodes();
+            final int childsListLength = childNodes.getLength();
+            for (int childsIdx = 0; childsIdx < childsListLength; childsIdx++) {
+                final Node child = childNodes.item(childsIdx);
+                final String nodeName = child.getNodeName();
+                if ("hostname".equals(nodeName)) {
+                    final String textContent = child.getTextContent();
+                    String hostName = textContent;
+                    if (textContent.contains("%EMAILDOMAIN%")) {
+                        hostName = textContent.replace("%EMAILDOMAIN%", emailAddress.split("@")[1]);
                     }
-                    if ("username".equals(nodeName)) {
-                        final String textContent = child.getTextContent();
-                        String loginUser = textContent;
-                        if ("%EMAILADDRESS%".equalsIgnoreCase(textContent)) {
-                            loginUser = login;
-                        }
-                        if ("%EMAILLOCALPART%".equalsIgnoreCase(textContent)) {
-                            loginUser = login.split("@")[0];
-                        }
-                        this.setUser(loginUser);
+                    this.setHost(protocol, hostName);
+                }
+                if ("username".equals(nodeName)) {
+                    final String textContent = child.getTextContent();
+                    String loginUser = textContent;
+                    if ("%EMAILADDRESS%".equalsIgnoreCase(textContent)) {
+                        loginUser = emailAddress;
                     }
+                    if ("%EMAILLOCALPART%".equalsIgnoreCase(textContent)) {
+                        loginUser = emailAddress.split("@")[0];
+                    }
+                    this.setUser(protocol, loginUser);
                 }
             }
+        }
+    }
+    
+    private void setHost(String protocol, String host) {
+        if ("imap".equalsIgnoreCase(protocol)) {
+            setImapHost(host);
+        }
+        if ("smtp".equalsIgnoreCase(protocol)) {
+            setSmtpHost(host);
+        }
+    }
+
+    private void setUser(String protocol, String login) {
+        if ("imap".equalsIgnoreCase(protocol)) {
+            setImapUser(login);
+        }
+        if ("smtp".equalsIgnoreCase(protocol)) {
+            setSmtpUser(login);
         }
     }
 

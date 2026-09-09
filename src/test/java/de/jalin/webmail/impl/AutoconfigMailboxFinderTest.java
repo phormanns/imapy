@@ -34,32 +34,32 @@ public class AutoconfigMailboxFinderTest {
     public void extractsHostAndUserWithPlaceholders() throws Exception {
         final AutoconfigMailboxFinder finder = new AutoconfigMailboxFinder();
         finder.parseAutoconfig(fixture("config-placeholders.xml"), "paul@example.org");
-        assertEquals("example.org", finder.getHost());
-        assertEquals("paul", finder.getUser());
+        assertEquals("example.org", finder.getImapHost());
+        assertEquals("paul", finder.getImapUser());
     }
 
     @Test
     public void extractsFullEmailAddressAsUser() throws Exception {
         final AutoconfigMailboxFinder finder = new AutoconfigMailboxFinder();
         finder.parseAutoconfig(fixture("config-emailaddress.xml"), "paul@example.org");
-        assertEquals("imap.provider.example", finder.getHost());
-        assertEquals("paul@example.org", finder.getUser());
+        assertEquals("imap.provider.example", finder.getImapHost());
+        assertEquals("paul@example.org", finder.getImapUser());
     }
 
     @Test
     public void selectsImapServerAndSkipsPop3() throws Exception {
         final AutoconfigMailboxFinder finder = new AutoconfigMailboxFinder();
         finder.parseAutoconfig(fixture("config-pop-and-imap.xml"), "paul@example.org");
-        assertEquals("imap.example.org", finder.getHost());
-        assertEquals("paul", finder.getUser());
+        assertEquals("imap.example.org", finder.getImapHost());
+        assertEquals("paul", finder.getImapUser());
     }
 
     @Test
     public void leavesHostAndUserUnsetWithoutImapServer() throws Exception {
         final AutoconfigMailboxFinder finder = new AutoconfigMailboxFinder();
         finder.parseAutoconfig(fixture("config-no-imap.xml"), "paul@example.org");
-        assertNull(finder.getHost());
-        assertNull(finder.getUser());
+        assertNull(finder.getImapHost());
+        assertNull(finder.getImapUser());
     }
 
     @Test
@@ -75,8 +75,8 @@ public class AutoconfigMailboxFinderTest {
                 "https://example.org/.well-known/autoconfig/mail/config-v1.1.xml?emailaddress=paul@example.org",
                 fixture("config-placeholders.xml"));
         finder.setLogin("paul@example.org");
-        assertEquals("example.org", finder.getHost());
-        assertEquals("paul", finder.getUser());
+        assertEquals("example.org", finder.getImapHost());
+        assertEquals("paul", finder.getImapUser());
         assertEquals(2, finder.requestedUrls.size());
         assertEquals("https://autoconfig.example.org/mail/config-v1.1.xml?emailaddress=paul@example.org",
                 finder.requestedUrls.get(0));
@@ -91,8 +91,8 @@ public class AutoconfigMailboxFinderTest {
                 "https://autoconfig.example.org/mail/config-v1.1.xml?emailaddress=paul@example.org",
                 fixture("config-emailaddress.xml"));
         finder.setLogin("paul@example.org");
-        assertEquals("imap.provider.example", finder.getHost());
-        assertEquals("paul@example.org", finder.getUser());
+        assertEquals("imap.provider.example", finder.getImapHost());
+        assertEquals("paul@example.org", finder.getImapUser());
         assertEquals(1, finder.requestedUrls.size());
     }
 

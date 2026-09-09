@@ -45,41 +45,20 @@ public class LoginServlet extends HttpServlet {
         }
         try {
             mbxFinder.setLogin(emailAddr);
-            final String host = mbxFinder.getHost();
-            final String user = mbxFinder.getUser();
+            final String imapHost = mbxFinder.getImapHost();
+            final String imapUser = mbxFinder.getImapUser();
+            final String smtpHost = mbxFinder.getSmtpHost();
+            final String smtpUser = mbxFinder.getSmtpUser();
             session.setAttribute("email", emailAddr);
-            session.setAttribute("from", emailAddr.contains("@") ? emailAddr : user + "@" + host);
+            session.setAttribute("from", emailAddr.contains("@") ? emailAddr : imapUser + "@" + imapHost);
             session.setAttribute("max_list_length", "300");
-            session.setAttribute("imap", new IMAPySession(host, user, password));
-            session.setAttribute("smtp", new SMTPySession(
-                    smtpHost(getServletContext().getInitParameter("smtp.host"), host),
-                    smtpPort(getServletContext().getInitParameter("smtp.port")),
-                    user, password));
+            session.setAttribute("imap", new IMAPySession(imapHost, imapUser, password));
+            session.setAttribute("smtp", new SMTPySession(smtpHost, 587, smtpUser, password));
             response.sendRedirect("mailbox");
         } catch (IMAPyException e) {
             response.sendRedirect("login.jsp?error=invalid");
         }
 
-    }
-
-    static String smtpHost(final String configuredHost, final String imapHost) {
-        if (configuredHost != null && !configuredHost.isBlank()) {
-            return configuredHost;
-        }
-        if (imapHost.startsWith("imap.")) {
-            return "smtp." + imapHost.substring(5);
-        }
-        return imapHost;
-    }
-
-    static int smtpPort(final String configuredPort) {
-        if (configuredPort != null && !configuredPort.isBlank()) {
-            try {
-                return Integer.parseInt(configuredPort);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return 587;
     }
 
 }

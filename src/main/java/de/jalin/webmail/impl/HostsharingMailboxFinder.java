@@ -9,8 +9,11 @@ public class HostsharingMailboxFinder extends AbstractMailboxFinder {
         if (login == null || login.length() < 5) {
             throw new IMAPyException("invalid login");
         }
-        this.setUser(login);
-        this.setHost(login.substring(0, 5) + ".hostsharing.net");
+        this.setImapUser(login);
+        this.setSmtpUser(login);
+        final String webspaceDomain = login.substring(0, 5) + ".hostsharing.net";
+        this.setImapHost(webspaceDomain);
+        this.setSmtpHost(webspaceDomain);
     }
 
 }
