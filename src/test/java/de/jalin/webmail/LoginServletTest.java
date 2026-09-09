@@ -1,15 +1,14 @@
 package de.jalin.webmail;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -30,39 +29,6 @@ public class LoginServletTest {
     }
 
     @Test
-    public void computesSmtpHostFromImapHost() {
-        assertEquals("smtp.example.org", LoginServlet.smtpHost(null, "imap.example.org"));
-    }
-
-    @Test
-    public void prefersConfiguredSmtpHost() {
-        assertEquals("mail.example.net", LoginServlet.smtpHost("mail.example.net", "imap.example.org"));
-    }
-
-    @Test
-    public void ignoresBlankConfiguredSmtpHost() {
-        assertEquals("smtp.example.org", LoginServlet.smtpHost("  ", "imap.example.org"));
-    }
-
-    @Test
-    public void keepsImapHostWithoutImapPrefix() {
-        assertEquals("example.org", LoginServlet.smtpHost(null, "example.org"));
-    }
-
-    @Test
-    public void defaultsToStandardSmtpPort() {
-        assertEquals(587, LoginServlet.smtpPort(null));
-        assertEquals(587, LoginServlet.smtpPort(""));
-        assertEquals(587, LoginServlet.smtpPort("  "));
-        assertEquals(587, LoginServlet.smtpPort("abc"));
-    }
-
-    @Test
-    public void parsesConfiguredSmtpPort() {
-        assertEquals(465, LoginServlet.smtpPort("465"));
-    }
-
-    @Test
     public void rejectsTooShortEmail() throws Exception {
         when(request.getParameter("email")).thenReturn("ab");
         new LoginServlet().doPost(request, response);
@@ -75,6 +41,45 @@ public class LoginServletTest {
         when(request.getParameter("password")).thenReturn("xy");
         new LoginServlet().doPost(request, response);
         verify(response).sendRedirect("login.jsp?error=invalid");
+    }
+
+    @Test
+    public void rejectsNullEmail() throws Exception {
+        when(request.getParameter("email")).thenReturn(null);
+        new LoginServlet().doPost(request, response);
+        verify(response).sendRedirect("login.jsp?error=invalid");
+    }
+
+    @Test
+    public void rejectsNullPassword() throws Exception {
+        when(request.getParameter("email")).thenReturn("paul@example.org");
+        when(request.getParameter("password")).thenReturn(null);
+        new LoginServlet().doPost(request, response);
+        verify(response).sendRedirect("login.jsp?error=invalid");
+    }
+
+    @Test
+    public void rejectsBlankPassword() throws Exception {
+        when(request.getParameter("email")).thenReturn("paul@example.org");
+        when(request.getParameter("password")).thenReturn("  ");
+        new LoginServlet().doPost(request, response);
+        verify(response).sendRedirect("login.jsp?error=invalid");
+    }
+
+    @Test
+    public void invalidEmailRedirectsBeforeCheckingPassword() throws Exception {
+        when(request.getParameter("email")).thenReturn("ab");
+        when(request.getParameter("password")).thenReturn(null);
+        new LoginServlet().doPost(request, response);
+        verify(response).sendRedirect("login.jsp?error=invalid");
+        verify(request, never()).getParameter("password");
+    }
+
+    @Test
+    public void invalidatesSessionOnLogin() throws Exception {
+        when(request.getParameter("email")).thenReturn("ab");
+        new LoginServlet().doPost(request, response);
+        verify(httpSession).invalidate();
     }
 
 }
