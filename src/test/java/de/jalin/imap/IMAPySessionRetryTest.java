@@ -89,6 +89,21 @@ public class IMAPySessionRetryTest {
     }
 
     @Test
+    public void providesInboxEvenWhenNotSubscribed() throws Exception {
+        final Folder root = mock(Folder.class);
+        when(root.listSubscribed()).thenReturn(new Folder[0]);
+        when(store.getDefaultFolder()).thenReturn(root);
+        when(store.getFolder("INBOX")).thenReturn(inbox);
+        when(inbox.getMessageCount()).thenReturn(0);
+        when(inbox.getUnreadMessageCount()).thenReturn(0);
+        when(inbox.getNewMessageCount()).thenReturn(0);
+        final IMAPySession imap = newSession();
+        final List<IMAPyFolder> folders = imap.getFolders();
+        assertEquals(1, folders.size());
+        assertEquals("INBOX", folders.get(0).getName());
+    }
+
+    @Test
     public void reportsMinus999CountsOnFolderError() throws Exception {
         when(store.getFolder("INBOX")).thenThrow(new MessagingException("kaputt"));
         final IMAPySession imap = newSession();

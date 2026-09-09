@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -78,6 +79,8 @@ public class IMAPySession {
         }
     }
 
+    private static final List<String> PRIORITY_FOLDERS = List.of("INBOX", "Sent", "Drafts", "Junk", "Trash");
+
     public List<IMAPyFolder> getFolders() throws IMAPyException {
         ensureConnected();
         final List<IMAPyFolder> fdList = new ArrayList<>();
@@ -97,7 +100,33 @@ public class IMAPySession {
             }
             fdList.add(yFolder);
         }
+        fdList.sort(comparingFolderPriority());
         return fdList;
+    }
+
+    private static Comparator<IMAPyFolder> comparingFolderPriority() {
+        return Comparator.comparingInt((IMAPyFolder folder) -> priority(folder.getName()))
+                .thenComparingInt((IMAPyFolder folder) -> isTopLevel(folder.getName()) ? 0 : 1)
+                .thenComparing(IMAPyFolder::getName);
+    }
+
+    private static boolean isTopLevel(final String name) {
+        return name.indexOf('/') < 0 && name.indexOf('.') < 0;
+    }
+
+    private static int priority(final String name) {
+        final String normalized = lastSegment(name).toUpperCase(Locale.ROOT);
+        for (int i = 0; i < PRIORITY_FOLDERS.size(); i++) {
+            if (PRIORITY_FOLDERS.get(i).toUpperCase(Locale.ROOT).equals(normalized)) {
+                return i;
+            }
+        }
+        return PRIORITY_FOLDERS.size();
+    }
+
+    private static String lastSegment(final String name) {
+        int idx = Math.max(name.lastIndexOf('/'), name.lastIndexOf('.'));
+        return idx < 0 ? name : name.substring(idx + 1);
     }
 
     public List<IMAPyMessage> getMessages(final String folderName) throws IMAPyException {
@@ -269,6 +298,7 @@ public class IMAPySession {
     private void refreshFolders() throws MessagingException {
         folders.clear();
         collectFolders(store.getDefaultFolder());
+        folders.putIfAbsent("INBOX", "INBOX");
     }
 
     private void collectFolders(final Folder parent) throws MessagingException {

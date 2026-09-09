@@ -112,6 +112,27 @@ public class IMAPySessionTest {
     }
 
     @Test
+    public void listsStandardFoldersFirst() throws Exception {
+        createFolder("Archiv");
+        createFolder("Sent");
+        createFolder("Drafts");
+        createFolder("Junk");
+        createFolder("Trash");
+        createFolder("INBOX.Sent");
+        imap = newSession();
+        final List<IMAPyFolder> folders = imap.getFolders();
+        final List<String> names = folders.stream().map(IMAPyFolder::getName).toList();
+        assertEquals("INBOX", names.get(0));
+        assertTrue(names.indexOf("Sent") < names.indexOf("INBOX.Sent"));
+        assertTrue(names.indexOf("Sent") < names.indexOf("Drafts"));
+        assertTrue(names.indexOf("Drafts") < names.indexOf("Junk"));
+        assertTrue(names.indexOf("Junk") < names.indexOf("Trash"));
+        assertTrue(names.indexOf("Trash") < names.indexOf("Archiv"));
+        assertTrue(names.indexOf("INBOX.Sent") < names.indexOf("Archiv"));
+        assertEquals("Archiv", names.get(names.size() - 1));
+    }
+
+    @Test
     public void listsMessagesNewestFirst() throws Exception {
         deliveredMessage("alice@example.org", "Eins", "eins");
         deliveredMessage("alice@example.org", "Zwei", "zwei");
